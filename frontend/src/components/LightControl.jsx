@@ -5,10 +5,7 @@ import { MotionZones } from './MotionZones';
 export const LightControl = ({
   bridgeIp,
   username,
-  lights: _deprecatedLights,  // Deprecated - will be ignored
-  onTest: _deprecatedOnTest,  // Deprecated - will be ignored
-  loading: parentLoading,
-  error: parentError
+  onLogout
 }) => {
   // API data
   const [lights, setLights] = useState(null);
@@ -243,7 +240,14 @@ export const LightControl = ({
     <div className="light-control">
       <div className="header-with-status">
         <h2>Light Control</h2>
-        <div className="status-indicator connected" title="Connected to bridge"></div>
+        <div className="header-actions">
+          <div className="status-indicator connected" title="Connected to bridge"></div>
+          {onLogout && (
+            <button onClick={onLogout} className="logout-button" title="Logout and disconnect">
+              Logout
+            </button>
+          )}
+        </div>
       </div>
 
       {loading && !lights && (

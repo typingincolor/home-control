@@ -1,28 +1,21 @@
 import { useState, useEffect } from 'react';
 
 export const Authentication = ({ bridgeIp, onAuthenticate, loading, error }) => {
-  const [countdown, setCountdown] = useState(30);
   const [isButtonPressed, setIsButtonPressed] = useState(false);
 
+  // Automatically authenticate when user confirms they pressed the button
   useEffect(() => {
-    if (isButtonPressed && countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
+    if (isButtonPressed) {
+      onAuthenticate();
     }
-  }, [isButtonPressed, countdown]);
+  }, [isButtonPressed, onAuthenticate]);
 
   const handleStartAuth = () => {
     setIsButtonPressed(true);
-    setCountdown(30);
-  };
-
-  const handleCreateUsername = () => {
-    onAuthenticate();
   };
 
   const handleRetry = () => {
     setIsButtonPressed(false);
-    setCountdown(30);
   };
 
   return (
@@ -34,7 +27,6 @@ export const Authentication = ({ bridgeIp, onAuthenticate, loading, error }) => 
       </div>
 
       <div className="instructions">
-        <h3>Step 1: Press the Link Button</h3>
         <div className="link-button-image">
           <div className="bridge-icon">
             <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -45,43 +37,27 @@ export const Authentication = ({ bridgeIp, onAuthenticate, loading, error }) => 
             </svg>
           </div>
         </div>
-        <p className="instruction-text">Press the round button on top of your Hue Bridge</p>
 
-        {!isButtonPressed && (
-          <button onClick={handleStartAuth} className="primary large">
-            I Pressed the Button
-          </button>
+        {!isButtonPressed && !loading && (
+          <>
+            <h3>Press the Link Button</h3>
+            <p className="instruction-text">Press the round button on top of your Hue Bridge, then click below</p>
+            <button onClick={handleStartAuth} className="primary large">
+              I Pressed the Button
+            </button>
+          </>
+        )}
+
+        {loading && (
+          <div className="auth-step">
+            <h3>Authenticating...</h3>
+            <div className="loading">
+              <div className="spinner"></div>
+              <p>Creating secure connection to your bridge</p>
+            </div>
+          </div>
         )}
       </div>
-
-      {isButtonPressed && (
-        <div className="auth-step">
-          <h3>Step 2: Create Username</h3>
-          <div className="countdown">
-            <div className="countdown-circle">
-              <span className="countdown-number">{countdown}</span>
-            </div>
-            <p>seconds remaining</p>
-          </div>
-
-          <button
-            onClick={handleCreateUsername}
-            disabled={loading || countdown === 0}
-            className="primary large"
-          >
-            {loading ? 'Creating...' : 'Create Username'}
-          </button>
-
-          {countdown === 0 && (
-            <div className="warning">
-              <p>Time expired. Please press the link button again.</p>
-              <button onClick={handleRetry} className="secondary">
-                Start Over
-              </button>
-            </div>
-          )}
-        </div>
-      )}
 
       {error && (
         <div className="error-box">

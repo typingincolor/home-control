@@ -62,10 +62,7 @@ function App() {
           <LightControl
             bridgeIp={bridgeIp}
             username={username}
-            lights={lights}
-            onTest={testConnection}
-            loading={loading}
-            error={error}
+            onLogout={reset}
           />
         )}
       </main>

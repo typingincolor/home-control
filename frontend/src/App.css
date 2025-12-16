@@ -401,6 +401,34 @@ button.secondary:hover:not(:disabled) {
   }
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logout-button {
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.logout-button:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.logout-button:active {
+  transform: translateY(0);
+}
+
 .connection-info {
   background: #f8f9fa;
   padding: 20px;
