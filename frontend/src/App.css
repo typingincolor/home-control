@@ -364,7 +364,7 @@ button.secondary:hover:not(:disabled) {
 }
 
 /* Connection Test */
-.connection-test {
+.light-control {
   max-width: 100%;
   margin: 0 auto;
 }
@@ -1012,5 +1012,123 @@ button.secondary:hover:not(:disabled) {
   .current-scene {
     width: 100%;
     text-align: center;
+  }
+}
+
+/* Motion Zones Display */
+.motion-zones {
+  margin-bottom: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.motion-zones-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.motion-zones-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.motion-zones-error {
+  padding: 8px 12px;
+  background: #ffe5e5;
+  border-left: 4px solid #e74c3c;
+  border-radius: 4px;
+  color: #c0392b;
+  font-size: 0.9rem;
+}
+
+/* Horizontal row layout */
+.motion-zones-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Individual motion zone */
+.motion-zone {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.motion-zone:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.motion-zone.unreachable {
+  opacity: 0.5;
+  background: #f0f0f0;
+}
+
+.motion-zone.unreachable::after {
+  content: '⚠️';
+  font-size: 0.9rem;
+  margin-left: 4px;
+}
+
+/* Motion status dot */
+.motion-dot {
+  font-size: 1.2rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.motion-dot.active {
+  animation: pulse-motion 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-motion {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* Zone name text */
+.motion-zone-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2c3e50;
+  white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .motion-zones-row {
+    gap: 8px;
+  }
+
+  .motion-zone {
+    padding: 6px 12px;
+  }
+
+  .motion-zone-name {
+    font-size: 0.85rem;
+  }
+
+  .motion-dot {
+    font-size: 1rem;
   }
 }

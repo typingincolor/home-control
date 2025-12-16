@@ -71,31 +71,9 @@ export const useHueBridge = () => {
   };
 
   const testConnection = async () => {
-    setState(prev => ({ ...prev, loading: true, error: null }));
-
-    try {
-      const lights = await hueApi.getLights(state.bridgeIp, state.username);
-
-      setState(prev => ({
-        ...prev,
-        lights,
-        loading: false,
-        error: null
-      }));
-    } catch (error) {
-      let errorMessage = error.message;
-
-      // Handle CORS error specifically
-      if (error.message === 'CORS_ERROR') {
-        errorMessage = 'Browser security is blocking the request. See troubleshooting tips below.';
-      }
-
-      setState(prev => ({
-        ...prev,
-        loading: false,
-        error: errorMessage
-      }));
-    }
+    // Connection testing is now handled by ConnectionTest component
+    // This function is kept for compatibility but does nothing
+    setState(prev => ({ ...prev, loading: false, error: null }));
   };
 
   const reset = () => {

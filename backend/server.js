@@ -61,6 +61,12 @@ app.all(/^\/api\/hue\/(.*)/, async (req, res) => {
       validateStatus: () => true // Accept all status codes
     };
 
+    // Forward hue-application-key header for API v2 support
+    if (req.headers['hue-application-key']) {
+      axiosConfig.headers['hue-application-key'] = req.headers['hue-application-key'];
+      console.log('[PROXY] Using v2 API with application key');
+    }
+
     // Add data for POST, PUT, PATCH requests
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       axiosConfig.data = req.body;

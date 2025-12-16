@@ -1,7 +1,7 @@
 import { useHueBridge } from './hooks/useHueBridge';
 import { BridgeDiscovery } from './components/BridgeDiscovery';
 import { Authentication } from './components/Authentication';
-import { ConnectionTest } from './components/ConnectionTest';
+import { LightControl } from './components/LightControl';
 import './App.css';
 
 function App() {
@@ -59,7 +59,7 @@ function App() {
         )}
 
         {step === 'connected' && (
-          <ConnectionTest
+          <LightControl
             bridgeIp={bridgeIp}
             username={username}
             lights={lights}
@@ -77,7 +77,7 @@ function App() {
           </button>
 
           <div className="footer-info">
-            <p>Using Philips Hue Local API v1</p>
+            <p>Using Philips Hue Local API v2</p>
           </div>
         </footer>
       )}

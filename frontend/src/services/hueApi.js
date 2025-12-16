@@ -62,16 +62,61 @@ export const hueApi = {
     }
   },
 
+
   /**
-   * Test connection by fetching lights
+   * Get all resources using Hue API
    * @param {string} bridgeIp - The IP address of the bridge
-   * @param {string} username - The authenticated username
+   * @param {string} username - The authenticated username (used as application key)
+   * @param {string} resourceType - The resource type (e.g., 'device', 'zone', 'room', 'behavior_instance')
+   * @returns {Promise<Object>} Object containing resource data
+   */
+  async getResource(bridgeIp, username, resourceType) {
+    try {
+      const url = `${PROXY_URL}/api/hue/clip/v2/resource/${resourceType}?bridgeIp=${bridgeIp}`;
+      const response = await fetch(url, {
+        headers: {
+          'hue-application-key': username
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // V2 API returns errors differently
+      if (data.errors && data.errors.length > 0) {
+        throw new Error(data.errors[0].description);
+      }
+
+      return data;
+    } catch (error) {
+      console.error(`Get resource v2 (${resourceType}) error:`, error);
+
+      // Check if it's a network error
+      if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+        throw new Error('Could not connect to proxy server. Make sure it is running.');
+      }
+
+      throw error;
+    }
+  },
+
+  /**
+   * Get all lights using Hue API
+   * @param {string} bridgeIp - The IP address of the bridge
+   * @param {string} username - The authenticated username (used as application key)
    * @returns {Promise<Object>} Object containing light data
    */
   async getLights(bridgeIp, username) {
     try {
-      const url = `${PROXY_URL}/api/hue/api/${username}/lights?bridgeIp=${bridgeIp}`;
-      const response = await fetch(url);
+      const url = `${PROXY_URL}/api/hue/clip/v2/resource/light?bridgeIp=${bridgeIp}`;
+      const response = await fetch(url, {
+        headers: {
+          'hue-application-key': username
+        }
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -79,14 +124,14 @@ export const hueApi = {
 
       const data = await response.json();
 
-      // Check for API error
-      if (data[0]?.error) {
-        throw new Error(data[0].error.description);
+      // V2 API returns errors differently
+      if (data.errors && data.errors.length > 0) {
+        throw new Error(data.errors[0].description);
       }
 
       return data;
     } catch (error) {
-      console.error('Get lights error:', error);
+      console.error('Get lights v2 error:', error);
 
       // Check if it's a network error
       if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
@@ -98,36 +143,19 @@ export const hueApi = {
   },
 
   /**
-   * Get bridge configuration (unauthenticated)
+   * Get all rooms using Hue API
    * @param {string} bridgeIp - The IP address of the bridge
-   * @returns {Promise<Object>} Bridge configuration data
+   * @param {string} username - The authenticated username (used as application key)
+   * @returns {Promise<Object>} Object containing room data
    */
-  async getBridgeConfig(bridgeIp) {
+  async getRooms(bridgeIp, username) {
     try {
-      const url = `${PROXY_URL}/api/hue/api/config?bridgeIp=${bridgeIp}`;
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Get config error:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Get all groups/rooms
-   * @param {string} bridgeIp - The IP address of the bridge
-   * @param {string} username - The authenticated username
-   * @returns {Promise<Object>} Object containing group data
-   */
-  async getGroups(bridgeIp, username) {
-    try {
-      const url = `${PROXY_URL}/api/hue/api/${username}/groups?bridgeIp=${bridgeIp}`;
-      const response = await fetch(url);
+      const url = `${PROXY_URL}/api/hue/clip/v2/resource/room?bridgeIp=${bridgeIp}`;
+      const response = await fetch(url, {
+        headers: {
+          'hue-application-key': username
+        }
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -135,14 +163,14 @@ export const hueApi = {
 
       const data = await response.json();
 
-      // Check for API error
-      if (data[0]?.error) {
-        throw new Error(data[0].error.description);
+      // V2 API returns errors differently
+      if (data.errors && data.errors.length > 0) {
+        throw new Error(data.errors[0].description);
       }
 
       return data;
     } catch (error) {
-      console.error('Get groups error:', error);
+      console.error('Get rooms v2 error:', error);
 
       // Check if it's a network error
       if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
@@ -154,19 +182,61 @@ export const hueApi = {
   },
 
   /**
-   * Set light state (on/off, brightness, color, etc.)
+   * Get all scenes using Hue API
    * @param {string} bridgeIp - The IP address of the bridge
-   * @param {string} username - The authenticated username
-   * @param {string} lightId - The light ID
-   * @param {Object} state - The state to set (e.g., { on: true })
+   * @param {string} username - The authenticated username (used as application key)
+   * @returns {Promise<Object>} Object containing scene data
+   */
+  async getScenes(bridgeIp, username) {
+    try {
+      const url = `${PROXY_URL}/api/hue/clip/v2/resource/scene?bridgeIp=${bridgeIp}`;
+      const response = await fetch(url, {
+        headers: {
+          'hue-application-key': username
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // V2 API returns errors differently
+      if (data.errors && data.errors.length > 0) {
+        throw new Error(data.errors[0].description);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Get scenes v2 error:', error);
+
+      // Check if it's a network error
+      if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+        throw new Error('Could not connect to proxy server. Make sure it is running.');
+      }
+
+      throw error;
+    }
+  },
+
+  /**
+   * Set light state using Hue API
+   * @param {string} bridgeIp - The IP address of the bridge
+   * @param {string} username - The authenticated username (used as application key)
+   * @param {string} lightId - The light UUID
+   * @param {Object} state - The state to set (e.g., { on: { on: true } })
    * @returns {Promise<Object>} Response from the bridge
    */
   async setLightState(bridgeIp, username, lightId, state) {
     try {
-      const url = `${PROXY_URL}/api/hue/api/${username}/lights/${lightId}/state?bridgeIp=${bridgeIp}`;
+      const url = `${PROXY_URL}/api/hue/clip/v2/resource/light/${lightId}?bridgeIp=${bridgeIp}`;
       const response = await fetch(url, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'hue-application-key': username
+        },
         body: JSON.stringify(state)
       });
 
@@ -176,14 +246,14 @@ export const hueApi = {
 
       const data = await response.json();
 
-      // Check for API error
-      if (data[0]?.error) {
-        throw new Error(data[0].error.description);
+      // V2 API returns errors differently
+      if (data.errors && data.errors.length > 0) {
+        throw new Error(data.errors[0].description);
       }
 
       return data;
     } catch (error) {
-      console.error('Set light state error:', error);
+      console.error('Set light state v2 error:', error);
 
       // Check if it's a network error
       if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
@@ -195,55 +265,22 @@ export const hueApi = {
   },
 
   /**
-   * Get all scenes
+   * Activate a scene using Hue API
    * @param {string} bridgeIp - The IP address of the bridge
-   * @param {string} username - The authenticated username
-   * @returns {Promise<Object>} Object containing scene data
-   */
-  async getScenes(bridgeIp, username) {
-    try {
-      const url = `${PROXY_URL}/api/hue/api/${username}/scenes?bridgeIp=${bridgeIp}`;
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      // Check for API error
-      if (data[0]?.error) {
-        throw new Error(data[0].error.description);
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Get scenes error:', error);
-
-      // Check if it's a network error
-      if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
-        throw new Error('Could not connect to proxy server. Make sure it is running.');
-      }
-
-      throw error;
-    }
-  },
-
-  /**
-   * Activate a scene for a group
-   * @param {string} bridgeIp - The IP address of the bridge
-   * @param {string} username - The authenticated username
-   * @param {string} groupId - The group ID
-   * @param {string} sceneId - The scene ID to activate
+   * @param {string} username - The authenticated username (used as application key)
+   * @param {string} sceneId - The scene UUID
    * @returns {Promise<Object>} Response from the bridge
    */
-  async activateScene(bridgeIp, username, groupId, sceneId) {
+  async activateScene(bridgeIp, username, sceneId) {
     try {
-      const url = `${PROXY_URL}/api/hue/api/${username}/groups/${groupId}/action?bridgeIp=${bridgeIp}`;
+      const url = `${PROXY_URL}/api/hue/clip/v2/resource/scene/${sceneId}?bridgeIp=${bridgeIp}`;
       const response = await fetch(url, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scene: sceneId })
+        headers: {
+          'Content-Type': 'application/json',
+          'hue-application-key': username
+        },
+        body: JSON.stringify({ recall: { action: 'active' } })
       });
 
       if (!response.ok) {
@@ -252,14 +289,14 @@ export const hueApi = {
 
       const data = await response.json();
 
-      // Check for API error
-      if (data[0]?.error) {
-        throw new Error(data[0].error.description);
+      // V2 API returns errors differently
+      if (data.errors && data.errors.length > 0) {
+        throw new Error(data.errors[0].description);
       }
 
       return data;
     } catch (error) {
-      console.error('Activate scene error:', error);
+      console.error('Activate scene v2 error:', error);
 
       // Check if it's a network error
       if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {

@@ -1,26 +1,27 @@
 # Philips Hue Light Control
 
-A modern React web application for controlling Philips Hue lights locally. Features a responsive card-based interface with visual light controls, room organization, and scene management. Built with a separated frontend/backend architecture for easy deployment across multiple machines.
+A modern React web application for controlling Philips Hue lights locally using the official Hue API v2. Features a responsive interface with visual light controls, room organization, scene management, and real-time motion zone detection. Built with a separated frontend/backend architecture for easy deployment across multiple machines.
 
 ## Features
 
-- **Visual Light Control**: Toggle lights with color-coded bulb buttons (green=on, red=off)
+- **Visual Light Control**: Toggle lights with color-coded bulb buttons (yellow=on, gray=off)
+- **Motion Zone Detection**: Real-time display of MotionAware zones with status indicators
 - **Room Organization**: Lights automatically grouped by room with horizontal card layout
 - **Scene Management**: Select and activate scenes for each room
 - **Master Controls**: Turn all lights in a room on/off with one button
-- **Auto-Refresh**: Light states automatically refresh every 30 seconds
-- **Responsive Design**: 4 cards on large screens, 3 on medium, 1 on small
-- **Dynamic Sizing**: Buttons scale based on viewport width while maintaining readability
+- **Auto-Refresh**: Light states and motion zones automatically refresh every 30 seconds
+- **Responsive Design**: Adaptive layout for all screen sizes
 - **Bridge Discovery**: Automatically find your Hue Bridge or enter IP manually
 - **Easy Authentication**: Simple guided flow with link button authentication
 - **Persistent Credentials**: Bridge IP and username saved in browser localStorage
 - **CORS Solution**: Built-in proxy server handles CORS and HTTPS certificate issues
 - **Multi-Machine Support**: Access from any device on your network
 - **Centralized Configuration**: All settings managed through config.json
+- **Modern API v2**: Uses the latest Philips Hue API for future-proof functionality
 
 ## Prerequisites
 
-- **Philips Hue Bridge** (v1 or v2) with lights configured
+- **Philips Hue Bridge** (v2 recommended) with lights configured
 - **Node.js** (v16 or higher)
 - Server machine on the **same local network** as your bridge
 - Modern web browser (Chrome, Firefox, Safari, Edge)
@@ -109,9 +110,10 @@ philips-hue-connector/
 │       ├── components/
 │       │   ├── BridgeDiscovery.jsx
 │       │   ├── Authentication.jsx
-│       │   └── ConnectionTest.jsx
+│       │   ├── LightControl.jsx
+│       │   └── MotionZones.jsx
 │       ├── services/
-│       │   └── hueApi.js      # API client (uses relative URLs)
+│       │   └── hueApi.js      # API client (v2 native)
 │       └── hooks/
 │           └── useHueBridge.js
 └── backend/                    # Express backend workspace
@@ -176,7 +178,7 @@ The Philips Hue Bridge doesn't send CORS headers and uses self-signed HTTPS cert
 - **Vite 6** - Fast build tool and dev server
 - **Express 5** - Backend server for CORS and static files
 - **Axios** - HTTP client with HTTPS agent support
-- **Philips Hue API v1** - Local bridge communication
+- **Philips Hue API v2** - Modern local bridge communication
 - **localStorage** - Credential persistence
 - **CSS Grid & Flexbox** - Responsive card layout
 - **CSS Custom Properties** - Dynamic sizing with clamp()
@@ -211,26 +213,25 @@ Starts only the backend server
 
 ## UI Features
 
-### Responsive Card Layout
+### Motion Zone Detection
 
-- **Large screens (>1200px)**: 4 cards per row
-- **Medium screens (768px-1200px)**: 3 cards per row
-- **Small screens (<768px)**: 1 card full width
+- **Real-time Status**: Green dot (🟢) = no motion, Red dot (🔴) = motion detected
+- **MotionAware Integration**: Works with Philips Hue lights that have built-in motion detection
+- **Auto-refresh**: Updates every 30 seconds
+- **Room Association**: Motion zones linked to their respective rooms
 
-### Dynamic Button Sizing
+### Responsive Layout
 
-Buttons scale with viewport width:
-- **Minimum**: 60px (maintains usability on small screens)
-- **Maximum**: 80px (prevents oversized buttons on large displays)
-- **Icons**: Scale to 90% of button size
-- **Cards**: Always fit at least 5 buttons horizontally (4 on large screens)
+- Adaptive card layout for all screen sizes
+- Visual feedback with color-coded buttons
+- Loading indicators during operations
+- Smooth animations and transitions
 
 ### Visual Feedback
 
-- **Green buttons**: Lights are on
-- **Red buttons**: Lights are off
+- **Yellow buttons**: Lights are on
+- **Gray buttons**: Lights are off
 - **Loading indicators**: Show when toggling lights or activating scenes
-- **Unreachable lights**: Warning indicator displayed
 - **Hover effects**: Cards and buttons have subtle animations
 
 ## Finding Your Bridge IP
@@ -252,18 +253,22 @@ Visit: https://discovery.meethue.com/
 
 ## API Reference
 
-This app uses the **Philips Hue Local API v1**:
+This app uses the **Philips Hue Local API v2** (CLIP API):
 
-### Endpoints Used
+### V2 Endpoints Used
 
 - `GET https://discovery.meethue.com/` - Discover bridges on network
-- `POST http://{bridge-ip}/api` - Create new user (requires link button)
-- `GET http://{bridge-ip}/api/{username}/lights` - Get all lights
-- `GET http://{bridge-ip}/api/{username}/groups` - Get rooms/zones
-- `GET http://{bridge-ip}/api/{username}/scenes` - Get scenes
-- `PUT http://{bridge-ip}/api/{username}/lights/{id}/state` - Control light
-- `PUT http://{bridge-ip}/api/{username}/groups/{id}/action` - Activate scene
-- `GET http://{bridge-ip}/api/config` - Get bridge config (unauthenticated)
+- `POST https://{bridge-ip}/api` - Create new user (requires link button)
+- `GET https://{bridge-ip}/clip/v2/resource/light` - Get all lights
+- `GET https://{bridge-ip}/clip/v2/resource/room` - Get rooms
+- `GET https://{bridge-ip}/clip/v2/resource/device` - Get devices (for room hierarchy)
+- `GET https://{bridge-ip}/clip/v2/resource/scene` - Get scenes
+- `GET https://{bridge-ip}/clip/v2/resource/behavior_instance` - Get MotionAware zones
+- `GET https://{bridge-ip}/clip/v2/resource/convenience_area_motion` - Get motion status
+- `PUT https://{bridge-ip}/clip/v2/resource/light/{uuid}` - Control light
+- `PUT https://{bridge-ip}/clip/v2/resource/scene/{uuid}` - Activate scene
+
+All v2 API requests use the `hue-application-key` header for authentication.
 
 ### Backend Endpoints
 
@@ -275,8 +280,8 @@ This app uses the **Philips Hue Local API v1**:
 ### Official Documentation
 
 - [Philips Hue Developer Portal](https://developers.meethue.com/)
+- [CLIP API v2 Documentation](https://developers.meethue.com/develop/hue-api-v2/)
 - [Getting Started Guide](https://developers.meethue.com/develop/get-started-2/)
-- [API Reference](https://developers.meethue.com/develop/hue-api/)
 
 ## Deployment Guide
 
@@ -344,18 +349,12 @@ PORT=8080 npm run start
 - Ensure lights are paired with your bridge in the Hue app
 - Check that lights are powered on
 - Verify your credentials are correct
-- Try refreshing the lights list
+- The app will retry automatically every 30 seconds
 
-### Lights not responding
-- Check that lights are powered on and reachable
-- Unreachable lights show a warning icon (⚠️)
-- Some lights may take a moment to respond
-- Try toggling again if the first attempt fails
-
-### "PathError: Missing parameter name" (Express 5)
-- This has been fixed in v0.2.0
-- Ensure you're using the latest version
-- The wildcard route now uses `app.use()` instead of `app.get('*')`
+### No motion zones showing
+- MotionAware requires compatible Hue lights with built-in motion detection
+- Zones must be configured in the Philips Hue app first
+- Motion zones auto-hide if none are configured
 
 ## Security Notes
 
@@ -369,15 +368,20 @@ PORT=8080 npm run start
 
 ## Version History
 
-### v0.2.0 (Current)
+### v0.3.0 (Current)
+- **Migrated to Hue API v2** (CLIP API)
+- **Motion zone detection** with MotionAware support
+- **Component refactoring** - renamed ConnectionTest to LightControl
+- **Removed adapter layer** - direct v2 data structures
+- **Improved room hierarchy** - device-based organization
+- **Real-time updates** - 30-second auto-refresh for all features
+
+### v0.2.0
 - **Separated frontend and backend** into monorepo structure
 - **Added config.json** for centralized configuration
 - **Multi-machine support** - access from any device on network
 - **Single deployment** - backend serves both API and frontend
 - **Express 5 compatibility** - fixed wildcard route pattern
-- Backend listens on 0.0.0.0 (all network interfaces)
-- Frontend uses relative URLs (no hardcoded localhost)
-- Vite proxy for seamless development workflow
 
 ### v0.1.0
 - Initial release with full light control features
@@ -387,7 +391,7 @@ PORT=8080 npm run start
 
 ## Contributing
 
-This project demonstrates modern React patterns, monorepo architecture, and responsive design. Feel free to fork and modify for your needs.
+This project demonstrates modern React patterns, monorepo architecture, Hue API v2 integration, and responsive design. Feel free to fork and modify for your needs.
 
 ## License
 
@@ -396,9 +400,9 @@ MIT
 ## Acknowledgments
 
 - Built with React, Vite, and Express
-- Uses the Philips Hue Local API v1
+- Uses the Philips Hue Local API v2 (CLIP API)
 - Responsive design with CSS Grid and Flexbox
-- Dynamic sizing with CSS clamp() function
+- MotionAware integration for built-in motion detection
 
 ## Support
 
