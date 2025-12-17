@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Philips Hue Light Control** web application built as a monorepo with separated frontend (React) and backend (Express) workspaces. The app controls Philips Hue lights locally through the Hue Bridge API, featuring room organization, scene management, and **MotionAware zone display** with real-time motion detection.
+This is a **Philips Hue Light Control** web application built as a monorepo with separated frontend (React) and backend (Express) workspaces. The app controls Philips Hue lights locally through the Hue Bridge API, featuring **true color display** with mathematical color space conversion, **information-dense UI** with brightness indicators and room statistics, **responsive design** optimized for iPhone 14+ and iPad, room organization, scene management, and **MotionAware zone display** with real-time motion detection.
 
 ## Development Commands
 
@@ -170,9 +170,95 @@ fetch('/api/hue/clip/v2/resource/light?bridgeIp={ip}', {
 
 ### CSS Architecture
 - **Single CSS file**: `frontend/src/App.css` (no CSS modules)
-- **Responsive grid**: 4 cards on large screens → 3 on medium → 1 on small
-- **Dynamic sizing**: CSS `clamp()` for viewport-responsive buttons
-- **Component classes**: `.motion-zones`, `.room-group`, `.light-button`, etc.
+- **Responsive grid**: CSS Grid with `repeat(auto-fill, minmax(440px, 1fr))`
+- **Mobile optimization**: Reduced padding on iPhone 14+ (calc(100% - 16px) container width)
+- **Dynamic sizing**: CSS `clamp()` for viewport-responsive buttons and icons
+- **Modern design**: Tailwind-inspired color palette, layered shadows, cubic-bezier transitions
+- **Component classes**: `.motion-zones`, `.room-group`, `.light-bulb-button`, `.lights-summary`, etc.
+
+### UI Features & Patterns
+
+#### Color Display System
+Light buttons display actual bulb colors using mathematical color space conversions:
+
+**Color Conversion Functions** (LightControl.jsx):
+```javascript
+// Convert Hue xy coordinates (CIE 1931) to RGB
+xyToRgb(x, y, brightness) {
+  // xy → XYZ → sRGB with gamma correction
+  // Returns { r, g, b } in 0-255 range
+}
+
+// Convert color temperature (mirek) to RGB
+mirekToRgb(mirek) {
+  // mirek → Kelvin → RGB approximation
+  // Returns { r, g, b } in 0-255 range
+}
+
+// Determine which conversion to use
+getLightColor(light) {
+  // Prefers xy color, falls back to temperature, returns null for basic bulbs
+  // Returns CSS color string: "rgb(r, g, b)" or null
+}
+```
+
+**Dynamic Button Styling**:
+- Inline styles override default CSS when color data available
+- Background gradient and box-shadow use actual bulb color
+- Hover uses `filter: brightness(0.85)` for universal darkening
+- Works with RGB colors, white temperatures, and default green
+
+#### Information Density Features
+
+**Dashboard Summary** (LightControl.jsx):
+```javascript
+// Overall statistics at top of page
+<div className="lights-summary">
+  <div className="summary-stat">
+    <span className="stat-value">{totalLightsOn}</span>
+    <span className="stat-label">lights on</span>
+  </div>
+  {/* Room count and scene count stats */}
+</div>
+```
+
+**Room Status System**:
+```javascript
+// Helper function calculates room statistics
+getRoomLightStats(roomLights) {
+  const lightsOnCount = roomLights.filter(light => light.on?.on).length;
+  const averageBrightness = /* average of light.dimming.brightness */;
+  return { lightsOnCount, totalLights, averageBrightness };
+}
+```
+
+**Visual Elements**:
+- Status badges: "{X} of {Y} on" for each room
+- Brightness bars: Horizontal progress bars showing average room brightness
+- Per-light overlays: Brightness percentage on each button
+- Responsive overflow: Ellipsis handling for long names
+
+#### Responsive Design Strategy
+
+**Breakpoints**:
+- `max-width: 768px` - Mobile devices (reduced padding, smaller fonts)
+- `min-width: 1800px` - Large screens (cap at 4 rooms per row)
+
+**Mobile Optimizations**:
+- Container: `calc(100% - 16px)` width, `8px` padding
+- Header/footer: `12px` padding
+- Button size: `clamp(60px, 4vw, 80px)` scales with viewport
+
+**iPad Optimizations**:
+- Buttons scale up to 82px on iPad Pro (1024px)
+- Text labels increase to 100px max-width
+- Logo scales with `clamp(60px, 15vw, 120px)`
+
+**Layout Grid**:
+- Room cards: `repeat(auto-fill, minmax(440px, 1fr))`
+- Light buttons: `repeat(auto-fit, minmax(var(--button-size), 1fr))`
+- Maximum 4 rooms per row via media query
+- 5 light buttons per row when space allows
 
 ## Important Implementation Notes
 

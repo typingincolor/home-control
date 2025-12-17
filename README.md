@@ -4,13 +4,16 @@ A modern React web application for controlling Philips Hue lights locally using 
 
 ## Features
 
-- **Visual Light Control**: Toggle lights with color-coded bulb buttons (yellow=on, gray=off)
+- **True Color Display**: Light buttons show actual bulb colors (RGB, white temperature, or default green)
+- **Information Dashboard**: At-a-glance summary showing total lights on, room count, and scene count
+- **Brightness Indicators**: Live brightness percentage displayed on each light and room average
+- **Room Status Badges**: See "{X} of {Y} lights on" for each room at a glance
 - **Motion Zone Detection**: Real-time display of MotionAware zones with status indicators
-- **Room Organization**: Lights automatically grouped by room with horizontal card layout
+- **Room Organization**: Lights automatically grouped by room with modern card layout
 - **Scene Management**: Select and activate scenes for each room
 - **Master Controls**: Turn all lights in a room on/off with one button
 - **Auto-Refresh**: Light states and motion zones automatically refresh every 30 seconds
-- **Responsive Design**: Adaptive layout for all screen sizes
+- **Responsive Design**: Optimized for iPhone 14+, iPad, and desktop browsers
 - **Bridge Discovery**: Automatically find your Hue Bridge or enter IP manually
 - **Easy Authentication**: Simple guided flow with link button authentication
 - **Persistent Credentials**: Bridge IP and username saved in browser localStorage
@@ -213,6 +216,21 @@ Starts only the backend server
 
 ## UI Features
 
+### Information Density
+
+- **Dashboard Summary**: Overall statistics showing lights on, room count, and available scenes
+- **Room Status Badges**: Each room shows "{X} of {Y} on" count
+- **Brightness Bars**: Visual indicators showing average room brightness with percentage labels
+- **Per-Light Brightness**: Individual brightness percentages overlaid on each button
+
+### Color-Accurate Display
+
+- **RGB Color Lights**: Display actual colors using xy color space conversion (CIE 1931 → sRGB)
+- **White Ambiance Lights**: Show warm/cool white based on color temperature (mirek → RGB)
+- **Basic On/Off Lights**: Fallback to emerald green gradient
+- **Dynamic Shadows**: Button shadows match the light's actual color
+- **Universal Hover**: Brightness filter darkens any color on hover
+
 ### Motion Zone Detection
 
 - **Real-time Status**: Green dot (🟢) = no motion, Red dot (🔴) = motion detected
@@ -222,17 +240,20 @@ Starts only the backend server
 
 ### Responsive Layout
 
-- Adaptive card layout for all screen sizes
-- Visual feedback with color-coded buttons
-- Loading indicators during operations
-- Smooth animations and transitions
+- **Mobile Optimized**: Reduced padding on iPhone 14+ for maximum usable space (94% vs 87% screen width)
+- **iPad Enhanced**: Larger buttons (60-82px) and text labels for comfortable touch targets
+- **Uniform Cards**: CSS Grid ensures consistent card sizing across all rows
+- **Smart Grid**: Maximum 4 rooms per row on large screens, 5 lights per row when space allows
+- **Text Protection**: Overflow handling prevents cut-off names for rooms, lights, and scenes
 
-### Visual Feedback
+### Visual Design
 
-- **Yellow buttons**: Lights are on
-- **Gray buttons**: Lights are off
-- **Loading indicators**: Show when toggling lights or activating scenes
-- **Hover effects**: Cards and buttons have subtle animations
+- **Modern Color Palette**: Tailwind-inspired colors (emerald green, blue accents, neutral grays)
+- **Layered Shadows**: Soft, depth-creating shadows on cards and buttons
+- **Smooth Transitions**: Cubic-bezier easing for professional animations
+- **Visual Hierarchy**: Clear section separation with badges, bars, and spacing
+- **Loading States**: Animated indicators during operations
+- **Hover Effects**: Cards lift and buttons darken on interaction
 
 ## Finding Your Bridge IP
 
@@ -368,7 +389,17 @@ PORT=8080 npm run start
 
 ## Version History
 
-### v0.3.0 (Current)
+### v0.4.0 (Current)
+- **True color display** - light buttons show actual RGB colors and white temperatures
+- **Information density improvements** - dashboard summary, room status badges, brightness indicators
+- **Modern visual design** - Tailwind-inspired color palette, layered shadows, improved typography
+- **Responsive optimization** - iPhone 14+ and iPad support with optimized spacing and button sizing
+- **Layout improvements** - CSS Grid with uniform card sizing, max 4 rooms per row, 5 lights per row
+- **Color conversion** - xy color space (CIE 1931) and color temperature (mirek) to RGB
+- **Universal hover effects** - brightness filter works with any color
+- **Text overflow protection** - ellipsis handling for long room, light, and scene names
+
+### v0.3.0
 - **Migrated to Hue API v2** (CLIP API)
 - **Motion zone detection** with MotionAware support
 - **Component refactoring** - renamed ConnectionTest to LightControl
