@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { hueApi } from '../services/hueApi';
+import { mockApi } from '../services/mockData';
 import { MotionZones } from './MotionZones';
 
 export const LightControl = ({
@@ -7,6 +8,10 @@ export const LightControl = ({
   username,
   onLogout
 }) => {
+  // Check if demo mode is enabled (via URL parameter ?demo=true)
+  const isDemoMode = new URLSearchParams(window.location.search).get('demo') === 'true';
+  const api = isDemoMode ? mockApi : hueApi;
+
   // API data
   const [lights, setLights] = useState(null);
   const [rooms, setRooms] = useState(null);
@@ -26,9 +31,9 @@ export const LightControl = ({
     }
   }, [bridgeIp, username]);
 
-  // Auto-refresh every 30 seconds
+  // Auto-refresh every 30 seconds (disabled in demo mode)
   useEffect(() => {
-    if (!bridgeIp || !username) return;
+    if (!bridgeIp || !username || isDemoMode) return;
 
     const intervalId = setInterval(() => {
       console.log('[Auto-refresh] Refreshing all data...');
@@ -46,10 +51,10 @@ export const LightControl = ({
     try {
       // Fetch all data in parallel
       const [lightsData, roomsData, devicesData, scenesData] = await Promise.all([
-        hueApi.getLights(bridgeIp, username),
-        hueApi.getRooms(bridgeIp, username),
-        hueApi.getResource(bridgeIp, username, 'device'),
-        hueApi.getScenes(bridgeIp, username)
+        api.getLights(bridgeIp, username),
+        api.getRooms(bridgeIp, username),
+        api.getResource(bridgeIp, username, 'device'),
+        api.getScenes(bridgeIp, username)
       ]);
 
       setLights(lightsData);
@@ -86,7 +91,7 @@ export const LightControl = ({
       const currentState = light.on?.on || false;
       const newState = { on: { on: !currentState } };
 
-      await hueApi.setLightState(bridgeIp, username, lightUuid, newState);
+      await api.setLightState(bridgeIp, username, lightUuid, newState);
 
       // Update local state for responsive UI
       setLights(prev => ({
@@ -120,7 +125,7 @@ export const LightControl = ({
       const newState = { on: { on: turnOn } };
 
       await Promise.all(
-        lightUuids.map(uuid => hueApi.setLightState(bridgeIp, username, uuid, newState))
+        lightUuids.map(uuid => api.setLightState(bridgeIp, username, uuid, newState))
       );
 
       // Update local state
@@ -149,7 +154,7 @@ export const LightControl = ({
 
     setActivatingScene(sceneUuid);
     try {
-      await hueApi.activateScene(bridgeIp, username, sceneUuid);
+      await api.activateScene(bridgeIp, username, sceneUuid);
       console.log(`Activated scene ${sceneUuid} for room ${roomName}`);
       // Refresh lights to show updated states
       setTimeout(() => fetchAllData(), 500);
@@ -162,10 +167,10 @@ export const LightControl = ({
   };
 
   // Convert Hue XY color to CSS RGB
-  const xyToRgb = (x, y, brightness = 100) => {
-    // Convert xy to XYZ
+  const xyToRgb = (x, y) => {
+    // Convert xy to XYZ (using full brightness for pure color)
     const z = 1.0 - x - y;
-    const Y = brightness / 100;
+    const Y = 1.0;
     const X = (Y / y) * x;
     const Z = (Y / y) * z;
 
@@ -241,23 +246,26 @@ export const LightControl = ({
     return { r: Math.round(r), g: Math.round(g), b: Math.round(b) };
   };
 
-  // Get CSS color for a light
+  // Get CSS color for a light with opacity based on brightness
   const getLightColor = (light) => {
     if (!light.on?.on) return null;
 
     const brightness = light.dimming?.brightness || 100;
+    // Convert brightness (0-100) to opacity (0.2-1.0)
+    // Minimum opacity of 0.2 ensures dim lights are still visible
+    const opacity = Math.max(0.2, brightness / 100);
 
     // Prefer xy color if available
     if (light.color?.xy) {
       const { x, y } = light.color.xy;
-      const { r, g, b } = xyToRgb(x, y, brightness);
-      return `rgb(${r}, ${g}, ${b})`;
+      const { r, g, b } = xyToRgb(x, y);
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
 
     // Fall back to color temperature
     if (light.color_temperature?.mirek) {
       const { r, g, b } = mirekToRgb(light.color_temperature.mirek);
-      return `rgb(${r}, ${g}, ${b})`;
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
 
     // No color data available, return null (will use default green)
@@ -363,9 +371,12 @@ export const LightControl = ({
   return (
     <div className="light-control">
       <div className="header-with-status">
-        <h2>Light Control</h2>
+        <h2>
+          Light Control
+          {isDemoMode && <span className="demo-badge">DEMO MODE</span>}
+        </h2>
         <div className="header-actions">
-          <div className="status-indicator connected" title="Connected to bridge"></div>
+          <div className="status-indicator connected" title={isDemoMode ? "Demo mode - no real bridge" : "Connected to bridge"}></div>
           {onLogout && (
             <button onClick={onLogout} className="logout-button" title="Logout and disconnect">
               Logout
@@ -509,11 +520,6 @@ export const LightControl = ({
                                 <path d="M10 22h4"></path>
                                 <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7Z"></path>
                               </svg>
-                            )}
-                            {light.on?.on && light.dimming?.brightness && (
-                              <div className="brightness-overlay">
-                                {Math.round(light.dimming.brightness)}%
-                              </div>
                             )}
                           </button>
                           <span className="light-label">{light.metadata?.name || 'Unknown Light'}</span>

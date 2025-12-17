@@ -387,6 +387,32 @@ button.secondary:hover:not(:disabled) {
 
 .header-with-status h2 {
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.demo-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+  animation: demo-pulse 2s ease-in-out infinite;
+}
+
+@keyframes demo-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
 }
 
 .status-indicator {
@@ -1034,20 +1060,6 @@ button.secondary:hover:not(:disabled) {
   background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 6px 20px rgba(107, 114, 128, 0.3);
-}
-
-/* Brightness overlay on button */
-.brightness-overlay {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 8px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  backdrop-filter: blur(4px);
 }
 
 .light-bulb-button:disabled {
