@@ -389,7 +389,11 @@ PORT=8080 npm run start
 
 ## Version History
 
-### v0.4.0 (Current)
+### v0.4.1 (Current)
+- **Dim light color adjustment** - Lights below 30% brightness display as pale yellow/beige for better visual representation
+- Improves realism for very dim lights which appear similar regardless of color capability
+
+### v0.4.0
 - **True color display** - light buttons show actual RGB colors and white temperatures
 - **Information density improvements** - dashboard summary, room status badges, brightness indicators
 - **Modern visual design** - Tailwind-inspired color palette, layered shadows, improved typography
