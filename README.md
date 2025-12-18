@@ -389,7 +389,14 @@ PORT=8080 npm run start
 
 ## Version History
 
-### v0.4.1 (Current)
+### v0.4.2 (Current)
+- **Brightness-aware warm dim blending** - Smooth gradual transition from warm candlelight color (15%) to actual color (50%) using smoothstep curve
+- **Smart shadow system** - Colored glow only appears on bright lights (≥50% brightness), neutral gray shadows for dim lights
+- **Race condition fixes** - Intelligent fallback system prevents green flashing during scene transitions when color data is loading
+- **Brightness badge redesign** - Compact badge design replaces progress bar, with always-visible placeholder ("—") for consistent layout alignment
+- **Demo mode enhancements** - Added boundary test lights at 5% and 15% brightness for comprehensive testing of warm dim transitions
+
+### v0.4.1
 - **Dim light color adjustment** - Lights below 30% brightness display as pale yellow/beige for better visual representation
 - Improves realism for very dim lights which appear similar regardless of color capability
 

@@ -179,34 +179,67 @@ fetch('/api/hue/clip/v2/resource/light?bridgeIp={ip}', {
 ### UI Features & Patterns
 
 #### Color Display System
-Light buttons display actual bulb colors using mathematical color space conversions:
+Light buttons display actual bulb colors using mathematical color space conversions with **brightness-aware warm dim blending** for realistic visualization:
 
 **Color Conversion Functions** (LightControl.jsx):
 ```javascript
-// Convert Hue xy coordinates (CIE 1931) to RGB
-xyToRgb(x, y, brightness) {
+// Convert Hue xy coordinates (CIE 1931) to RGB with brightness scaling
+xyToRgb(x, y, brightness = 100) {
   // xy → XYZ → sRGB with gamma correction
-  // Returns { r, g, b } in 0-255 range
+  // Uses gamma curve: brightnessScale = (brightness / 100)^2.2
+  // Returns { r, g, b } in 0-255 range scaled by brightness
 }
 
-// Convert color temperature (mirek) to RGB
-mirekToRgb(mirek) {
+// Convert color temperature (mirek) to RGB with brightness scaling
+mirekToRgb(mirek, brightness = 100) {
   // mirek → Kelvin → RGB approximation
-  // Returns { r, g, b } in 0-255 range
+  // Applies linear brightness scaling to RGB components
+  // Returns { r, g, b } in 0-255 range scaled by brightness
 }
 
-// Determine which conversion to use
+// Warm dim blending with race condition handling
 getLightColor(light) {
-  // Prefers xy color, falls back to temperature, returns null for basic bulbs
+  // Algorithm:
+  // 1. Get actual color from xy or color_temperature
+  // 2. Blend between warm candlelight (15%) and actual color (50%) using smoothstep
+  // 3. Below 15%: Pure warm (255, 200, 130)
+  // 4. 15-50%: Smooth S-curve transition
+  // 5. Above 50%: Pure actual color
+  //
+  // Fallback for race conditions (missing color data during API loads):
+  // - Blends between warm and neutral white (255, 245, 235)
+  // - Prevents green flashing during scene transitions
+  //
   // Returns CSS color string: "rgb(r, g, b)" or null
+}
+
+// Smart shadow system - colored glow only for bright lights
+getLightShadow(light, lightColor) {
+  // Brightness < 50%: Neutral gray shadow only
+  // Brightness ≥ 50%: Colored glow with intensity scaling
+  // Glow opacity scales from 20% (at 50%) to 60% (at 100%)
+  // Returns CSS box-shadow string
 }
 ```
 
+**Warm Dim Blending Algorithm**:
+- **DIM_START = 15%**: Pure warm candlelight color below this threshold
+- **BRIGHT_START = 50%**: Pure actual color above this threshold
+- **Transition zone (15-50%)**: Smoothstep curve `t²(3-2t)` for gradual blending
+- **Warm color**: RGB(255, 200, 130) - mimics candlelight appearance
+- **Rationale**: Human eyes perceive very dim colored lights as warm/yellowish regardless of actual color
+
+**Race Condition Handling**:
+- During scene transitions, Hue API may return light state before color properties load
+- Fallback system uses neutral white RGB(255, 245, 235) with brightness-based blending
+- Prevents green CSS fallback from appearing during data loads
+
 **Dynamic Button Styling**:
 - Inline styles override default CSS when color data available
-- Background gradient and box-shadow use actual bulb color
+- Background gradient uses blended color from `getLightColor()`
+- Box-shadow determined by `getLightShadow()` based on brightness threshold
 - Hover uses `filter: brightness(0.85)` for universal darkening
-- Works with RGB colors, white temperatures, and default green
+- Works with RGB colors, white temperatures, and handles missing data gracefully
 
 #### Information Density Features
 
@@ -224,19 +257,38 @@ getLightColor(light) {
 
 **Room Status System**:
 ```javascript
-// Helper function calculates room statistics
+// Helper function calculates room statistics with race condition handling
 getRoomLightStats(roomLights) {
   const lightsOnCount = roomLights.filter(light => light.on?.on).length;
-  const averageBrightness = /* average of light.dimming.brightness */;
+  const totalLights = roomLights.length;
+
+  // Calculate average brightness with fallback for missing data
+  const lightsOn = roomLights.filter(light => light.on?.on);
+  const averageBrightness = lightsOn.length > 0
+    ? lightsOn.reduce((sum, light) => {
+        const brightness = light.dimming?.brightness ?? 50; // 50% fallback
+        return sum + brightness;
+      }, 0) / lightsOn.length
+    : 0;
+
   return { lightsOnCount, totalLights, averageBrightness };
 }
 ```
 
+**Race Condition Handling**:
+- During scene transitions, `light.dimming?.brightness` may be temporarily undefined
+- Fallback to 50% prevents brightness from dropping to 0 and causing flickering
+- Visibility condition uses `lightsOnCount > 0` instead of `averageBrightness > 0` for stability
+
 **Visual Elements**:
-- Status badges: "{X} of {Y} on" for each room
-- Brightness bars: Horizontal progress bars showing average room brightness
-- Per-light overlays: Brightness percentage on each button
-- Responsive overflow: Ellipsis handling for long names
+- **Status badges**: "{X} of {Y} on" for each room
+- **Brightness badge**: Compact badge showing average room brightness percentage
+  - Always visible for consistent layout alignment
+  - Shows "—" placeholder when no lights are on
+  - Blue styling (background: #eff6ff, text: #3b82f6)
+  - Minimum width ensures consistent sizing
+- **Per-light overlays**: Individual brightness percentages removed for cleaner design
+- **Responsive overflow**: Ellipsis handling for long names
 
 #### Responsive Design Strategy
 

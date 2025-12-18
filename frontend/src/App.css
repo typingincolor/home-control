@@ -883,34 +883,22 @@ button.secondary:hover:not(:disabled) {
   white-space: nowrap;
 }
 
-.room-brightness-indicator {
+.room-badges {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
 }
 
-.brightness-bar {
-  flex: 1;
-  height: 6px;
-  background: #e5e7eb;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.brightness-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.brightness-label {
+.room-brightness-badge {
+  background: #eff6ff;
+  color: #3b82f6;
+  padding: 4px 10px;
+  border-radius: 12px;
   font-size: 0.75rem;
-  color: #6b7280;
   font-weight: 600;
-  min-width: 36px;
-  text-align: right;
+  white-space: nowrap;
+  min-width: 42px;
+  text-align: center;
 }
 
 .room-controls {
@@ -1047,7 +1035,7 @@ button.secondary:hover:not(:disabled) {
 .light-bulb-button.on:hover:not(:disabled) {
   filter: brightness(0.85);
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  /* Shadow handled by inline styles */
 }
 
 .light-bulb-button.off {

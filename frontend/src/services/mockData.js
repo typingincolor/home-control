@@ -86,6 +86,20 @@ export const mockLights = {
       dimming: { brightness: 0 },
       color: { xy: { x: 0.3227, y: 0.3290 } },
       metadata: { name: "Bedroom 3" }
+    },
+    {
+      id: "light-13",
+      on: { on: true },
+      dimming: { brightness: 5 },
+      color: { xy: { x: 0.6915, y: 0.3083 } }, // Red (should look warm)
+      metadata: { name: "Test Very Dim" }
+    },
+    {
+      id: "light-14",
+      on: { on: true },
+      dimming: { brightness: 15 },
+      color: { xy: { x: 0.1532, y: 0.0475 } }, // Blue (should start transitioning)
+      metadata: { name: "Test Dim Threshold" }
     }
   ]
 };
@@ -112,7 +126,8 @@ export const mockRooms = {
       id: "room-3",
       metadata: { name: "Bedroom" },
       children: [
-        { rid: "device-4", rtype: "device" }
+        { rid: "device-4", rtype: "device" },
+        { rid: "device-5", rtype: "device" }
       ]
     }
   ]
@@ -151,6 +166,13 @@ export const mockDevices = {
         { rid: "light-10", rtype: "light" },
         { rid: "light-11", rtype: "light" },
         { rid: "light-12", rtype: "light" }
+      ]
+    },
+    {
+      id: "device-5",
+      services: [
+        { rid: "light-13", rtype: "light" },
+        { rid: "light-14", rtype: "light" }
       ]
     }
   ]

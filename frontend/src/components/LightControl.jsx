@@ -167,10 +167,11 @@ export const LightControl = ({
   };
 
   // Convert Hue XY color to CSS RGB
-  const xyToRgb = (x, y) => {
-    // Convert xy to XYZ (using full brightness for pure color)
+  const xyToRgb = (x, y, brightness = 100) => {
+    // Convert xy to XYZ with brightness scaling
     const z = 1.0 - x - y;
-    const Y = 1.0;
+    const brightnessScale = Math.pow(brightness / 100, 2.2); // Gamma curve
+    const Y = brightnessScale;
     const X = (Y / y) * x;
     const Z = (Y / y) * z;
 
@@ -206,7 +207,7 @@ export const LightControl = ({
   };
 
   // Convert color temperature (mirek) to RGB
-  const mirekToRgb = (mirek) => {
+  const mirekToRgb = (mirek, brightness = 100) => {
     // Convert mirek to Kelvin (mirek = 1,000,000 / Kelvin)
     const kelvin = 1000000 / mirek;
     const temp = kelvin / 100;
@@ -243,36 +244,95 @@ export const LightControl = ({
       b = Math.max(0, Math.min(255, b));
     }
 
-    return { r: Math.round(r), g: Math.round(g), b: Math.round(b) };
+    // Apply brightness scaling
+    const brightnessScale = brightness / 100;
+    r = Math.round(r * brightnessScale);
+    g = Math.round(g * brightnessScale);
+    b = Math.round(b * brightnessScale);
+
+    return { r, g, b };
   };
 
-  // Get CSS color for a light with opacity based on brightness
+  // Get CSS color for a light with warm dim blending
   const getLightColor = (light) => {
     if (!light.on?.on) return null;
 
     const brightness = light.dimming?.brightness ?? 100;
-    const DIM_THRESHOLD = 30; // Brightness below 30% shows as pale yellow/beige
 
-    // If light is very dim, show pale yellow/beige regardless of color capability
-    if (brightness < DIM_THRESHOLD) {
-      return `rgb(245, 235, 210)`; // Pale yellow/beige
-    }
+    // Warm candlelight color for dim lights
+    const WARM_DIM_COLOR = { r: 255, g: 200, b: 130 };
 
-    // Prefer xy color if available
+    // Blend thresholds
+    const DIM_START = 15;   // Pure warm below this
+    const BRIGHT_START = 50; // Pure color above this
+
+    // Get actual light color
+    let baseColor = null;
     if (light.color?.xy) {
       const { x, y } = light.color.xy;
-      const { r, g, b } = xyToRgb(x, y, brightness);
-      return `rgb(${r}, ${g}, ${b})`;
+      baseColor = xyToRgb(x, y, 100); // Full saturation first
+    } else if (light.color_temperature?.mirek) {
+      baseColor = mirekToRgb(light.color_temperature.mirek, 100);
     }
 
-    // Fall back to color temperature
-    if (light.color_temperature?.mirek) {
-      const { r, g, b } = mirekToRgb(light.color_temperature.mirek);
-      return `rgb(${r}, ${g}, ${b})`;
+    // If no color data available, use intelligent fallback
+    if (!baseColor) {
+      // Assume neutral white as default - prevents green flash during API data load
+      // Most color-capable lights default to neutral/warm white
+      const DEFAULT_WHITE = { r: 255, g: 245, b: 235 }; // Neutral warm white
+
+      // For dim lights, use warm candlelight color
+      if (brightness < DIM_START) {
+        return `rgb(${WARM_DIM_COLOR.r}, ${WARM_DIM_COLOR.g}, ${WARM_DIM_COLOR.b})`;
+      }
+      // For mid-range, blend between warm dim and neutral white
+      else if (brightness < BRIGHT_START) {
+        const t = (brightness - DIM_START) / (BRIGHT_START - DIM_START);
+        const blendFactor = t * t * (3 - 2 * t);
+        const r = Math.round(WARM_DIM_COLOR.r * (1 - blendFactor) + DEFAULT_WHITE.r * blendFactor);
+        const g = Math.round(WARM_DIM_COLOR.g * (1 - blendFactor) + DEFAULT_WHITE.g * blendFactor);
+        const b = Math.round(WARM_DIM_COLOR.b * (1 - blendFactor) + DEFAULT_WHITE.b * blendFactor);
+        return `rgb(${r}, ${g}, ${b})`;
+      }
+      // For bright lights, use neutral white until color data loads
+      return `rgb(${DEFAULT_WHITE.r}, ${DEFAULT_WHITE.g}, ${DEFAULT_WHITE.b})`;
     }
 
-    // No color data available, return null (will use default green)
-    return null;
+    // Calculate blend factor using smoothstep
+    let blendFactor;
+    if (brightness <= DIM_START) {
+      blendFactor = 0; // Pure warm
+    } else if (brightness >= BRIGHT_START) {
+      blendFactor = 1; // Pure color
+    } else {
+      const t = (brightness - DIM_START) / (BRIGHT_START - DIM_START);
+      blendFactor = t * t * (3 - 2 * t); // Smoothstep curve
+    }
+
+    // Blend colors (blending already accounts for perceived dimness)
+    const r = Math.round(WARM_DIM_COLOR.r * (1 - blendFactor) + baseColor.r * blendFactor);
+    const g = Math.round(WARM_DIM_COLOR.g * (1 - blendFactor) + baseColor.g * blendFactor);
+    const b = Math.round(WARM_DIM_COLOR.b * (1 - blendFactor) + baseColor.b * blendFactor);
+
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  // Get shadow styling for a light based on brightness
+  const getLightShadow = (light, lightColor) => {
+    if (!lightColor || !light.on?.on) return null;
+
+    const brightness = light.dimming?.brightness ?? 100;
+    const SHADOW_THRESHOLD = 50;
+
+    if (brightness < SHADOW_THRESHOLD) {
+      // Dim lights: neutral shadow only
+      return '0 2px 6px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1)';
+    } else {
+      // Bright lights: colored glow + depth shadow
+      const glowIntensity = Math.round(((brightness - SHADOW_THRESHOLD) / (100 - SHADOW_THRESHOLD)) * 40 + 20);
+      const glowOpacity = glowIntensity.toString(16).padStart(2, '0');
+      return `0 4px 12px ${lightColor}${glowOpacity}, 0 2px 4px rgba(0, 0, 0, 0.1)`;
+    }
   };
 
   // Get scenes for a specific room UUID
@@ -359,7 +419,11 @@ export const LightControl = ({
     // Calculate average brightness of lights that are on
     const lightsOn = roomLights.filter(light => light.on?.on);
     const averageBrightness = lightsOn.length > 0
-      ? lightsOn.reduce((sum, light) => sum + (light.dimming?.brightness || 0), 0) / lightsOn.length
+      ? lightsOn.reduce((sum, light) => {
+          // Use 50% as default during scene transitions when brightness data is loading
+          const brightness = light.dimming?.brightness ?? 50;
+          return sum + brightness;
+        }, 0) / lightsOn.length
       : 0;
 
     return { lightsOnCount, totalLights, averageBrightness };
@@ -453,22 +517,15 @@ export const LightControl = ({
                     <div className="room-header">
                       <div className="room-title-row">
                         <h4 className="room-name">{roomName}</h4>
-                        <span className="room-status-badge">
-                          {lightsOnCount} of {totalLights} on
-                        </span>
-                      </div>
-
-                      {averageBrightness > 0 && (
-                        <div className="room-brightness-indicator">
-                          <div className="brightness-bar">
-                            <div
-                              className="brightness-fill"
-                              style={{ width: `${averageBrightness}%` }}
-                            />
-                          </div>
-                          <span className="brightness-label">{Math.round(averageBrightness)}%</span>
+                        <div className="room-badges">
+                          <span className="room-status-badge">
+                            {lightsOnCount} of {totalLights} on
+                          </span>
+                          <span className="room-brightness-badge">
+                            {lightsOnCount > 0 ? `${Math.round(averageBrightness)}%` : '—'}
+                          </span>
                         </div>
-                      )}
+                      </div>
 
                       <div className="room-controls">
                         {roomScenes.length > 0 && (
@@ -502,9 +559,10 @@ export const LightControl = ({
                     <div className="room-lights-grid">
                     {roomData.lights.map((light) => {
                       const lightColor = getLightColor(light);
+                      const lightShadow = getLightShadow(light, lightColor);
                       const buttonStyle = lightColor ? {
                         background: `linear-gradient(135deg, ${lightColor} 0%, ${lightColor} 100%)`,
-                        boxShadow: `0 4px 12px ${lightColor}40, 0 2px 4px rgba(0, 0, 0, 0.1)`
+                        boxShadow: lightShadow
                       } : {};
 
                       return (
@@ -539,9 +597,10 @@ export const LightControl = ({
             <div className="lights-grid-simple">
               {lights?.data?.map((light) => {
                 const lightColor = getLightColor(light);
+                const lightShadow = getLightShadow(light, lightColor);
                 const buttonStyle = lightColor ? {
                   background: `linear-gradient(135deg, ${lightColor} 0%, ${lightColor} 100%)`,
-                  boxShadow: `0 4px 12px ${lightColor}40, 0 2px 4px rgba(0, 0, 0, 0.1)`
+                  boxShadow: lightShadow
                 } : {};
 
                 return (
