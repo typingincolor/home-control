@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { hueApi } from '../services/hueApi';
+import { mockApi } from '../services/mockData';
 
 export const MotionZones = ({ bridgeIp, username }) => {
+  // Check if demo mode is enabled
+  const isDemoMode = new URLSearchParams(window.location.search).get('demo') === 'true';
+  const api = isDemoMode ? mockApi : hueApi;
 
   const [behaviors, setBehaviors] = useState(null);
   const [motionAreas, setMotionAreas] = useState(null);
@@ -50,10 +54,10 @@ export const MotionZones = ({ bridgeIp, username }) => {
   const fetchSensors = async () => {
     try {
       // Fetch behaviors (for zone names)
-      const behaviorsData = await hueApi.getResource(bridgeIp, username, 'behavior_instance');
+      const behaviorsData = await api.getResource(bridgeIp, username, 'behavior_instance');
 
       // Fetch convenience_area_motion (for motion status)
-      const motionAreasData = await hueApi.getResource(bridgeIp, username, 'convenience_area_motion');
+      const motionAreasData = await api.getResource(bridgeIp, username, 'convenience_area_motion');
 
       setBehaviors(behaviorsData);
       setMotionAreas(motionAreasData);
@@ -73,9 +77,9 @@ export const MotionZones = ({ bridgeIp, username }) => {
     }
   }, [bridgeIp, username]);
 
-  // Poll every 30 seconds
+  // Poll every 30 seconds (disabled in demo mode)
   useEffect(() => {
-    if (!bridgeIp || !username) return;
+    if (!bridgeIp || !username || isDemoMode) return;
 
     const intervalId = setInterval(() => {
       fetchSensors();
@@ -85,7 +89,7 @@ export const MotionZones = ({ bridgeIp, username }) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [bridgeIp, username]);
+  }, [bridgeIp, username, isDemoMode]);
 
   const motionSensors = getMotionSensors(behaviors, motionAreas);
 
