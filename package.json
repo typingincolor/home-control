@@ -14,7 +14,12 @@
     "build": "npm run build --workspace=frontend",
     "build:backend": "npm run build --workspace=backend",
     "start": "npm run start --workspace=backend",
-    "deploy": "npm run build && npm run build:backend && npm run start"
+    "deploy": "npm run build && npm run build:backend && npm run start",
+    "test": "npm run test --workspace=frontend",
+    "test:ui": "npm run test:ui --workspace=frontend",
+    "test:run": "npm run test:run --workspace=frontend",
+    "test:coverage": "npm run test:coverage --workspace=frontend",
+    "test:mutation": "npm run test:mutation --workspace=frontend"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
