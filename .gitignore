@@ -16,6 +16,10 @@ dist-ssr
 frontend/dist
 backend/public
 
+# Test outputs
+frontend/coverage
+frontend/reports
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
