@@ -147,6 +147,54 @@ export const openApiSpec = {
             }
           }
         }
+      },
+      Zone: {
+        type: 'object',
+        description: 'A Hue zone (group of lights that can span multiple rooms)',
+        properties: {
+          id: {
+            type: 'string',
+            example: 'zone-uuid'
+          },
+          name: {
+            type: 'string',
+            example: 'Downstairs'
+          },
+          stats: {
+            type: 'object',
+            properties: {
+              lightsOnCount: { type: 'integer', example: 2 },
+              totalLights: { type: 'integer', example: 4 },
+              averageBrightness: { type: 'number', example: 75.5 }
+            }
+          },
+          lights: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/Light' }
+          },
+          scenes: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                name: { type: 'string' }
+              }
+            }
+          }
+        }
+      },
+      MotionZone: {
+        type: 'object',
+        description: 'A MotionAware zone with motion detection status',
+        properties: {
+          id: { type: 'string' },
+          name: { type: 'string', example: 'Hallway MotionAware' },
+          motionDetected: { type: 'boolean', example: false },
+          enabled: { type: 'boolean', example: true },
+          reachable: { type: 'boolean', example: true },
+          lastChanged: { type: 'string', format: 'date-time', example: '2025-12-23T10:30:00Z' }
+        }
       }
     }
   },
@@ -292,6 +340,16 @@ export const openApiSpec = {
                     rooms: {
                       type: 'array',
                       items: { $ref: '#/components/schemas/Room' }
+                    },
+                    zones: {
+                      type: 'array',
+                      description: 'Hue zones (groups of lights that can span multiple rooms)',
+                      items: { $ref: '#/components/schemas/Zone' }
+                    },
+                    motionZones: {
+                      type: 'array',
+                      description: 'MotionAware zones with motion detection status',
+                      items: { $ref: '#/components/schemas/MotionZone' }
                     }
                   }
                 }
@@ -355,6 +413,152 @@ export const openApiSpec = {
         }
       }
     },
+    '/rooms/{id}/lights': {
+      put: {
+        summary: 'Update all lights in a room',
+        description: 'Toggle all lights in a room on or off',
+        tags: ['Rooms'],
+        security: [{ BearerAuth: [] }, { HeaderAuth: [] }, { QueryAuth: [] }],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Room UUID'
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  on: { type: 'boolean', example: true }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Lights updated',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    updatedLights: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/Light' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '404': {
+            description: 'Room not found',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+          }
+        }
+      }
+    },
+    '/zones/{id}/lights': {
+      put: {
+        summary: 'Update all lights in a zone',
+        description: 'Toggle all lights in a zone on or off',
+        tags: ['Zones'],
+        security: [{ BearerAuth: [] }, { HeaderAuth: [] }, { QueryAuth: [] }],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Zone UUID'
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  on: { type: 'boolean', example: true }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Lights updated',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    updatedLights: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/Light' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '404': {
+            description: 'Zone not found',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+          }
+        }
+      }
+    },
+    '/scenes/{id}/activate': {
+      post: {
+        summary: 'Activate a scene',
+        description: 'Activate a Hue scene by its UUID',
+        tags: ['Scenes'],
+        security: [{ BearerAuth: [] }, { HeaderAuth: [] }, { QueryAuth: [] }],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Scene UUID'
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Scene activated',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    affectedLights: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/Light' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '404': {
+            description: 'Scene not found',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+          }
+        }
+      }
+    },
     '/motion-zones': {
       get: {
         summary: 'Get motion zones',
@@ -371,17 +575,7 @@ export const openApiSpec = {
                   properties: {
                     zones: {
                       type: 'array',
-                      items: {
-                        type: 'object',
-                        properties: {
-                          id: { type: 'string' },
-                          name: { type: 'string', example: 'Hallway MotionAware' },
-                          motionDetected: { type: 'boolean', example: false },
-                          enabled: { type: 'boolean', example: true },
-                          reachable: { type: 'boolean', example: true },
-                          lastChanged: { type: 'string', example: '2025-12-23T10:30:00Z' }
-                        }
-                      }
+                      items: { $ref: '#/components/schemas/MotionZone' }
                     }
                   }
                 }
@@ -395,7 +589,10 @@ export const openApiSpec = {
   tags: [
     { name: 'Authentication', description: 'Session management' },
     { name: 'Dashboard', description: 'Unified dashboard data' },
-    { name: 'Lights', description: 'Light control' },
+    { name: 'Lights', description: 'Individual light control' },
+    { name: 'Rooms', description: 'Room-level control' },
+    { name: 'Zones', description: 'Zone-level control (groups spanning multiple rooms)' },
+    { name: 'Scenes', description: 'Scene activation' },
     { name: 'Motion', description: 'MotionAware zones' }
   ]
 };
