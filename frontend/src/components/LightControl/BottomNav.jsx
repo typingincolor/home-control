@@ -15,22 +15,27 @@ import {
   LightbulbOff
 } from './Icons';
 
+// Icon size for nav tabs
+const NAV_ICON_SIZE = 36;
+
 // Get room-specific icon based on room name
-const getRoomIcon = (name, size) => {
+const getRoomIcon = (name) => {
   const lower = name?.toLowerCase() || '';
 
-  if (lower.includes('living')) return <Sofa size={size} className="nav-tab-icon" />;
-  if (lower.includes('dining')) return <DiningTable size={size} className="nav-tab-icon" />;
-  if (lower.includes('kitchen')) return <Saucepan size={size} className="nav-tab-icon" />;
-  if (lower.includes('bedroom') || lower.includes('bed room')) return <Bed size={size} className="nav-tab-icon" />;
-  if (lower.includes('office') || lower.includes('study')) return <DeskLamp size={size} className="nav-tab-icon" />;
-  if (lower.includes('bathroom') || lower.includes('bath')) return <Shower size={size} className="nav-tab-icon" />;
-  if (lower.includes('garage')) return <Car size={size} className="nav-tab-icon" />;
-  if (lower.includes('garden') || lower.includes('outdoor') || lower.includes('patio')) return <Tree size={size} className="nav-tab-icon" />;
-  if (lower.includes('hall') || lower.includes('entry') || lower.includes('foyer')) return <Door size={size} className="nav-tab-icon" />;
+  // Check specific room types first (order matters - more specific before generic)
+  if (lower.includes('living')) return <Sofa size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('dining')) return <DiningTable size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('kitchen')) return <Saucepan size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('office') || lower.includes('study')) return <DeskLamp size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('bathroom') || lower.includes('bath')) return <Shower size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('garage')) return <Car size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('garden') || lower.includes('outdoor') || lower.includes('patio')) return <Tree size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('hall') || lower.includes('entry') || lower.includes('foyer') || lower.includes('landing')) return <Door size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  // Generic "room" check last (for "Bart's Room", "Maggie Room", etc.)
+  if (lower.includes('bedroom') || lower.includes('bed room') || lower.includes('room')) return <Bed size={NAV_ICON_SIZE} className="nav-tab-icon" />;
 
   // Default to home icon for unrecognized rooms
-  return <Home size={size} className="nav-tab-icon" />;
+  return <Home size={NAV_ICON_SIZE} className="nav-tab-icon" />;
 };
 
 export const BottomNav = ({
@@ -53,7 +58,7 @@ export const BottomNav = ({
             className={`nav-tab ${isActive ? 'active' : ''}`}
             onClick={() => onSelect(room.id)}
           >
-            {getRoomIcon(room.name, 28)}
+            {getRoomIcon(room.name)}
             <span className="nav-tab-label">{room.name}</span>
             {lightsOn > 0 && (
               <span className="nav-tab-badge">{lightsOn}</span>
@@ -67,7 +72,7 @@ export const BottomNav = ({
           className={`nav-tab ${isZonesSelected ? 'active' : ''}`}
           onClick={() => onSelect('zones')}
         >
-          <Grid size={28} className="nav-tab-icon" />
+          <Grid size={NAV_ICON_SIZE} className="nav-tab-icon" />
           <span className="nav-tab-label">{UI_TEXT.NAV_ZONES}</span>
           <span className="nav-tab-badge">{zones.length}</span>
         </button>

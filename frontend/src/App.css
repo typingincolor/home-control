@@ -37,7 +37,7 @@
   --light-tile-gap: 20px;
 
   /* Navigation */
-  --nav-height: 72px;
+  --nav-height: 120px;
   --toolbar-height: 56px;
 }
 
@@ -1648,8 +1648,8 @@ body.dark-theme {
 
 /* Room Content */
 .room-content {
-  max-width: 600px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
 }
 
 .room-header-bar {
@@ -1700,18 +1700,24 @@ body.dark-theme {
   color: #000;
 }
 
-/* Light Tiles Grid */
+/* Light Tiles Grid - full width, max 4 columns */
 .light-tiles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--light-tile-size), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: var(--light-tile-gap);
-  justify-items: center;
+  max-width: 100%;
+}
+
+@media (min-width: 700px) {
+  .light-tiles-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 /* Light Tile */
 .light-tile {
-  width: var(--light-tile-size);
-  height: var(--light-tile-size);
+  width: 100%;
+  aspect-ratio: 1;
   border-radius: 24px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -1775,26 +1781,13 @@ body.dark-theme {
 }
 
 .light-tile-name {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: var(--text-primary);
   text-align: center;
   max-width: 90%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.light-tile-brightness {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  font-size: 0.7rem;
-  color: var(--text-primary);
-  background: rgba(0, 0, 0, 0.3);
-  padding: 3px 7px;
-  border-radius: 6px;
-  z-index: 2;
 }
 
 /* Bottom Navigation */
@@ -1820,13 +1813,13 @@ body.dark-theme {
 
 .nav-tab {
   flex-shrink: 0;
-  min-width: 80px;
-  padding: 8px 16px;
+  min-width: 90px;
+  padding: 12px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 8px;
   background: transparent;
   border: none;
   color: var(--text-secondary);
@@ -1862,12 +1855,12 @@ body.dark-theme {
 }
 
 .nav-tab-label {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 70px;
+  max-width: 80px;
 }
 
 .nav-tab-badge {

@@ -14,8 +14,8 @@ export const LightTile = ({ light, onToggle, isToggling }) => {
     boxShadow: light.shadow
   } : {};
 
-  // Icon color: dark when over fill, light when not
-  const iconColor = brightness > 40 ? 'rgba(0, 0, 0, 0.7)' : 'var(--text-secondary)';
+  // Content color: dark on bright fills for contrast, light on dark/empty
+  const contentColor = brightness > 50 ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.9)';
 
   return (
     <button
@@ -36,19 +36,14 @@ export const LightTile = ({ light, onToggle, isToggling }) => {
       {/* Content layer */}
       <div className="light-tile-content">
         {isToggling ? (
-          <Spinner size={48} className="light-tile-icon" style={{ color: iconColor }} />
+          <Spinner size={48} className="light-tile-icon" style={{ color: contentColor }} />
         ) : light.on ? (
-          <LightbulbOn size={48} className="light-tile-icon" style={{ color: iconColor }} />
+          <LightbulbOn size={48} className="light-tile-icon" style={{ color: contentColor }} />
         ) : (
-          <LightbulbOff size={48} className="light-tile-icon" style={{ color: iconColor }} />
+          <LightbulbOff size={48} className="light-tile-icon" style={{ color: contentColor }} />
         )}
-        <span className="light-tile-name">{light.name || 'Light'}</span>
+        <span className="light-tile-name" style={{ color: contentColor }}>{light.name || 'Light'}</span>
       </div>
-
-      {/* Brightness percentage badge */}
-      {light.on && brightness > 0 && (
-        <span className="light-tile-brightness">{Math.round(brightness)}%</span>
-      )}
     </button>
   );
 };
