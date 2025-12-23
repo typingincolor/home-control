@@ -3,14 +3,42 @@ import { hueApi } from '../services/hueApi';
 import { STORAGE_KEYS } from '../constants/storage';
 import { useSession } from './useSession';
 
+// Helper to check for valid session synchronously (before first render)
+const getInitialStep = () => {
+  const savedToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
+  const savedBridgeIp = localStorage.getItem(STORAGE_KEYS.BRIDGE_IP);
+  const savedExpiry = localStorage.getItem(STORAGE_KEYS.SESSION_EXPIRES_AT);
+
+  // Check if we have all required session fields
+  if (savedToken && savedBridgeIp && savedExpiry) {
+    const expiryTime = parseInt(savedExpiry, 10);
+    const isExpired = Date.now() >= expiryTime;
+
+    // If session is valid and not expired, start at 'connected'
+    if (!isExpired) {
+      return 'connected';
+    }
+  }
+
+  // Otherwise, start at 'discovery'
+  return 'discovery';
+};
+
 export const useHueBridge = () => {
-  const [state, setState] = useState({
-    step: 'discovery', // 'discovery' | 'authentication' | 'connected'
-    bridgeIp: null,
-    username: null, // Legacy, kept for compatibility
-    lights: null,
-    loading: false,
-    error: null
+  const [state, setState] = useState(() => {
+    const initialStep = getInitialStep();
+    const initialBridgeIp = initialStep === 'connected'
+      ? localStorage.getItem(STORAGE_KEYS.BRIDGE_IP)
+      : null;
+
+    return {
+      step: initialStep, // Initialize based on existing session
+      bridgeIp: initialBridgeIp,
+      username: null, // Legacy, kept for compatibility
+      lights: null,
+      loading: false,
+      error: null
+    };
   });
 
   const { sessionToken, bridgeIp: sessionBridgeIp, createSession, clearSession, isValid } = useSession();

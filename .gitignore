@@ -19,6 +19,7 @@ backend/public
 # Test outputs
 frontend/coverage
 frontend/reports
+frontend/.stryker-tmp
 
 # Editor directories and files
 .vscode/*
