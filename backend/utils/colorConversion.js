@@ -202,3 +202,53 @@ export const getLightShadow = (light, lightColor) => {
     return `0 4px 12px ${lightColor}${glowOpacity}, 0 2px 4px rgba(0, 0, 0, 0.1)`;
   }
 };
+
+/**
+ * Enrich a light object with pre-computed color and shadow properties
+ * @param {Object} light - Raw Hue light object
+ * @returns {Object} Enriched light object with color, shadow, and colorSource properties
+ */
+export const enrichLight = (light) => {
+  // Determine color source
+  let colorSource = null;
+  if (light.color?.xy) {
+    colorSource = 'xy';
+  } else if (light.color_temperature?.mirek) {
+    colorSource = 'temperature';
+  } else if (light.on?.on) {
+    colorSource = 'fallback';
+  }
+
+  // Get pre-computed color
+  const color = getLightColor(light);
+
+  // Get pre-computed shadow
+  const shadow = getLightShadow(light, color);
+
+  // Calculate brightness with minimum of 5% when light is on
+  const isOn = light.on?.on ?? false;
+  const rawBrightness = light.dimming?.brightness ?? 0;
+  const brightness = isOn ? Math.max(5, rawBrightness) : 0;
+
+  // Return enriched light with additional properties
+  return {
+    id: light.id,
+    name: light.metadata?.name || 'Unknown',
+    on: isOn,
+    brightness,
+    color,
+    shadow,
+    colorSource,
+    // Keep original data for advanced use cases
+    _original: light
+  };
+};
+
+/**
+ * Enrich multiple lights
+ * @param {Array} lights - Array of raw Hue light objects
+ * @returns {Array} Array of enriched light objects
+ */
+export const enrichLights = (lights) => {
+  return lights.map(light => enrichLight(light));
+};

@@ -1,7 +1,7 @@
 import express from 'express';
 import hueClient from '../../services/hueClient.js';
 import zoneService from '../../services/zoneService.js';
-import colorService from '../../services/colorService.js';
+import { enrichLight } from '../../utils/colorConversion.js';
 import { extractCredentials } from '../../middleware/auth.js';
 import { convertToHueState } from '../../utils/stateConversion.js';
 
@@ -54,7 +54,7 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
     const updatedLightsData = await hueClient.getLights(bridgeIp, username);
     const updatedLights = zone.lights.map(light => {
       const updated = updatedLightsData.data.find(l => l.id === light.id);
-      return updated ? colorService.enrichLight(updated) : null;
+      return updated ? enrichLight(updated) : null;
     }).filter(Boolean);
 
     res.json({

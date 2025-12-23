@@ -1,5 +1,5 @@
 import hueClient from './hueClient.js';
-import colorService from './colorService.js';
+import { enrichLight } from '../utils/colorConversion.js';
 import roomService from './roomService.js';
 import statsService from './statsService.js';
 import motionService from './motionService.js';
@@ -49,7 +49,7 @@ class DashboardService {
     // Step 3: Process each room
     const rooms = Object.entries(roomMap).map(([roomName, roomData]) => {
       // Enrich lights with pre-computed colors and shadows
-      const enrichedLights = roomData.lights.map(light => colorService.enrichLight(light));
+      const enrichedLights = roomData.lights.map(light => enrichLight(light));
 
       // Calculate room statistics
       const stats = roomService.calculateRoomStats(roomData.lights);
@@ -73,7 +73,7 @@ class DashboardService {
 
     const zones = Object.entries(zoneMap).map(([zoneName, zoneData]) => {
       // Enrich lights with pre-computed colors and shadows
-      const enrichedLights = zoneData.lights.map(light => colorService.enrichLight(light));
+      const enrichedLights = zoneData.lights.map(light => enrichLight(light));
 
       // Calculate zone statistics
       const stats = zoneService.calculateZoneStats(zoneData.lights);

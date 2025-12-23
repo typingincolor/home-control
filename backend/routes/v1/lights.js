@@ -1,6 +1,6 @@
 import express from 'express';
 import hueClient from '../../services/hueClient.js';
-import colorService from '../../services/colorService.js';
+import { enrichLight } from '../../utils/colorConversion.js';
 import { extractCredentials } from '../../middleware/auth.js';
 import { ResourceNotFoundError } from '../../utils/errors.js';
 import { convertToHueState } from '../../utils/stateConversion.js';
@@ -36,7 +36,7 @@ router.put('/:id', extractCredentials, async (req, res, next) => {
     }
 
     // Enrich with color and shadow
-    const enrichedLight = colorService.enrichLight(updatedLight);
+    const enrichedLight = enrichLight(updatedLight);
 
     console.log(`[LIGHTS] Light ${id} updated successfully`);
 

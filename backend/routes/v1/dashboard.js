@@ -1,6 +1,6 @@
 import express from 'express';
 import hueClient from '../../services/hueClient.js';
-import colorService from '../../services/colorService.js';
+import { enrichLight } from '../../utils/colorConversion.js';
 import roomService from '../../services/roomService.js';
 import statsService from '../../services/statsService.js';
 import { extractCredentials } from '../../middleware/auth.js';
@@ -38,7 +38,7 @@ router.get('/', extractCredentials, async (req, res, next) => {
     // Step 3: Process each room
     const rooms = Object.entries(roomMap).map(([roomName, roomData]) => {
       // Enrich lights with pre-computed colors and shadows
-      const enrichedLights = roomData.lights.map(light => colorService.enrichLight(light));
+      const enrichedLights = roomData.lights.map(light => enrichLight(light));
 
       // Calculate room statistics
       const stats = roomService.calculateRoomStats(roomData.lights);

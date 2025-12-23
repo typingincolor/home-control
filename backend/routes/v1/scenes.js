@@ -1,7 +1,7 @@
 import express from 'express';
 import hueClient from '../../services/hueClient.js';
 import roomService from '../../services/roomService.js';
-import colorService from '../../services/colorService.js';
+import { enrichLight } from '../../utils/colorConversion.js';
 import { extractCredentials } from '../../middleware/auth.js';
 import { SCENE_APPLY_DELAY_MS } from '../../constants/timings.js';
 
@@ -44,7 +44,7 @@ router.post('/:id/activate', extractCredentials, async (req, res, next) => {
     const room = Object.values(roomMap).find(r => r.roomUuid === scene.group?.rid);
 
     const affectedLights = room
-      ? room.lights.map(light => colorService.enrichLight(light))
+      ? room.lights.map(light => enrichLight(light))
       : [];
 
     console.log(`[SCENES] Scene activated, ${affectedLights.length} lights affected`);
