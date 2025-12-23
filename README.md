@@ -9,10 +9,11 @@ A modern React web application for controlling Philips Hue lights locally using 
 - **Information Dashboard**: At-a-glance summary showing total lights on, room count, and scene count
 - **Brightness Indicators**: Live brightness percentage displayed on each light and room average
 - **Room Status Badges**: See "{X} of {Y} lights on" for each room at a glance
-- **Motion Zone Detection**: Real-time display of MotionAware zones with status indicators
+- **Zone Support**: Control Hue zones (light groups spanning multiple rooms) with compact bar UI
+- **Motion Zone Detection**: Always-visible inline bar showing MotionAware zones with real-time status indicators
 - **Room Organization**: Lights automatically grouped by room with modern card layout
-- **Scene Management**: Select and activate scenes for each room
-- **Master Controls**: Turn all lights in a room on/off with one button
+- **Scene Management**: Select and activate scenes for each room and zone
+- **Master Controls**: Turn all lights in a room or zone on/off with one button
 
 ### Modern Architecture
 - **WebSocket Real-Time Updates**: Instant state synchronization across all connected devices
@@ -33,7 +34,7 @@ A modern React web application for controlling Philips Hue lights locally using 
 - **Multi-Machine Support**: Access from any device on your network
 - **Centralized Configuration**: All settings managed through config.json
 - **Modern API v2**: Uses the latest Philips Hue API for future-proof functionality
-- **Comprehensive Testing**: 117 tests (91 frontend + backend) with integration test suite
+- **Comprehensive Testing**: 209 tests (110 frontend + 99 backend) with integration test suite
 
 ## Prerequisites
 
@@ -135,6 +136,7 @@ philips-hue-connector/
 │       │       ├── index.jsx          # Main container
 │       │       ├── LightButton.jsx    # Individual light button
 │       │       ├── RoomCard.jsx       # Room grouping
+│       │       ├── ZoneCard.jsx       # Compact zone control bar
 │       │       ├── SceneSelector.jsx  # Scene dropdown
 │       │       └── DashboardSummary.jsx
 │       ├── utils/             # Utility functions
@@ -324,11 +326,11 @@ Runs mutation testing with Stryker (validates test quality)
 
 ## Testing
 
-The project includes comprehensive testing infrastructure with **117 tests total** (91 frontend + backend) and mutation testing to ensure code quality.
+The project includes comprehensive testing infrastructure with **209 tests total** (110 frontend + 99 backend) and mutation testing to ensure code quality.
 
 ### Test Coverage
 
-**Frontend Tests (91 tests):**
+**Frontend Tests (110 tests):**
 - **Unit tests**: Utilities, hooks, and components
 - **Integration tests**: 11 end-to-end flow tests with MSW
 - **Vitest 4.0** - Fast, Vite-native test runner
@@ -356,12 +358,14 @@ frontend/src/
 │   ├── useHueApi.test.js           # 4 tests - API selection
 │   └── usePolling.test.js          # 10 tests - Polling intervals
 ├── components/
-│   ├── MotionZones.test.jsx        # 17 tests - Motion zone display
+│   ├── MotionZones.test.jsx        # 10 tests - Motion zone compact bar
 │   └── LightControl/
 │       ├── DashboardSummary.test.jsx   # 5 tests - Summary statistics
 │       ├── SceneSelector.test.jsx      # 11 tests - Scene dropdown
 │       ├── LightButton.test.jsx        # 15 tests - Light button rendering
-│       └── RoomCard.test.jsx           # 16 tests - Room card component
+│       ├── RoomCard.test.jsx           # 16 tests - Room card component
+│       ├── ZoneCard.test.jsx           # 14 tests - Zone bar component
+│       └── index.zones.test.jsx        # 8 tests - Zone integration tests
 ├── services/
 │   └── hueApi.test.js              # 15 tests - API client methods
 └── integration.test.jsx            # 11 tests - Full app flow tests
@@ -515,7 +519,7 @@ The backend exposes a **simplified v1 REST API** that aggregates Hue API v2 data
   ```
 
 **Data Endpoints:**
-- `GET /api/v1/dashboard` - Get complete dashboard (lights, rooms, scenes, statistics)
+- `GET /api/v1/dashboard` - Get complete dashboard (lights, rooms, zones, scenes, statistics)
   ```
   Header: Authorization: Bearer {sessionToken}
   Response: {
@@ -529,7 +533,16 @@ The backend exposes a **simplified v1 REST API** that aggregates Hue API v2 data
         "scenes": [ /* filtered by room */ ]
       }
     ],
-    "unassignedLights": [ /* lights not in any room */ ]
+    "zones": [
+      {
+        "id": "zone-uuid",
+        "name": "Downstairs",
+        "stats": { "lightsOnCount": 2, "totalLights": 3, "averageBrightness": 85 },
+        "lights": [ /* lights in zone */ ],
+        "scenes": [ /* zone scenes */ ]
+      }
+    ],
+    "motionZones": [ /* motion detection zones */ ]
   }
   ```
 
@@ -551,6 +564,13 @@ The backend exposes a **simplified v1 REST API** that aggregates Hue API v2 data
   ```
   Header: Authorization: Bearer {sessionToken}
   Body: { "on": true, "brightness": 100 }
+  Response: { "updatedLights": [ /* all updated lights */ ] }
+  ```
+
+- `PUT /api/v1/zones/{zoneId}/lights` - Update all lights in zone
+  ```
+  Header: Authorization: Bearer {sessionToken}
+  Body: { "on": true }
   Response: { "updatedLights": [ /* all updated lights */ ] }
   ```
 
@@ -676,7 +696,25 @@ PORT=8080 npm run start
 
 ## Version History
 
-### v0.6.0 (Current - Architecture Overhaul)
+### v0.8.1 (Current)
+- **OpenAPI documentation** - Added Zone and MotionZone schemas to API specification
+- **Demo mode improvements** - Added zones to mock data, descriptive light names
+- **UI polish** - Fixed zone card alignment, light labels wrap to multiple lines
+
+### v0.8.0
+- **Compact motion zones** - Redesigned as always-visible inline bar with pill-shaped badges
+- **Motion detection indicators** - Green dot (no motion) and red dot (motion detected)
+- **WebSocket motion updates** - Real-time push notifications for motion zone changes
+
+### v0.7.0 (Zone Support)
+- **Hue Zones** - Full support for Hue zones (light groups spanning multiple rooms)
+- **ZoneCard component** - Compact bar layout with scene selector and on/off toggle
+- **Zone API endpoints** - PUT /zones/{id}/lights for zone-level control
+- **Zone scenes** - Scene activation for zone-specific scenes
+- **Collapsible zones section** - 3-column grid with expand/collapse toggle
+- **Backend zone support** - Zone data included in dashboard response with pre-computed stats
+
+### v0.6.0 (Architecture Overhaul)
 - **Backend-heavy architecture** - Migrated business logic from frontend to backend (~1,300 lines)
 - **v1 REST API** - Simplified API with pre-computed data (dashboard, motion zones, light control)
 - **WebSocket support** - Real-time bidirectional updates replace 30-second polling
