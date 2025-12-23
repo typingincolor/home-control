@@ -457,28 +457,39 @@ const mockDashboard = {
 let motionCallbacks = [];
 let motionTimerId = null;
 
-const triggerRandomMotion = () => {
-  // Pick a random reachable zone
-  const reachableZones = mockDashboard.motionZones.filter(z => z.reachable);
-  if (reachableZones.length === 0) return;
-
-  const randomZone = reachableZones[Math.floor(Math.random() * reachableZones.length)];
-
-  // Set motion detected
-  randomZone.motionDetected = true;
-  console.log(`[MOCK] Motion detected in: ${randomZone.name}`);
-
-  // Notify all subscribers
+const triggerMotionInZone = (zone) => {
+  zone.motionDetected = true;
+  console.log(`[MOCK] Motion detected in: ${zone.name}`);
   motionCallbacks.forEach(cb => cb([...mockDashboard.motionZones]));
 
   // Clear motion after 5 seconds
   setTimeout(() => {
-    randomZone.motionDetected = false;
+    zone.motionDetected = false;
     motionCallbacks.forEach(cb => cb([...mockDashboard.motionZones]));
   }, 5000);
+};
 
-  // Schedule next motion (random 5-60 seconds)
-  const nextDelay = 5000 + Math.random() * 55000;
+const triggerRandomMotion = () => {
+  const reachableZones = mockDashboard.motionZones.filter(z => z.reachable);
+  if (reachableZones.length === 0) return;
+
+  // Shuffle zones for random selection
+  const shuffled = [...reachableZones].sort(() => Math.random() - 0.5);
+
+  // 30% chance of multiple zones (simulating walking through rooms)
+  const triggerMultiple = Math.random() < 0.3 && shuffled.length > 1;
+  const zonesToTrigger = triggerMultiple
+    ? shuffled.slice(0, Math.min(2 + Math.floor(Math.random() * 2), shuffled.length)) // 2-3 zones
+    : [shuffled[0]];
+
+  // Trigger zones with slight delays between them (0.5-1.5s apart)
+  zonesToTrigger.forEach((zone, index) => {
+    const delay = index * (500 + Math.random() * 1000);
+    setTimeout(() => triggerMotionInZone(zone), delay);
+  });
+
+  // Schedule next motion (random 10-60 seconds)
+  const nextDelay = 10000 + Math.random() * 50000;
   motionTimerId = setTimeout(triggerRandomMotion, nextDelay);
 };
 
