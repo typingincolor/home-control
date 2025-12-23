@@ -31,3 +31,4 @@ frontend/.stryker-tmp
 *.njsproj
 *.sln
 *.sw?
+test-websocket.js
