@@ -266,9 +266,9 @@ const mockDashboard = {
   ],
   motionZones: [
     { id: "motion-1", name: "Living Room", motionDetected: false, enabled: true, reachable: true },
-    { id: "motion-2", name: "Kitchen", motionDetected: true, enabled: true, reachable: true },
+    { id: "motion-2", name: "Kitchen", motionDetected: false, enabled: true, reachable: true },
     { id: "motion-3", name: "Hallway", motionDetected: false, enabled: true, reachable: true },
-    { id: "motion-4", name: "Garage", motionDetected: false, enabled: true, reachable: false }
+    { id: "motion-4", name: "Garage", motionDetected: false, enabled: true, reachable: true }
   ],
   rooms: [
     {
@@ -453,6 +453,51 @@ const mockDashboard = {
   ]
 };
 
+// Random motion detection system for demo mode
+let motionCallbacks = [];
+let motionTimerId = null;
+
+const triggerRandomMotion = () => {
+  // Pick a random reachable zone
+  const reachableZones = mockDashboard.motionZones.filter(z => z.reachable);
+  if (reachableZones.length === 0) return;
+
+  const randomZone = reachableZones[Math.floor(Math.random() * reachableZones.length)];
+
+  // Set motion detected
+  randomZone.motionDetected = true;
+  console.log(`[MOCK] Motion detected in: ${randomZone.name}`);
+
+  // Notify all subscribers
+  motionCallbacks.forEach(cb => cb([...mockDashboard.motionZones]));
+
+  // Clear motion after 5 seconds
+  setTimeout(() => {
+    randomZone.motionDetected = false;
+    motionCallbacks.forEach(cb => cb([...mockDashboard.motionZones]));
+  }, 5000);
+
+  // Schedule next motion (random 5-60 seconds)
+  const nextDelay = 5000 + Math.random() * 55000;
+  motionTimerId = setTimeout(triggerRandomMotion, nextDelay);
+};
+
+const startMotionSimulation = () => {
+  if (motionTimerId) return; // Already running
+
+  // Initial delay of 3-10 seconds before first motion
+  const initialDelay = 3000 + Math.random() * 7000;
+  motionTimerId = setTimeout(triggerRandomMotion, initialDelay);
+  console.log('[MOCK] Motion simulation started');
+};
+
+const stopMotionSimulation = () => {
+  if (motionTimerId) {
+    clearTimeout(motionTimerId);
+    motionTimerId = null;
+  }
+};
+
 // Mock API functions that simulate the real API
 export const mockApi = {
   // V1 API Methods (new simplified API)
@@ -584,6 +629,20 @@ export const mockApi = {
     await delay(200);
     console.log(`[MOCK] Activating scene ${sceneId}`);
     return { errors: [], data: [{ rid: sceneId, rtype: "scene" }] };
+  },
+
+  // Subscribe to motion updates (demo mode only)
+  subscribeToMotion(callback) {
+    motionCallbacks.push(callback);
+    startMotionSimulation();
+
+    // Return unsubscribe function
+    return () => {
+      motionCallbacks = motionCallbacks.filter(cb => cb !== callback);
+      if (motionCallbacks.length === 0) {
+        stopMotionSimulation();
+      }
+    };
   }
 };
 

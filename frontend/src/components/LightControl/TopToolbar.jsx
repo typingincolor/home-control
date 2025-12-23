@@ -3,7 +3,6 @@ import { UI_TEXT } from '../../constants/uiText';
 import { Logout } from './Icons';
 
 export const TopToolbar = ({
-  motionZones = [],
   summary = {},
   isConnected = true,
   isDemoMode = false,
@@ -14,19 +13,7 @@ export const TopToolbar = ({
   return (
     <div className="top-toolbar">
       <div className="toolbar-left">
-        {motionZones.length > 0 && (
-          <div className="toolbar-motion">
-            <span className="toolbar-motion-label">{UI_TEXT.TOOLBAR_MOTION_LABEL}</span>
-            <div className="toolbar-motion-dots">
-              {motionZones.map((zone) => (
-                <div key={zone.id} className="toolbar-motion-item">
-                  <span className={`motion-indicator ${zone.motionDetected ? 'active' : 'inactive'}`} />
-                  <span>{zone.name?.replace(' MotionAware', '') || 'Zone'}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Space for future features */}
       </div>
 
       <div className="toolbar-center">
@@ -63,13 +50,6 @@ export const TopToolbar = ({
 };
 
 TopToolbar.propTypes = {
-  motionZones: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string,
-      motionDetected: PropTypes.bool
-    })
-  ),
   summary: PropTypes.shape({
     lightsOn: PropTypes.number,
     roomCount: PropTypes.number,

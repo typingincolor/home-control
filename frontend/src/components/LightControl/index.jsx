@@ -92,6 +92,23 @@ export const LightControl = ({
     };
   }, []);
 
+  // Subscribe to motion updates in demo mode
+  useEffect(() => {
+    if (!isDemoMode || !api.subscribeToMotion) return;
+
+    const unsubscribe = api.subscribeToMotion((updatedMotionZones) => {
+      setLocalDashboard(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          motionZones: updatedMotionZones
+        };
+      });
+    });
+
+    return unsubscribe;
+  }, [isDemoMode, api]);
+
   // Helper: Get light by UUID from dashboard
   const getLightByUuid = (uuid) => {
     if (!dashboard?.rooms) return null;
@@ -296,7 +313,6 @@ export const LightControl = ({
       <div className="dark-layout">
         <TopToolbar
           summary={{}}
-          motionZones={[]}
           isConnected={false}
           isDemoMode={isDemoMode}
           onLogout={onLogout}
@@ -316,7 +332,6 @@ export const LightControl = ({
   return (
     <div className="dark-layout">
       <TopToolbar
-        motionZones={dashboard?.motionZones || []}
         summary={dashboard?.summary || {}}
         isConnected={wsConnected || isDemoMode}
         isDemoMode={isDemoMode}
