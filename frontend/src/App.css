@@ -1717,13 +1717,9 @@ body.dark-theme {
   border: 1px solid var(--border-color);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
   position: relative;
   overflow: hidden;
+  padding: 0;
 }
 
 .light-tile:hover {
@@ -1737,6 +1733,29 @@ body.dark-theme {
 
 .light-tile.toggling {
   opacity: 0.7;
+}
+
+/* Brightness fill - rises from bottom */
+.light-tile-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transition: height 0.4s ease-out;
+  border-radius: 0 0 23px 23px;
+}
+
+/* Content layer - centered over fill */
+.light-tile-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  width: 100%;
 }
 
 .light-tile-icon {
@@ -1756,7 +1775,7 @@ body.dark-theme {
 }
 
 .light-tile-name {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-primary);
   text-align: center;
@@ -1768,13 +1787,14 @@ body.dark-theme {
 
 .light-tile-brightness {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
+  bottom: 10px;
+  right: 10px;
   font-size: 0.7rem;
-  color: var(--text-secondary);
-  background: var(--bg-primary);
-  padding: 2px 6px;
-  border-radius: 4px;
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 3px 7px;
+  border-radius: 6px;
+  z-index: 2;
 }
 
 /* Bottom Navigation */
