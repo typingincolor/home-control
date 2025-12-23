@@ -3,6 +3,7 @@ import hueClient from '../../services/hueClient.js';
 import roomService from '../../services/roomService.js';
 import colorService from '../../services/colorService.js';
 import { extractCredentials } from '../../middleware/auth.js';
+import { SCENE_APPLY_DELAY_MS } from '../../constants/timings.js';
 
 const router = express.Router();
 
@@ -22,8 +23,8 @@ router.post('/:id/activate', extractCredentials, async (req, res, next) => {
     // Activate scene
     await hueClient.activateScene(bridgeIp, username, sceneId);
 
-    // Wait for lights to update (Hue Bridge takes ~500ms to apply scene)
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Wait for lights to update (Hue Bridge takes time to apply scene)
+    await new Promise(resolve => setTimeout(resolve, SCENE_APPLY_DELAY_MS));
 
     // Fetch updated light states
     const { lightsData, roomsData, devicesData, scenesData } = await hueClient.getDashboardData(bridgeIp, username);

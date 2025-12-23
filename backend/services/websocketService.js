@@ -1,6 +1,11 @@
 import { WebSocketServer } from 'ws';
 import dashboardService from './dashboardService.js';
 import sessionManager from './sessionManager.js';
+import {
+  WEBSOCKET_POLL_INTERVAL_MS,
+  WEBSOCKET_HEARTBEAT_INTERVAL_MS,
+  WEBSOCKET_CLEANUP_INTERVAL_MS
+} from '../constants/timings.js';
 
 /**
  * WebSocket Service for real-time updates
@@ -12,7 +17,7 @@ class WebSocketService {
     this.connections = new Map(); // bridgeIp → Set<WebSocket>
     this.pollingIntervals = new Map(); // bridgeIp → intervalId
     this.stateCache = new Map(); // bridgeIp → lastKnownState
-    this.pollInterval = 15000; // Poll every 15 seconds
+    this.pollInterval = WEBSOCKET_POLL_INTERVAL_MS;
   }
 
   /**
@@ -78,7 +83,7 @@ class WebSocketService {
       });
     });
 
-    // Heartbeat check every 30 seconds - terminates dead connections
+    // Heartbeat check - terminates dead connections
     this.heartbeatInterval = setInterval(() => {
       let terminated = 0;
       this.wss.clients.forEach((ws) => {
@@ -95,12 +100,12 @@ class WebSocketService {
       if (terminated > 0) {
         this.logStats('after heartbeat cleanup');
       }
-    }, 30000);
+    }, WEBSOCKET_HEARTBEAT_INTERVAL_MS);
 
-    // Periodic cleanup check every 60 seconds - catches any orphaned resources
+    // Periodic cleanup check - catches any orphaned resources
     this.cleanupInterval = setInterval(() => {
       this.cleanupOrphanedResources();
-    }, 60000);
+    }, WEBSOCKET_CLEANUP_INTERVAL_MS);
 
     console.log('[WebSocket] Server initialized on /api/v1/ws');
   }

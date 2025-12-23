@@ -1,5 +1,6 @@
 import axios from 'axios';
 import https from 'https';
+import { CACHE_TTL_MS } from '../constants/timings.js';
 
 /**
  * HueClient - Low-level Hue Bridge API client
@@ -13,9 +14,9 @@ class HueClient {
       rejectUnauthorized: false
     });
 
-    // Cache for static resources (5 minute TTL)
+    // Cache for static resources
     this.cache = new Map();
-    this.cacheTTL = 5 * 60 * 1000; // 5 minutes
+    this.cacheTTL = CACHE_TTL_MS;
   }
 
   /**

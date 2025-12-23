@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { SESSION_EXPIRY_MS, SESSION_CLEANUP_INTERVAL_MS } from '../constants/timings.js';
 
 /**
  * SessionManager - Manages user sessions to avoid repeating bridge credentials
@@ -10,8 +11,8 @@ class SessionManager {
     this.sessions = new Map();
 
     // Session configuration
-    this.SESSION_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
-    this.CLEANUP_INTERVAL = 60 * 60 * 1000; // Clean up every hour
+    this.SESSION_EXPIRY = SESSION_EXPIRY_MS;
+    this.CLEANUP_INTERVAL = SESSION_CLEANUP_INTERVAL_MS;
 
     // Start cleanup interval
     this.startCleanup();
