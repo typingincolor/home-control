@@ -33,7 +33,7 @@ export const TopToolbar = ({
       <div className="toolbar-center">
         <div className="toolbar-stat">
           <span className="toolbar-stat-value">{lightsOn}</span>
-          <span className="toolbar-stat-label">{UI_TEXT.STATUS_LIGHTS_ON}</span>
+          <span className="toolbar-stat-label">{UI_TEXT.LABEL_LIGHTS_ON}</span>
         </div>
         <div className="toolbar-stat">
           <span className="toolbar-stat-value">{roomCount}</span>
