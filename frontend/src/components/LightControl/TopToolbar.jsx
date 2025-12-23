@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { UI_TEXT } from '../../constants/uiText';
+import { Logout } from './Icons';
 
 export const TopToolbar = ({
   motionZones = [],
@@ -19,9 +20,7 @@ export const TopToolbar = ({
             <div className="toolbar-motion-dots">
               {motionZones.map((zone) => (
                 <div key={zone.id} className="toolbar-motion-item">
-                  <span className={`motion-dot ${zone.motionDetected ? 'active' : 'inactive'}`}>
-                    {zone.motionDetected ? '🔴' : '🟢'}
-                  </span>
+                  <span className={`motion-indicator ${zone.motionDetected ? 'active' : 'inactive'}`} />
                   <span>{zone.name?.replace(' MotionAware', '') || 'Zone'}</span>
                 </div>
               ))}
@@ -56,7 +55,7 @@ export const TopToolbar = ({
           <span>{isConnected ? UI_TEXT.STATUS_CONNECTED : 'Reconnecting...'}</span>
         </div>
         <button className="toolbar-logout" onClick={onLogout}>
-          {UI_TEXT.BUTTON_LOGOUT}
+          <Logout size={16} />
         </button>
       </div>
     </div>

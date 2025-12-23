@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { LightTile } from './LightTile';
 import { SceneSelector } from './SceneSelector';
 import { UI_TEXT } from '../../constants/uiText';
+import { Moon, Sun, Home, LightbulbOff } from './Icons';
 
 export const RoomContent = ({
   room,
@@ -14,7 +15,7 @@ export const RoomContent = ({
   if (!room) {
     return (
       <div className="empty-state-dark">
-        <div className="empty-state-dark-icon">🏠</div>
+        <Home size={48} className="empty-state-dark-icon" />
         <div className="empty-state-dark-text">Select a room from the navigation below</div>
       </div>
     );
@@ -38,13 +39,23 @@ export const RoomContent = ({
           className={`room-toggle-all ${allOn ? 'all-on' : ''}`}
           onClick={() => onToggleRoom(room.id, !anyOn)}
         >
-          {anyOn ? `🌙 ${UI_TEXT.BUTTON_ALL_OFF}` : `💡 ${UI_TEXT.BUTTON_ALL_ON}`}
+          {anyOn ? (
+            <>
+              <Moon size={18} />
+              <span>{UI_TEXT.BUTTON_ALL_OFF}</span>
+            </>
+          ) : (
+            <>
+              <Sun size={18} />
+              <span>{UI_TEXT.BUTTON_ALL_ON}</span>
+            </>
+          )}
         </button>
       </div>
 
       {lights.length === 0 ? (
         <div className="empty-state-dark">
-          <div className="empty-state-dark-icon">💡</div>
+          <LightbulbOff size={48} className="empty-state-dark-icon" />
           <div className="empty-state-dark-text">No lights in this room</div>
         </div>
       ) : (

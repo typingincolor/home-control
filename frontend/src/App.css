@@ -32,9 +32,9 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
 
-  /* Light tile sizes */
-  --light-tile-size: clamp(100px, 28vw, 140px);
-  --light-tile-gap: 16px;
+  /* Light tile sizes - larger for better touch targets */
+  --light-tile-size: clamp(130px, 35vw, 180px);
+  --light-tile-gap: 20px;
 
   /* Navigation */
   --nav-height: 72px;
@@ -1546,12 +1546,30 @@ body.dark-theme {
 .toolbar-motion-item {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
+  gap: 6px;
+  padding: 4px 10px;
   background: var(--bg-tertiary);
   border-radius: 12px;
   font-size: 0.75rem;
   color: var(--text-secondary);
+}
+
+/* Motion indicator dots */
+.motion-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #27ae60;
+  flex-shrink: 0;
+}
+
+.motion-indicator.active {
+  background: #e74c3c;
+  animation: pulse-motion 1.5s ease-in-out infinite;
+}
+
+.motion-indicator.inactive {
+  background: #27ae60;
 }
 
 .toolbar-center {
@@ -1603,12 +1621,14 @@ body.dark-theme {
 }
 
 .toolbar-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  padding: 6px 12px;
+  padding: 8px;
   border-radius: 6px;
-  font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -1656,6 +1676,9 @@ body.dark-theme {
 }
 
 .room-toggle-all {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
@@ -1717,8 +1740,19 @@ body.dark-theme {
 }
 
 .light-tile-icon {
-  font-size: 2.5rem;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Spinner animation */
+.icon-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .light-tile-name {
@@ -1802,8 +1836,9 @@ body.dark-theme {
 }
 
 .nav-tab-icon {
-  font-size: 1.5rem;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-tab-label {
@@ -1907,6 +1942,9 @@ body.dark-theme {
 }
 
 .zone-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
@@ -1927,6 +1965,11 @@ body.dark-theme {
   color: #000;
 }
 
+.zone-toggle-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Loading state in dark theme */
 .dark-loading {
   display: flex;
@@ -1945,8 +1988,10 @@ body.dark-theme {
 }
 
 .empty-state-dark-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
   opacity: 0.5;
 }
 

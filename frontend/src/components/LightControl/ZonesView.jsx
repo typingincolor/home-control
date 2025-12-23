@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { SceneSelector } from './SceneSelector';
 import { UI_TEXT } from '../../constants/uiText';
+import { Moon, Sun, Spinner, Grid } from './Icons';
 
 export const ZonesView = ({
   zones = [],
@@ -13,7 +14,7 @@ export const ZonesView = ({
     return (
       <div className="zones-view">
         <div className="empty-state-dark">
-          <div className="empty-state-dark-icon">📦</div>
+          <Grid size={48} className="empty-state-dark-icon" />
           <div className="empty-state-dark-text">No zones configured</div>
         </div>
       </div>
@@ -55,7 +56,19 @@ export const ZonesView = ({
                   onClick={() => onToggleZone(zone.id, !anyOn)}
                   disabled={isToggling}
                 >
-                  {isToggling ? '⏳' : anyOn ? '🌙 Off' : '💡 On'}
+                  {isToggling ? (
+                    <Spinner size={18} />
+                  ) : anyOn ? (
+                    <>
+                      <Moon size={18} />
+                      <span>Off</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sun size={18} />
+                      <span>On</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

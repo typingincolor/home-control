@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { LightbulbOn, LightbulbOff, Spinner } from './Icons';
 
 export const LightTile = ({ light, onToggle, isToggling }) => {
   // Use pre-computed color and shadow from backend
@@ -6,6 +7,9 @@ export const LightTile = ({ light, onToggle, isToggling }) => {
     background: `linear-gradient(135deg, ${light.color} 0%, ${adjustColor(light.color, -20)} 100%)`,
     boxShadow: light.shadow
   } : {};
+
+  // Icon color: dark for bright on-lights, light for off-lights
+  const iconColor = light.on ? 'rgba(0, 0, 0, 0.7)' : 'var(--text-secondary)';
 
   return (
     <button
@@ -15,9 +19,11 @@ export const LightTile = ({ light, onToggle, isToggling }) => {
       style={tileStyle}
     >
       {isToggling ? (
-        <span className="light-tile-icon">⏳</span>
+        <Spinner size={48} className="light-tile-icon" style={{ color: iconColor }} />
+      ) : light.on ? (
+        <LightbulbOn size={48} className="light-tile-icon" style={{ color: iconColor }} />
       ) : (
-        <span className="light-tile-icon">{light.on ? '💡' : '🔌'}</span>
+        <LightbulbOff size={48} className="light-tile-icon" style={{ color: iconColor }} />
       )}
       <span className="light-tile-name">{light.name || 'Light'}</span>
       {light.on && light.brightness > 0 && (
