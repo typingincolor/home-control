@@ -852,29 +852,48 @@ button.secondary:hover:not(:disabled) {
   margin-top: 24px;
 }
 
-.zones-header {
+.zones-header-toggle {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  margin-bottom: 8px;
+  cursor: pointer;
+  width: 100%;
 }
 
-.zones-header h3 {
+.zones-header-toggle h3 {
   color: #7c3aed;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   margin: 0;
 }
 
-.zones-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
-  gap: 12px;
+.zones-header-toggle:hover h3 {
+  color: #6d28d9;
 }
 
-@media (min-width: 1800px) {
+.collapse-icon {
+  color: #7c3aed;
+  font-size: 0.7rem;
+  transition: transform 0.2s ease;
+}
+
+.collapse-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.zones-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 1200px) {
   .zones-list {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -1056,120 +1075,95 @@ button.secondary:hover:not(:disabled) {
   justify-content: start;
 }
 
-/* Zone Cards (light groupings spanning multiple rooms) */
-.zone-group {
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
-              0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e9d5ff;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.zone-group:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07),
-              0 8px 20px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
-  border-color: #d8b4fe;
-}
-
-.zone-header {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #faf5ff;
-}
-
-.zone-title-row {
+/* Zone Bars (compact horizontal controls for light groupings) */
+.zone-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  background: white;
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e9d5ff;
+  transition: all 0.2s ease;
+}
+
+.zone-bar:hover {
+  border-color: #d8b4fe;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.1);
+}
+
+.zone-bar-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.zone-bar-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .zone-name {
   color: #111827;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   margin: 0;
-  font-weight: 700;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.zone-status-badge {
-  background: #faf5ff;
-  color: #7c3aed;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
   white-space: nowrap;
 }
 
 .zone-badges {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+}
+
+.zone-status-badge {
+  background: #faf5ff;
+  color: #7c3aed;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .zone-brightness-badge {
   background: #f5f3ff;
   color: #8b5cf6;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
   font-weight: 600;
   white-space: nowrap;
-  min-width: 42px;
+  min-width: 32px;
   text-align: center;
 }
 
-.zone-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
 .zone-control-button {
-  padding: 8px 16px;
+  padding: 6px 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #8b5cf6;
   color: white;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
+  transition: all 0.15s ease;
 }
 
 .zone-control-button:hover:not(:disabled) {
   background: #7c3aed;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
-}
-
-.zone-control-button:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(139, 92, 246, 0.2);
 }
 
 .zone-control-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
-}
-
-.zone-lights-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, var(--button-size));
-  gap: var(--grid-gap);
-  justify-content: start;
 }
 
 /* Light Card */
@@ -1328,16 +1322,15 @@ button.secondary:hover:not(:disabled) {
   }
 
   .room-lights-grid,
-  .zone-lights-grid,
   .lights-grid-simple {
     grid-template-columns: repeat(auto-fit, var(--button-size));
     gap: var(--grid-gap);
   }
 
-  .room-controls,
-  .zone-controls {
+  .room-controls {
     width: 100%;
   }
+
 
   .scene-control {
     flex-direction: column;
@@ -1372,80 +1365,56 @@ button.secondary:hover:not(:disabled) {
   }
 }
 
-/* Motion Zones Display */
-.motion-zones {
-  margin-bottom: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.motion-zones-header {
+/* Motion Zones Compact Bar */
+.motion-zones-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 8px 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
-.motion-zones-header h3 {
-  margin: 0;
-  color: #2c3e50;
-  font-size: 1.1rem;
+.motion-zones-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
 }
 
 .motion-zones-error {
-  padding: 8px 12px;
-  background: #ffe5e5;
-  border-left: 4px solid #e74c3c;
-  border-radius: 4px;
-  color: #c0392b;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  color: #e74c3c;
 }
 
-/* Horizontal row layout */
-.motion-zones-row {
+.motion-zones-items {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 
-/* Individual motion zone */
-.motion-zone {
+.motion-zone-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: 4px;
+  padding: 2px 8px;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.85rem;
 }
 
-.motion-zone:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
-}
-
-.motion-zone.unreachable {
+.motion-zone-item.unreachable {
   opacity: 0.5;
-  background: #f0f0f0;
-}
-
-.motion-zone.unreachable::after {
-  content: '⚠️';
-  font-size: 0.9rem;
-  margin-left: 4px;
 }
 
 /* Motion status dot */
 .motion-dot {
-  font-size: 1.2rem;
+  font-size: 0.75rem;
   line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .motion-dot.active {
@@ -1458,37 +1427,34 @@ button.secondary:hover:not(:disabled) {
     opacity: 1;
   }
   50% {
-    transform: scale(1.1);
-    opacity: 0.8;
+    transform: scale(1.15);
+    opacity: 0.85;
   }
 }
 
-/* Zone name text */
 .motion-zone-name {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #2c3e50;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #475569;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 150px;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .motion-zones-row {
+  .motion-zones-bar {
+    padding: 6px 10px;
     gap: 8px;
   }
 
-  .motion-zone {
-    padding: 6px 12px;
+  .motion-zones-items {
+    gap: 6px;
+  }
+
+  .motion-zone-item {
+    padding: 2px 6px;
   }
 
   .motion-zone-name {
-    font-size: 0.85rem;
-  }
-
-  .motion-dot {
-    font-size: 1rem;
+    font-size: 0.75rem;
   }
 }

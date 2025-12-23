@@ -86,12 +86,19 @@ describe('LightControl - Zones', () => {
     render(<LightControl sessionToken="test-token" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Zones')).toBeInTheDocument();
+      expect(screen.getByText('Zones (2)')).toBeInTheDocument();
     });
   });
 
   it('should render zone cards for each zone', async () => {
+    const user = userEvent.setup();
     render(<LightControl sessionToken="test-token" />);
+
+    // Expand zones section
+    await waitFor(() => {
+      expect(screen.getByText('Zones (2)')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Zones (2)'));
 
     await waitFor(() => {
       expect(screen.getByText('Upstairs')).toBeInTheDocument();
@@ -100,12 +107,19 @@ describe('LightControl - Zones', () => {
   });
 
   it('should display zone stats', async () => {
+    const user = userEvent.setup();
     render(<LightControl sessionToken="test-token" />);
 
+    // Expand zones section
     await waitFor(() => {
-      // Check for zone stats
-      expect(screen.getByText('2 of 4 on')).toBeInTheDocument();
-      expect(screen.getByText('1 of 2 on')).toBeInTheDocument();
+      expect(screen.getByText('Zones (2)')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Zones (2)'));
+
+    await waitFor(() => {
+      // Check for zone stats (compact format)
+      expect(screen.getByText('2/4')).toBeInTheDocument();
+      expect(screen.getByText('1/2')).toBeInTheDocument();
     });
   });
 
@@ -118,7 +132,7 @@ describe('LightControl - Zones', () => {
       expect(screen.getByText('Lights (6)')).toBeInTheDocument();
     });
 
-    expect(screen.queryByText('Zones')).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Zones/)).not.toBeInTheDocument();
   });
 
   it('should not render zones section when zones is undefined', async () => {
@@ -132,11 +146,18 @@ describe('LightControl - Zones', () => {
       expect(screen.getByText('Lights (6)')).toBeInTheDocument();
     });
 
-    expect(screen.queryByText('Zones')).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Zones/)).not.toBeInTheDocument();
   });
 
   it('should render zone scenes', async () => {
+    const user = userEvent.setup();
     render(<LightControl sessionToken="test-token" />);
+
+    // Expand zones section
+    await waitFor(() => {
+      expect(screen.getByText('Zones (2)')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Zones (2)'));
 
     await waitFor(() => {
       expect(screen.getByText('Evening')).toBeInTheDocument();
@@ -145,12 +166,19 @@ describe('LightControl - Zones', () => {
   });
 
   it('should render zone toggle buttons', async () => {
+    const user = userEvent.setup();
     render(<LightControl sessionToken="test-token" />);
 
+    // Expand zones section
     await waitFor(() => {
-      // Zones have lights on, so should show "All Off" buttons
-      const allOffButtons = screen.getAllByText('🌙 All Off');
-      expect(allOffButtons.length).toBeGreaterThanOrEqual(2); // At least 2 zones
+      expect(screen.getByText('Zones (2)')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Zones (2)'));
+
+    await waitFor(() => {
+      // Zones have lights on, so should show "Off" buttons (compact format)
+      const offButtons = screen.getAllByText('🌙 Off');
+      expect(offButtons.length).toBeGreaterThanOrEqual(2); // At least 2 zones
     });
   });
 
@@ -159,14 +187,20 @@ describe('LightControl - Zones', () => {
 
     render(<LightControl sessionToken="test-token" />);
 
+    // Expand zones section
+    await waitFor(() => {
+      expect(screen.getByText('Zones (2)')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Zones (2)'));
+
     await waitFor(() => {
       expect(screen.getByText('Upstairs')).toBeInTheDocument();
     });
 
     // Find the zone control button in the Upstairs zone
-    const zoneCards = document.querySelectorAll('.zone-group');
-    const upstairsCard = Array.from(zoneCards).find(card =>
-      card.textContent.includes('Upstairs')
+    const zoneBars = document.querySelectorAll('.zone-bar');
+    const upstairsCard = Array.from(zoneBars).find(bar =>
+      bar.textContent.includes('Upstairs')
     );
 
     expect(upstairsCard).toBeTruthy();

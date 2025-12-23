@@ -42,31 +42,23 @@ export const MotionZones = ({ sessionToken, motionZones }) => {
   }
 
   return (
-    <div className="motion-zones">
-      <div className="motion-zones-header">
-        <h3>Motion Zones</h3>
-        {loading && <span className="loading-text">Loading sensors...</span>}
-      </div>
-
-      {error && (
-        <div className="motion-zones-error">
-          Failed to load sensors: {error}
-        </div>
-      )}
-
+    <div className="motion-zones-bar">
+      <span className="motion-zones-label">Motion:</span>
+      {loading && <span className="loading-text">...</span>}
+      {error && <span className="motion-zones-error">Failed</span>}
       {!loading && zones.length > 0 && (
-        <div className="motion-zones-row">
+        <div className="motion-zones-items">
           {zones.map((zone) => (
-            <div
+            <span
               key={zone.id}
-              className={`motion-zone ${!zone.reachable ? 'unreachable' : ''}`}
-              title={!zone.reachable ? 'Sensor unreachable' : ''}
+              className={`motion-zone-item ${!zone.reachable ? 'unreachable' : ''}`}
+              title={!zone.reachable ? 'Sensor unreachable' : zone.motionDetected ? 'Motion detected' : 'No motion'}
             >
               <span className={`motion-dot ${zone.motionDetected ? 'active' : 'inactive'}`}>
                 {zone.motionDetected ? '🔴' : '🟢'}
               </span>
               <span className="motion-zone-name">{zone.name}</span>
-            </div>
+            </span>
           ))}
         </div>
       )}

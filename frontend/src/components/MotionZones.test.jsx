@@ -53,7 +53,7 @@ describe('MotionZones', () => {
     render(<MotionZones sessionToken="test-session-token" motionZones={mockZones} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Motion Zones')).toBeInTheDocument();
+      expect(screen.getByText('Motion:')).toBeInTheDocument();
     });
 
     expect(screen.getByText('Hallway MotionAware')).toBeInTheDocument();
@@ -97,7 +97,7 @@ describe('MotionZones', () => {
   it('should show loading state when no motionZones prop provided', () => {
     render(<MotionZones sessionToken="test-session-token" />);
 
-    expect(screen.getByText('Loading sensors...')).toBeInTheDocument();
+    expect(screen.getByText('...')).toBeInTheDocument();
   });
 
   it('should fallback to API in demo mode', async () => {
@@ -150,11 +150,11 @@ describe('MotionZones', () => {
       <MotionZones sessionToken="test-session-token" motionZones={mockZones} />
     );
 
-    expect(screen.getByText('Motion Zones')).toBeInTheDocument();
+    expect(screen.getByText('Motion:')).toBeInTheDocument();
 
-    expect(container.querySelector('.motion-zones')).toBeInTheDocument();
-    expect(container.querySelector('.motion-zones-header')).toBeInTheDocument();
-    expect(container.querySelector('.motion-zones-row')).toBeInTheDocument();
+    expect(container.querySelector('.motion-zones-bar')).toBeInTheDocument();
+    expect(container.querySelector('.motion-zones-label')).toBeInTheDocument();
+    expect(container.querySelector('.motion-zones-items')).toBeInTheDocument();
   });
 
   it('should not render when missing credentials', () => {

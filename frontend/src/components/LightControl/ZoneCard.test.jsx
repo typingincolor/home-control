@@ -41,7 +41,7 @@ describe('ZoneCard', () => {
 
   it('should display pre-computed zone stats from backend', () => {
     render(<ZoneCard {...defaultProps} />);
-    expect(screen.getByText('3 of 5 on')).toBeInTheDocument();
+    expect(screen.getByText('3/5')).toBeInTheDocument();
     expect(screen.getByText('81%')).toBeInTheDocument();
   });
 
@@ -60,22 +60,22 @@ describe('ZoneCard', () => {
     expect(screen.getByText('Evening')).toBeInTheDocument();
   });
 
-  it('should show "All Off" button when some lights are on', () => {
+  it('should show "Off" button when some lights are on', () => {
     render(<ZoneCard {...defaultProps} />);
-    expect(screen.getByText('🌙 All Off')).toBeInTheDocument();
+    expect(screen.getByText('🌙 Off')).toBeInTheDocument();
   });
 
-  it('should show "All On" button when no lights are on', () => {
+  it('should show "On" button when no lights are on', () => {
     const zoneAllOff = {
       ...mockZone,
       stats: { lightsOnCount: 0, totalLights: 5, averageBrightness: 0 },
       lights: mockZone.lights.map(l => ({ ...l, on: false, brightness: 0 }))
     };
     render(<ZoneCard {...defaultProps} zone={zoneAllOff} />);
-    expect(screen.getByText('💡 All On')).toBeInTheDocument();
+    expect(screen.getByText('💡 On')).toBeInTheDocument();
   });
 
-  it('should call onToggleZone with zone ID and light UUIDs when All On clicked', async () => {
+  it('should call onToggleZone with zone ID and light UUIDs when On clicked', async () => {
     const user = userEvent.setup();
     const onToggleZone = vi.fn();
     const zoneAllOff = {
@@ -85,7 +85,7 @@ describe('ZoneCard', () => {
     };
     render(<ZoneCard {...defaultProps} zone={zoneAllOff} onToggleZone={onToggleZone} />);
 
-    const allButton = screen.getByText('💡 All On');
+    const allButton = screen.getByText('💡 On');
     await user.click(allButton);
 
     expect(onToggleZone).toHaveBeenCalledWith(
@@ -95,12 +95,12 @@ describe('ZoneCard', () => {
     );
   });
 
-  it('should call onToggleZone with false when All Off clicked', async () => {
+  it('should call onToggleZone with false when Off clicked', async () => {
     const user = userEvent.setup();
     const onToggleZone = vi.fn();
     render(<ZoneCard {...defaultProps} onToggleZone={onToggleZone} />);
 
-    const allButton = screen.getByText('🌙 All Off');
+    const allButton = screen.getByText('🌙 Off');
     await user.click(allButton);
 
     expect(onToggleZone).toHaveBeenCalledWith(
@@ -139,11 +139,10 @@ describe('ZoneCard', () => {
   it('should have correct structure', () => {
     const { container } = render(<ZoneCard {...defaultProps} />);
 
-    expect(container.querySelector('.zone-group')).toBeInTheDocument();
-    expect(container.querySelector('.zone-header')).toBeInTheDocument();
-    expect(container.querySelector('.zone-title-row')).toBeInTheDocument();
+    expect(container.querySelector('.zone-bar')).toBeInTheDocument();
+    expect(container.querySelector('.zone-bar-info')).toBeInTheDocument();
+    expect(container.querySelector('.zone-bar-controls')).toBeInTheDocument();
     expect(container.querySelector('.zone-badges')).toBeInTheDocument();
-    expect(container.querySelector('.zone-controls')).toBeInTheDocument();
   });
 
   it('should handle zone with no scenes', () => {
@@ -165,7 +164,7 @@ describe('ZoneCard', () => {
     };
     render(<ZoneCard {...defaultProps} zone={zone} />);
 
-    expect(screen.getByText('4 of 6 on')).toBeInTheDocument();
+    expect(screen.getByText('4/6')).toBeInTheDocument();
     expect(screen.getByText('93%')).toBeInTheDocument();
   });
 });

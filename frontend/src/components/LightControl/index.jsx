@@ -32,6 +32,7 @@ export const LightControl = ({
   const [error, setError] = useState(null);
   const [togglingLights, setTogglingLights] = useState(new Set());
   const [activatingScene, setActivatingScene] = useState(null);
+  const [zonesCollapsed, setZonesCollapsed] = useState(true);
 
   // Use local dashboard (synced from WebSocket in real mode, manually fetched in demo mode)
   const dashboard = localDashboard;
@@ -349,27 +350,33 @@ export const LightControl = ({
 
           {dashboard.zones && dashboard.zones.length > 0 && (
             <div className="zones-control">
-              <div className="zones-header">
-                <h3>Zones</h3>
-              </div>
+              <button
+                className="zones-header-toggle"
+                onClick={() => setZonesCollapsed(!zonesCollapsed)}
+              >
+                <span className={`collapse-icon ${zonesCollapsed ? 'collapsed' : ''}`}>▼</span>
+                <h3>Zones ({dashboard.zones.length})</h3>
+              </button>
 
-              <div className="zones-list">
-                {dashboard.zones.map((zone) => {
-                  const isActivating = activatingScene && zone.scenes.some(s => s.id === activatingScene);
+              {!zonesCollapsed && (
+                <div className="zones-list">
+                  {dashboard.zones.map((zone) => {
+                    const isActivating = activatingScene && zone.scenes.some(s => s.id === activatingScene);
 
-                  return (
-                    <ZoneCard
-                      key={zone.id}
-                      zoneName={zone.name}
-                      zone={zone}
-                      onToggleZone={toggleZone}
-                      onActivateScene={handleSceneChange}
-                      togglingLights={togglingLights}
-                      isActivating={isActivating}
-                    />
-                  );
-                })}
-              </div>
+                    return (
+                      <ZoneCard
+                        key={zone.id}
+                        zoneName={zone.name}
+                        zone={zone}
+                        onToggleZone={toggleZone}
+                        onActivateScene={handleSceneChange}
+                        togglingLights={togglingLights}
+                        isActivating={isActivating}
+                      />
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </>
