@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { UI_TEXT } from '../../constants/uiText';
-import { Logout } from './Icons';
+import { Logout, LightbulbOn, Home, Grid } from './Icons';
 
 export const TopToolbar = ({
   summary = {},
@@ -13,22 +13,21 @@ export const TopToolbar = ({
   return (
     <div className="top-toolbar">
       <div className="toolbar-left">
-        {/* Space for future features */}
+        <div className="toolbar-stat">
+          <LightbulbOn size={16} className="toolbar-stat-icon" />
+          <span className="toolbar-stat-value">{lightsOn}</span>
+        </div>
+        <div className="toolbar-stat">
+          <Home size={16} className="toolbar-stat-icon" />
+          <span className="toolbar-stat-value">{roomCount}</span>
+        </div>
+        <div className="toolbar-stat">
+          <Grid size={16} className="toolbar-stat-icon" />
+          <span className="toolbar-stat-value">{sceneCount}</span>
+        </div>
       </div>
 
       <div className="toolbar-center">
-        <div className="toolbar-stat">
-          <span className="toolbar-stat-value">{lightsOn}</span>
-          <span className="toolbar-stat-label">{UI_TEXT.LABEL_LIGHTS_ON}</span>
-        </div>
-        <div className="toolbar-stat">
-          <span className="toolbar-stat-value">{roomCount}</span>
-          <span className="toolbar-stat-label">{UI_TEXT.LABEL_ROOMS}</span>
-        </div>
-        <div className="toolbar-stat">
-          <span className="toolbar-stat-value">{sceneCount}</span>
-          <span className="toolbar-stat-label">{UI_TEXT.LABEL_SCENES}</span>
-        </div>
       </div>
 
       <div className="toolbar-right">

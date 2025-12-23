@@ -357,9 +357,9 @@ describe('Integration Tests', () => {
       expect(screen.getByText('Light 2')).toBeInTheDocument();
       expect(screen.getByText('Light 3')).toBeInTheDocument();
 
-      // Verify summary section exists
-      expect(screen.getByText(UI_TEXT.LABEL_LIGHTS_ON)).toBeInTheDocument();
-      expect(screen.getByText(UI_TEXT.LABEL_ROOMS)).toBeInTheDocument();
+      // Verify toolbar exists (stats show icons with values)
+      const toolbar = document.querySelector('.top-toolbar');
+      expect(toolbar).toBeInTheDocument();
     });
 
     it('includes Content-Type header in pairing request', async () => {

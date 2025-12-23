@@ -1560,8 +1560,13 @@ body.dark-theme {
 
 .toolbar-stat {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 4px;
+}
+
+.toolbar-stat-icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
 .toolbar-stat-value {
