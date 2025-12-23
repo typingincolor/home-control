@@ -34,7 +34,7 @@ A modern React web application for controlling Philips Hue lights locally using 
 - **Multi-Machine Support**: Access from any device on your network
 - **Centralized Configuration**: All settings managed through config.json
 - **Modern API v2**: Uses the latest Philips Hue API for future-proof functionality
-- **Comprehensive Testing**: 209 tests (110 frontend + 99 backend) with integration test suite
+- **Comprehensive Testing**: 332 tests (193 frontend + 139 backend) with integration test suite
 
 ## Prerequisites
 
@@ -326,21 +326,22 @@ Runs mutation testing with Stryker (validates test quality)
 
 ## Testing
 
-The project includes comprehensive testing infrastructure with **209 tests total** (110 frontend + 99 backend) and mutation testing to ensure code quality.
+The project includes comprehensive testing infrastructure with **332 tests total** (193 frontend + 139 backend) and mutation testing to ensure code quality.
 
 ### Test Coverage
 
-**Frontend Tests (110 tests):**
+**Frontend Tests (193 tests):**
 - **Unit tests**: Utilities, hooks, and components
 - **Integration tests**: 11 end-to-end flow tests with MSW
 - **Vitest 4.0** - Fast, Vite-native test runner
 - **Testing Library** - React component testing with user-centric approach
 - **MSW** - Network-level API mocking for integration tests
 
-**Backend Tests:**
-- **Service layer tests**: Color conversion, room hierarchy, motion sensors, statistics
+**Backend Tests (139 tests):**
+- **Service layer tests**: Color conversion, room hierarchy, motion sensors, statistics, WebSocket service
 - **Route tests**: API endpoint validation
 - **Session management tests**: Token handling and refresh logic
+- **Zone service tests**: Zone hierarchy and statistics
 
 **Test Quality:**
 - **73.25% mutation score** - excellent test effectiveness
@@ -696,7 +697,15 @@ PORT=8080 npm run start
 
 ## Version History
 
-### v0.8.1 (Current)
+### v3.0.0 (Current)
+- **Performance optimizations** - Backend caching for static resources (5-minute TTL), 15-second WebSocket polling
+- **Optimistic updates** - UI responds immediately to user actions without waiting for polling
+- **Brightness minimum** - Lights display minimum 5% when on (prevents 0% display artifacts)
+- **WebSocket cleanup** - Automatic cleanup of orphaned polling intervals, heartbeat monitoring, stale connection removal
+- **Stats endpoint** - New `/api/v1/stats/websocket` endpoint for debugging connection issues
+- **Test improvements** - 332 tests total (193 frontend + 139 backend)
+
+### v0.8.1
 - **OpenAPI documentation** - Added Zone and MotionZone schemas to API specification
 - **Demo mode improvements** - Added zones to mock data, descriptive light names
 - **UI polish** - Fixed zone card alignment, light labels wrap to multiple lines

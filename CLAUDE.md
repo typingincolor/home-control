@@ -6,13 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a **Philips Hue Light Control** web application built as a monorepo with separated frontend (React) and backend (Express) workspaces. The app controls Philips Hue lights locally through the Hue Bridge API, featuring **true color display** with mathematical color space conversion, **information-dense UI** with brightness indicators and room statistics, **responsive design** optimized for iPhone 14+ and iPad, room organization, scene management, **MotionAware zone display** with real-time motion detection, and **WebSocket support** for live updates.
 
-**Architecture (v2.0.0):** Business logic resides in the backend, exposing a simplified v1 REST API with WebSocket support. The backend pre-computes colors, shadows, and statistics while pushing real-time updates via WebSocket, reducing frontend complexity by ~1,300 lines, API calls by 67-83%, and eliminating polling overhead. The legacy proxy has been completely removed in favor of controlled v1 endpoints. See `ARCHITECTURE_UPDATE.md` for migration details.
+**Architecture (v3.0.0):** Business logic resides in the backend, exposing a simplified v1 REST API with WebSocket support. The backend pre-computes colors, shadows, and statistics while pushing real-time updates via WebSocket, reducing frontend complexity by ~1,300 lines, API calls by 67-83%, and eliminating polling overhead. The legacy proxy has been completely removed in favor of controlled v1 endpoints. See `ARCHITECTURE_UPDATE.md` for migration details.
 
 **Performance Optimizations:**
 - **Backend caching**: Static resources (rooms, devices, zones, scenes, behavior_instance) cached with 5-minute TTL
 - **WebSocket polling**: 15-second interval for dynamic data (lights, motion status)
 - **Optimistic updates**: Frontend updates UI immediately on user actions, syncs with backend asynchronously
 - **Brightness minimum**: Lights display minimum 5% brightness when on (prevents 0% display artifacts)
+- **WebSocket cleanup**: Automatic cleanup of orphaned polling intervals, heartbeat monitoring, and stale connection removal
+- **Stats endpoint**: `/api/v1/stats/websocket` for debugging connection issues
 
 ## Development Commands
 

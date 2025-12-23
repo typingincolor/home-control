@@ -45,7 +45,7 @@ View mutation report: `open reports/mutation/html/index.html`
 
 ## Test Coverage
 
-### Unit Test Results (75 tests)
+### Unit Test Results (193 tests)
 
 #### Utilities - 100% Pass Rate
 - **colorConversion.js**: 31 tests
@@ -134,7 +134,7 @@ Some mutants survive because they don't produce observable differences in the te
    - Mathematical code has expected survivors
 
 4. **Fast Execution**
-   - 75 tests run in <1 second
+   - 193 tests run in <5 seconds
    - Mutation testing completes in ~1 minute
    - Enables rapid development cycles
 

@@ -1,8 +1,15 @@
-# Architecture Update - Backend API Refactoring (v2.0.0)
+# Architecture Update - Backend API Refactoring (v3.0.0)
 
 ## Overview
 
 As of v2.0.0, business logic has been moved from frontend to backend, exposing a simplified v1 REST API with WebSocket support that pre-computes colors, shadows, and statistics. The legacy `/api/hue/*` proxy has been completely removed in favor of controlled v1 endpoints.
+
+**v3.0.0 additions:**
+- Backend caching for static resources (5-minute TTL)
+- WebSocket cleanup mechanisms (orphaned interval cleanup, heartbeat monitoring, stale connection removal)
+- Stats endpoint for debugging (`/api/v1/stats/websocket`)
+- Optimistic UI updates
+- Minimum 5% brightness display for on lights
 
 ## Backend API (v1)
 
@@ -203,8 +210,9 @@ const { dashboard, isConnected } = useWebSocket(bridgeIp, username);
 - **websocketService.js** - Real-time WebSocket connection management, state change detection, broadcasting
 
 ### Testing
-- **99 backend tests** (81% coverage)
-- **62.13% mutation score**
+- **139 backend tests** (81% coverage)
+- **193 frontend tests**
+- **332 tests total**
 - Stryker mutation testing configured
 
 ## Migration Benefits
