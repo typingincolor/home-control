@@ -204,10 +204,152 @@ export const mockScenes = {
   ]
 };
 
+// Mock dashboard data (v1 API format)
+const mockDashboard = {
+  summary: {
+    totalLights: 14,
+    lightsOn: 11,
+    roomCount: 3,
+    sceneCount: 4
+  },
+  rooms: [
+    {
+      id: "room-1",
+      name: "Living Room",
+      stats: {
+        lightsOnCount: 5,
+        totalLights: 6,
+        averageBrightness: 52
+      },
+      lights: [
+        { id: "light-1", name: "Living Room 1", on: true, brightness: 100, color: "rgb(255, 120, 100)", shadow: "0 0 30px rgba(255, 120, 100, 0.6)" },
+        { id: "light-2", name: "Living Room 2", on: true, brightness: 75, color: "rgb(100, 120, 255)", shadow: "0 0 25px rgba(100, 120, 255, 0.5)" },
+        { id: "light-3", name: "Living Room 3", on: true, brightness: 50, color: "rgb(120, 255, 120)", shadow: "0 0 20px rgba(120, 255, 120, 0.4)" },
+        { id: "light-4", name: "Living Room 4", on: true, brightness: 25, color: "rgb(255, 200, 130)", shadow: "0 4px 8px rgba(0, 0, 0, 0.1)" },
+        { id: "light-5", name: "Living Room 5", on: true, brightness: 10, color: "rgb(255, 200, 130)", shadow: "0 4px 8px rgba(0, 0, 0, 0.1)" },
+        { id: "light-6", name: "Living Room 6", on: false, brightness: 0, color: null, shadow: null }
+      ],
+      scenes: [
+        { id: "scene-1", name: "Bright" },
+        { id: "scene-2", name: "Relax" }
+      ]
+    },
+    {
+      id: "room-2",
+      name: "Kitchen",
+      stats: {
+        lightsOnCount: 3,
+        totalLights: 3,
+        averageBrightness: 63
+      },
+      lights: [
+        { id: "light-7", name: "Kitchen 1", on: true, brightness: 90, color: "rgb(220, 230, 255)", shadow: "0 0 28px rgba(220, 230, 255, 0.56)" },
+        { id: "light-8", name: "Kitchen 2", on: true, brightness: 60, color: "rgb(255, 240, 220)", shadow: "0 0 22px rgba(255, 240, 220, 0.44)" },
+        { id: "light-9", name: "Kitchen 3", on: true, brightness: 40, color: "rgb(255, 220, 180)", shadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }
+      ],
+      scenes: [
+        { id: "scene-3", name: "Concentrate" }
+      ]
+    },
+    {
+      id: "room-3",
+      name: "Bedroom",
+      stats: {
+        lightsOnCount: 3,
+        totalLights: 5,
+        averageBrightness: 47
+      },
+      lights: [
+        { id: "light-10", name: "Bedroom 1", on: true, brightness: 80, color: "rgb(255, 230, 120)", shadow: "0 0 26px rgba(255, 230, 120, 0.52)" },
+        { id: "light-11", name: "Bedroom 2", on: true, brightness: 45, color: "rgb(200, 150, 255)", shadow: "0 4px 8px rgba(0, 0, 0, 0.1)" },
+        { id: "light-12", name: "Bedroom 3", on: false, brightness: 0, color: null, shadow: null },
+        { id: "light-13", name: "Test Very Dim", on: true, brightness: 5, color: "rgb(255, 200, 130)", shadow: "0 4px 8px rgba(0, 0, 0, 0.1)" },
+        { id: "light-14", name: "Test Dim Threshold", on: true, brightness: 15, color: "rgb(255, 200, 130)", shadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }
+      ],
+      scenes: [
+        { id: "scene-4", name: "Nightlight" }
+      ]
+    }
+  ]
+};
+
 // Mock API functions that simulate the real API
 export const mockApi = {
+  // V1 API Methods (new simplified API)
+  async getDashboard() {
+    await delay(300);
+    console.log('[MOCK] getDashboard called');
+    return mockDashboard;
+  },
+
+  async getMotionZones() {
+    await delay(200);
+    console.log('[MOCK] getMotionZones called');
+    return { zones: [] };
+  },
+
+  async updateLight(sessionToken, lightId, state) {
+    await delay(150);
+    console.log(`[MOCK] updateLight ${lightId}:`, state);
+
+    // Find and update the light in mockDashboard
+    for (const room of mockDashboard.rooms) {
+      const light = room.lights.find(l => l.id === lightId);
+      if (light) {
+        light.on = state.on ?? light.on;
+        if (state.brightness !== undefined) {
+          light.brightness = state.brightness;
+        }
+      }
+    }
+
+    return { light: { id: lightId, ...state } };
+  },
+
+  async updateRoomLights(sessionToken, roomId, state) {
+    await delay(200);
+    console.log(`[MOCK] updateRoomLights ${roomId}:`, state);
+
+    const room = mockDashboard.rooms.find(r => r.id === roomId);
+    if (room) {
+      room.lights.forEach(light => {
+        light.on = state.on ?? light.on;
+      });
+      return { updatedLights: room.lights };
+    }
+
+    return { updatedLights: [] };
+  },
+
+  async activateSceneV1(sessionToken, sceneId) {
+    await delay(200);
+    console.log(`[MOCK] activateSceneV1 ${sceneId}`);
+    return { affectedLights: [] };
+  },
+
+  async createSession(bridgeIp, username) {
+    await delay(100);
+    console.log('[MOCK] createSession called');
+    return {
+      sessionToken: 'demo-session-token',
+      expiresIn: 86400,
+      bridgeIp
+    };
+  },
+
+  async refreshSession(sessionToken) {
+    await delay(100);
+    console.log('[MOCK] refreshSession called');
+    return {
+      sessionToken: 'demo-session-token-refreshed',
+      expiresIn: 86400,
+      bridgeIp: 'demo-bridge'
+    };
+  },
+
+  // Legacy V2 API Methods (kept for compatibility)
   async getLights() {
-    await delay(300); // Simulate network delay
+    await delay(300);
     return mockLights;
   },
 
@@ -233,7 +375,6 @@ export const mockApi = {
     await delay(150);
     console.log(`[MOCK] Setting light ${lightId} to:`, state);
 
-    // Update the mock data
     const light = mockLights.data.find(l => l.id === lightId);
     if (light && state.on) {
       light.on = state.on;
