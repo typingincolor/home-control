@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useHueApi } from '../hooks/useHueApi';
 import { useDemoMode } from '../hooks/useDemoMode';
-import { usePolling } from '../hooks/usePolling';
-import { POLLING_INTERVALS } from '../constants/polling';
 
-export const MotionZones = ({ sessionToken }) => {
+export const MotionZones = ({ sessionToken, motionZones }) => {
   const isDemoMode = useDemoMode();
   const api = useHueApi();
 
@@ -13,33 +11,30 @@ export const MotionZones = ({ sessionToken }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch MotionAware zones from unified endpoint
-  const fetchSensors = async () => {
-    try {
-      const motionData = await api.getMotionZones(sessionToken);
-      setZones(motionData.zones || []);
-      setError(null);
-    } catch (err) {
-      console.error('[MotionZones] Failed to fetch MotionAware data:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Initial fetch
+  // Use WebSocket data if available, otherwise fallback to API
   useEffect(() => {
-    if (sessionToken) {
+    if (motionZones) {
+      // WebSocket data available (real-time)
+      setZones(motionZones);
+      setLoading(false);
+      setError(null);
+    } else if (sessionToken) {
+      // Fallback: fetch from API (for demo mode or when backend doesn't send motionZones yet)
+      const fetchSensors = async () => {
+        try {
+          const motionData = await api.getMotionZones(sessionToken);
+          setZones(motionData.zones || []);
+          setError(null);
+        } catch (err) {
+          console.error('[MotionZones] Failed to fetch MotionAware data:', err);
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
       fetchSensors();
     }
-  }, [sessionToken]);
-
-  // Auto-refresh polling (disabled in demo mode)
-  usePolling(
-    fetchSensors,
-    POLLING_INTERVALS.MOTION_REFRESH,
-    !!(sessionToken && !isDemoMode)
-  );
+  }, [sessionToken, motionZones, api]);
 
   // Don't render if no MotionAware zones found
   if (!loading && zones.length === 0) {
@@ -80,5 +75,12 @@ export const MotionZones = ({ sessionToken }) => {
 };
 
 MotionZones.propTypes = {
-  sessionToken: PropTypes.string.isRequired
+  sessionToken: PropTypes.string.isRequired,
+  motionZones: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    motionDetected: PropTypes.bool.isRequired,
+    enabled: PropTypes.bool,
+    reachable: PropTypes.bool
+  }))
 };

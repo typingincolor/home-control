@@ -490,6 +490,114 @@ describe('useWebSocket', () => {
 
       global.WebSocket = originalWebSocket;
     });
+
+    it('should handle motion zone update', async () => {
+      let ws;
+      const originalWebSocket = global.WebSocket;
+      global.WebSocket = class extends MockWebSocket {
+        constructor(url) {
+          super(url);
+          ws = this;
+        }
+      };
+
+      const { result } = renderHook(() =>
+        useWebSocket('test-session-token', null, true)
+      );
+
+      await act(async () => {
+        vi.advanceTimersByTime(0);
+      });
+
+      // Set initial state with motion zones
+      act(() => {
+        ws.simulateMessage({
+          type: 'initial_state',
+          data: {
+            summary: {},
+            rooms: [],
+            motionZones: [
+              { id: 'zone-1', name: 'Hallway', motionDetected: false, enabled: true }
+            ]
+          }
+        });
+      });
+
+      expect(result.current.dashboard.motionZones).toHaveLength(1);
+      expect(result.current.dashboard.motionZones[0].motionDetected).toBe(false);
+
+      // Update motion zone
+      act(() => {
+        ws.simulateMessage({
+          type: 'state_update',
+          changes: [
+            {
+              type: 'motion_zone',
+              data: { id: 'zone-1', name: 'Hallway', motionDetected: true, enabled: true }
+            }
+          ]
+        });
+      });
+
+      expect(result.current.dashboard.motionZones[0].motionDetected).toBe(true);
+
+      global.WebSocket = originalWebSocket;
+    });
+
+    it('should handle multiple motion zone updates', async () => {
+      let ws;
+      const originalWebSocket = global.WebSocket;
+      global.WebSocket = class extends MockWebSocket {
+        constructor(url) {
+          super(url);
+          ws = this;
+        }
+      };
+
+      const { result } = renderHook(() =>
+        useWebSocket('test-session-token', null, true)
+      );
+
+      await act(async () => {
+        vi.advanceTimersByTime(0);
+      });
+
+      act(() => {
+        ws.simulateMessage({
+          type: 'initial_state',
+          data: {
+            summary: {},
+            rooms: [],
+            motionZones: [
+              { id: 'zone-1', name: 'Hallway', motionDetected: false },
+              { id: 'zone-2', name: 'Kitchen', motionDetected: false }
+            ]
+          }
+        });
+      });
+
+      // Update both zones
+      act(() => {
+        ws.simulateMessage({
+          type: 'state_update',
+          changes: [
+            {
+              type: 'motion_zone',
+              data: { id: 'zone-1', name: 'Hallway', motionDetected: true }
+            },
+            {
+              type: 'motion_zone',
+              data: { id: 'zone-2', name: 'Kitchen', motionDetected: true }
+            }
+          ]
+        });
+      });
+
+      expect(result.current.dashboard.motionZones[0].motionDetected).toBe(true);
+      expect(result.current.dashboard.motionZones[1].motionDetected).toBe(true);
+
+      global.WebSocket = originalWebSocket;
+    });
   });
 
   describe('Reconnection', () => {

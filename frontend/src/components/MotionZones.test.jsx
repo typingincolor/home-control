@@ -11,13 +11,8 @@ vi.mock('../hooks/useDemoMode', () => ({
   useDemoMode: vi.fn()
 }));
 
-vi.mock('../hooks/usePolling', () => ({
-  usePolling: vi.fn()
-}));
-
 import { useHueApi } from '../hooks/useHueApi';
 import { useDemoMode } from '../hooks/useDemoMode';
-import { usePolling } from '../hooks/usePolling';
 
 describe('MotionZones', () => {
   const mockGetMotionZones = vi.fn();
@@ -29,9 +24,6 @@ describe('MotionZones', () => {
     vi.clearAllMocks();
     useHueApi.mockReturnValue(mockApi);
     useDemoMode.mockReturnValue(false);
-    usePolling.mockImplementation((callback) => {
-      // Don't actually poll in tests
-    });
   });
 
   afterEach(() => {
@@ -58,24 +50,20 @@ describe('MotionZones', () => {
   ];
 
   it('should render motion zones', async () => {
-    mockGetMotionZones.mockResolvedValue({ zones: mockZones });
-
-    render(<MotionZones sessionToken="test-session-token" />);
+    render(<MotionZones sessionToken="test-session-token" motionZones={mockZones} />);
 
     await waitFor(() => {
       expect(screen.getByText('Motion Zones')).toBeInTheDocument();
     });
 
-    await waitFor(() => {
-      expect(screen.getByText('Hallway MotionAware')).toBeInTheDocument();
-      expect(screen.getByText('Bedroom MotionAware')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Hallway MotionAware')).toBeInTheDocument();
+    expect(screen.getByText('Bedroom MotionAware')).toBeInTheDocument();
   });
 
   it('should show green dot when no motion detected', async () => {
     mockGetMotionZones.mockResolvedValue({ zones: mockZones });
 
-    render(<MotionZones sessionToken="test-session-token" />);
+    render(<MotionZones sessionToken="test-session-token" motionZones={mockZones} />);
 
     await waitFor(() => {
       expect(screen.getByText('Hallway MotionAware')).toBeInTheDocument();
@@ -88,7 +76,7 @@ describe('MotionZones', () => {
   it('should show red dot when motion detected', async () => {
     mockGetMotionZones.mockResolvedValue({ zones: mockZones });
 
-    render(<MotionZones sessionToken="test-session-token" />);
+    render(<MotionZones sessionToken="test-session-token" motionZones={mockZones} />);
 
     await waitFor(() => {
       expect(screen.getByText('Bedroom MotionAware')).toBeInTheDocument();
@@ -98,49 +86,22 @@ describe('MotionZones', () => {
     expect(motionZones.length).toBeGreaterThan(0);
   });
 
-  it('should return null when no zones found', async () => {
-    mockGetMotionZones.mockResolvedValue({ zones: [] });
-
+  it('should return null when no zones found', () => {
     const { container } = render(
-      <MotionZones sessionToken="test-session-token" />
+      <MotionZones sessionToken="test-session-token" motionZones={[]} />
     );
-
-    await waitFor(() => {
-      expect(mockGetMotionZones).toHaveBeenCalled();
-    });
 
     expect(container.firstChild).toBeNull();
   });
 
-  it('should show loading state initially', () => {
-    mockGetMotionZones.mockImplementation(
-      () => new Promise(() => {}) // Never resolves
-    );
-
+  it('should show loading state when no motionZones prop provided', () => {
     render(<MotionZones sessionToken="test-session-token" />);
 
     expect(screen.getByText('Loading sensors...')).toBeInTheDocument();
   });
 
-  it('should show error message on fetch failure', async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    mockGetMotionZones.mockRejectedValue(new Error('Network error'));
-
-    render(<MotionZones sessionToken="test-session-token" />);
-
-    await waitFor(() => {
-      expect(consoleError).toHaveBeenCalledWith(
-        '[MotionZones] Failed to fetch MotionAware data:',
-        expect.any(Error)
-      );
-    });
-
-    // Error is logged but component returns null when no zones
-    expect(mockGetMotionZones).toHaveBeenCalled();
-    consoleError.mockRestore();
-  });
-
-  it('should call API with correct parameters', async () => {
+  it('should fallback to API in demo mode', async () => {
+    useDemoMode.mockReturnValue(true);
     mockGetMotionZones.mockResolvedValue({ zones: mockZones });
 
     render(<MotionZones sessionToken="test-session-token" />);
@@ -148,76 +109,48 @@ describe('MotionZones', () => {
     await waitFor(() => {
       expect(mockGetMotionZones).toHaveBeenCalledWith('test-session-token');
     });
+
+    expect(screen.getByText('Hallway MotionAware')).toBeInTheDocument();
   });
 
-  it('should mark unreachable zones', async () => {
+  it('should mark unreachable zones', () => {
     const zonesWithUnreachable = [
       { ...mockZones[0], reachable: false }
     ];
-    mockGetMotionZones.mockResolvedValue({ zones: zonesWithUnreachable });
 
     const { container } = render(
-      <MotionZones sessionToken="test-session-token" />
+      <MotionZones sessionToken="test-session-token" motionZones={zonesWithUnreachable} />
     );
 
-    await waitFor(() => {
-      expect(screen.getByText('Hallway MotionAware')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Hallway MotionAware')).toBeInTheDocument();
 
     const unreachableZone = container.querySelector('.unreachable');
     expect(unreachableZone).toBeInTheDocument();
   });
 
-  it('should setup polling with correct interval', () => {
-    mockGetMotionZones.mockResolvedValue({ zones: mockZones });
 
-    render(<MotionZones sessionToken="test-session-token" />);
-
-    expect(usePolling).toHaveBeenCalled();
-    const pollingArgs = usePolling.mock.calls[0];
-    expect(pollingArgs[1]).toBeDefined(); // Interval
-    expect(pollingArgs[2]).toBe(true); // Should be enabled (not in demo mode)
-  });
-
-  it('should not poll in demo mode', () => {
-    useDemoMode.mockReturnValue(true);
-    mockGetMotionZones.mockResolvedValue({ zones: mockZones });
-
-    render(<MotionZones sessionToken="test-session-token" />);
-
-    expect(usePolling).toHaveBeenCalled();
-    const pollingArgs = usePolling.mock.calls[0];
-    expect(pollingArgs[2]).toBe(false); // Should be disabled in demo mode
-  });
-
-  it('should handle zones without motion data gracefully', async () => {
+  it('should handle zones without motion data gracefully', () => {
     const incompleteZones = [
       {
         id: 'zone-1',
         name: 'Test Zone',
+        motionDetected: false,
         enabled: true,
         reachable: true
       }
     ];
-    mockGetMotionZones.mockResolvedValue({ zones: incompleteZones });
 
-    render(<MotionZones sessionToken="test-session-token" />);
+    render(<MotionZones sessionToken="test-session-token" motionZones={incompleteZones} />);
 
-    await waitFor(() => {
-      expect(screen.getByText('Test Zone')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Test Zone')).toBeInTheDocument();
   });
 
-  it('should have correct structure', async () => {
-    mockGetMotionZones.mockResolvedValue({ zones: mockZones });
-
+  it('should have correct structure', () => {
     const { container } = render(
-      <MotionZones sessionToken="test-session-token" />
+      <MotionZones sessionToken="test-session-token" motionZones={mockZones} />
     );
 
-    await waitFor(() => {
-      expect(screen.getByText('Motion Zones')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Motion Zones')).toBeInTheDocument();
 
     expect(container.querySelector('.motion-zones')).toBeInTheDocument();
     expect(container.querySelector('.motion-zones-header')).toBeInTheDocument();

@@ -265,7 +265,10 @@ export const LightControl = ({
 
       {dashboard && !error && (
         <>
-          <MotionZones sessionToken={sessionToken} />
+          <MotionZones
+            sessionToken={sessionToken}
+            motionZones={dashboard.motionZones}
+          />
 
           <DashboardSummary
             totalLightsOn={dashboard.summary.lightsOn}
