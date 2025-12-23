@@ -3,6 +3,7 @@ import { useDemoMode } from './hooks/useDemoMode';
 import { BridgeDiscovery } from './components/BridgeDiscovery';
 import { Authentication } from './components/Authentication';
 import { LightControl } from './components/LightControl';
+import { UI_TEXT } from './constants/uiText';
 import './App.css';
 
 function App() {
@@ -30,8 +31,8 @@ function App() {
     <div className="app">
       {effectiveStep !== 'connected' && (
         <header className="app-header">
-          <h1>Philips Hue Bridge Connector</h1>
-          <p className="subtitle">Verify Local API Connectivity</p>
+          <h1>{UI_TEXT.APP_TITLE}</h1>
+          <p className="subtitle">{UI_TEXT.APP_SUBTITLE}</p>
 
           <div className="progress-indicator">
             <div className={`step ${effectiveStep === 'discovery' ? 'active' : effectiveStep !== 'discovery' ? 'completed' : ''}`}>

@@ -97,8 +97,9 @@ export const useSession = () => {
    * @param {string} token - Session token from backend
    * @param {string} ip - Bridge IP address
    * @param {number} expiresIn - Seconds until expiration
+   * @param {string} username - Optional username to store for session recovery
    */
-  const createSession = useCallback((token, ip, expiresIn) => {
+  const createSession = useCallback((token, ip, expiresIn, username = null) => {
     const expiryTime = Date.now() + (expiresIn * 1000);
 
     // Store in state
@@ -112,8 +113,10 @@ export const useSession = () => {
     localStorage.setItem(STORAGE_KEYS.BRIDGE_IP, ip);
     localStorage.setItem(STORAGE_KEYS.SESSION_EXPIRES_AT, expiryTime.toString());
 
-    // Remove old username-based auth (migration)
-    localStorage.removeItem(STORAGE_KEYS.USERNAME);
+    // Keep username for automatic session recovery (e.g., after server restart)
+    if (username) {
+      localStorage.setItem(STORAGE_KEYS.USERNAME, username);
+    }
 
     console.log('[Session] Created session, expires in', expiresIn, 'seconds');
   }, []);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { UI_TEXT } from '../constants/uiText';
 
 export const Authentication = ({ bridgeIp, onAuthenticate, loading, error }) => {
   const [isButtonPressed, setIsButtonPressed] = useState(false);
@@ -21,10 +22,10 @@ export const Authentication = ({ bridgeIp, onAuthenticate, loading, error }) => 
 
   return (
     <div className="authentication">
-      <h2>Authenticate with Bridge</h2>
+      <h2>{UI_TEXT.AUTH_MAIN_TITLE}</h2>
 
       <div className="bridge-info">
-        <p>Bridge IP: <strong>{bridgeIp}</strong></p>
+        <p>{UI_TEXT.AUTH_BRIDGE_IP_LABEL} <strong>{bridgeIp}</strong></p>
       </div>
 
       <div className="instructions">
@@ -41,20 +42,20 @@ export const Authentication = ({ bridgeIp, onAuthenticate, loading, error }) => 
 
         {!isButtonPressed && !loading && (
           <>
-            <h3>Press the Link Button</h3>
-            <p className="instruction-text">Press the round button on top of your Hue Bridge, then click below</p>
+            <h3>{UI_TEXT.AUTH_TITLE}</h3>
+            <p className="instruction-text">{UI_TEXT.AUTH_DESCRIPTION}</p>
             <button onClick={handleStartAuth} className="primary large">
-              I Pressed the Button
+              {UI_TEXT.BUTTON_I_PRESSED_BUTTON}
             </button>
           </>
         )}
 
         {loading && (
           <div className="auth-step">
-            <h3>Authenticating...</h3>
+            <h3>{UI_TEXT.AUTH_AUTHENTICATING_TITLE}</h3>
             <div className="loading">
               <div className="spinner"></div>
-              <p>Creating secure connection to your bridge</p>
+              <p>{UI_TEXT.AUTH_AUTHENTICATING_MESSAGE}</p>
             </div>
           </div>
         )}
@@ -62,7 +63,7 @@ export const Authentication = ({ bridgeIp, onAuthenticate, loading, error }) => 
 
       {error && (
         <div className="error-box">
-          <h4>Authentication Failed</h4>
+          <h4>{UI_TEXT.AUTH_FAILED_TITLE}</h4>
           <p className="error-message">{error}</p>
 
           {error.includes('link button') && (
@@ -84,7 +85,7 @@ export const Authentication = ({ bridgeIp, onAuthenticate, loading, error }) => 
           )}
 
           <button onClick={handleRetry} className="secondary">
-            Try Again
+            {UI_TEXT.BUTTON_TRY_AGAIN}
           </button>
         </div>
       )}

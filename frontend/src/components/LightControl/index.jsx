@@ -32,8 +32,8 @@ export const LightControl = ({
   const [togglingLights, setTogglingLights] = useState(new Set());
   const [activatingScene, setActivatingScene] = useState(null);
 
-  // Use WebSocket dashboard in real mode, local dashboard in demo mode
-  const dashboard = isDemoMode ? localDashboard : wsDashboard;
+  // Use local dashboard (synced from WebSocket in real mode, manually fetched in demo mode)
+  const dashboard = localDashboard;
 
   // Fetch dashboard for demo mode (no WebSocket)
   const fetchAllData = async () => {
@@ -64,13 +64,17 @@ export const LightControl = ({
     if (!isDemoMode) {
       if (wsDashboard) {
         setLoading(false);
+        setError(null); // Clear error when data is received
+        // Sync WebSocket data to local dashboard for display
+        setLocalDashboard(wsDashboard);
       }
-      if (wsError) {
+      // Only show error if we've been trying for a while (not initial connection)
+      // This prevents flash of error during initial WebSocket handshake
+      if (wsError && !wsDashboard && !loading) {
         setError(wsError);
-        setLoading(false);
       }
     }
-  }, [wsDashboard, wsError, isDemoMode]);
+  }, [wsDashboard, wsError, isDemoMode, loading]);
 
   // Helper: Get light by UUID from dashboard
   const getLightByUuid = (uuid) => {
@@ -177,15 +181,17 @@ export const LightControl = ({
     try {
       // Use v1 endpoint that returns affected lights with pre-computed colors
       const response = await api.activateSceneV1(sessionToken, sceneUuid);
-      console.log(`Activated scene ${sceneUuid}`);
+      console.log(`Activated scene ${sceneUuid}`, response.affectedLights?.length, 'lights affected');
 
-      // In demo mode, update local dashboard. In real mode, WebSocket will update automatically
-      if (isDemoMode) {
-        // Update dashboard with affected lights
-        if (response.affectedLights && response.affectedLights.length > 0) {
-          const updatedLightMap = new Map(response.affectedLights.map(l => [l.id, l]));
+      // Update dashboard immediately with affected lights (optimistic update)
+      // WebSocket will reconcile with actual state on next poll in real mode
+      if (response.affectedLights && response.affectedLights.length > 0) {
+        const updatedLightMap = new Map(response.affectedLights.map(l => [l.id, l]));
 
-          setLocalDashboard(prev => ({
+        setLocalDashboard(prev => {
+          if (!prev) return prev;
+
+          return {
             ...prev,
             rooms: prev.rooms.map(room => ({
               ...room,
@@ -193,10 +199,12 @@ export const LightControl = ({
                 updatedLightMap.get(light.id) || light
               )
             }))
-          }));
-        }
+          };
+        });
+      }
 
-        // Refresh full dashboard after short delay to ensure all state is synced
+      // In demo mode, refresh full dashboard after short delay
+      if (isDemoMode) {
         setTimeout(() => fetchAllData(), 300);
       }
     } catch (err) {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { hueApi } from '../services/hueApi';
 import { STORAGE_KEYS } from '../constants/storage';
 import { useSession } from './useSession';
@@ -26,14 +26,14 @@ export const useHueBridge = () => {
       }));
       console.log('[Auth] Restored session from storage');
     }
-    // Fallback to legacy username-based auth
+    // Check if we have username but no valid session (e.g., after server restart)
     else {
       const savedIp = localStorage.getItem(STORAGE_KEYS.BRIDGE_IP);
       const savedUsername = localStorage.getItem(STORAGE_KEYS.USERNAME);
 
       if (savedIp && savedUsername) {
-        console.log('[Auth] Found legacy credentials, migrating to session...');
-        // Attempt to create session from legacy credentials
+        console.log('[Auth] Found saved credentials, auto-recovering session...');
+        // Automatically recreate session (no button press needed!)
         migrateToSession(savedIp, savedUsername);
       }
     }
@@ -44,23 +44,24 @@ export const useHueBridge = () => {
     setState(prev => ({ ...prev, loading: true }));
     try {
       const sessionInfo = await hueApi.createSession(bridgeIp, username);
-      createSession(sessionInfo.sessionToken, bridgeIp, sessionInfo.expiresIn);
+      createSession(sessionInfo.sessionToken, bridgeIp, sessionInfo.expiresIn, username);
       setState(prev => ({
         ...prev,
         bridgeIp,
         loading: false,
         step: 'connected'
       }));
-      console.log('[Auth] Successfully migrated to session auth');
+      console.log('[Auth] Successfully auto-recovered session');
     } catch (error) {
-      console.error('[Auth] Failed to migrate to session:', error);
-      // Fall back to legacy mode
+      console.error('[Auth] Failed to auto-recover session:', error);
+      // Clear invalid credentials and require re-authentication
+      localStorage.removeItem(STORAGE_KEYS.USERNAME);
       setState(prev => ({
         ...prev,
         bridgeIp,
-        username,
         loading: false,
-        step: 'connected'
+        step: 'authentication',
+        error: 'Session recovery failed. Please authenticate again.'
       }));
     }
   };
@@ -75,7 +76,7 @@ export const useHueBridge = () => {
     }));
   };
 
-  const authenticate = async () => {
+  const authenticate = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
@@ -85,7 +86,7 @@ export const useHueBridge = () => {
 
       // Step 2: Create session token
       const sessionInfo = await hueApi.createSession(state.bridgeIp, username);
-      createSession(sessionInfo.sessionToken, state.bridgeIp, sessionInfo.expiresIn);
+      createSession(sessionInfo.sessionToken, state.bridgeIp, sessionInfo.expiresIn, username);
 
       setState(prev => ({
         ...prev,
@@ -108,7 +109,7 @@ export const useHueBridge = () => {
         error: errorMessage
       }));
     }
-  };
+  }, [state.bridgeIp, createSession]);
 
   const testConnection = async () => {
     // Connection testing is now handled by ConnectionTest component

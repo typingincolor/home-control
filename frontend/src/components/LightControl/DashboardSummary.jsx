@@ -1,19 +1,20 @@
 import PropTypes from 'prop-types';
+import { UI_TEXT } from '../../constants/uiText';
 
 export const DashboardSummary = ({ totalLightsOn, roomCount, sceneCount }) => {
   return (
     <div className="lights-summary">
       <div className="summary-stat">
         <span className="stat-value">{totalLightsOn}</span>
-        <span className="stat-label">lights on</span>
+        <span className="stat-label">{UI_TEXT.LABEL_LIGHTS_ON}</span>
       </div>
       <div className="summary-stat">
         <span className="stat-value">{roomCount}</span>
-        <span className="stat-label">rooms</span>
+        <span className="stat-label">{UI_TEXT.LABEL_ROOMS}</span>
       </div>
       <div className="summary-stat">
         <span className="stat-value">{sceneCount}</span>
-        <span className="stat-label">scenes</span>
+        <span className="stat-label">{UI_TEXT.LABEL_SCENES}</span>
       </div>
     </div>
   );

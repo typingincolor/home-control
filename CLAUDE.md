@@ -202,7 +202,39 @@ fetch('/api/hue/clip/v2/resource/light?bridgeIp={ip}', {
 - **usePolling hook**: Reusable interval-based polling with cleanup
 - **hueApi service**: All API calls go through this service layer
 - **Utilities**: Pure functions for data transformation (color, rooms, validation, motion sensors)
-- **Constants**: Centralized configuration values (polling intervals, storage keys, colors, messages)
+- **Constants**: Centralized configuration values (polling intervals, storage keys, colors, messages, UI text)
+
+#### UI Text Constants
+
+All user-facing text is centralized in **`constants/uiText.js`** via the `UI_TEXT` constant. This provides:
+
+- **Consistency**: Single source of truth for all UI text
+- **Maintainability**: Update text in one place, reflected everywhere
+- **Test stability**: Tests use the same constants, preventing brittleness from text changes
+- **Internationalization-ready**: Easy to extend for multi-language support
+
+**Usage Pattern**:
+```javascript
+import { UI_TEXT } from '../constants/uiText';
+
+// In component
+<h1>{UI_TEXT.APP_TITLE}</h1>
+<button>{UI_TEXT.BUTTON_DISCOVER_BRIDGE}</button>
+
+// In tests
+expect(screen.getByText(UI_TEXT.APP_TITLE)).toBeInTheDocument();
+```
+
+**Organization**: Constants are grouped by component/feature:
+- App Header: `APP_TITLE`, `APP_SUBTITLE`
+- BridgeDiscovery: `BRIDGE_DISCOVERY_TITLE`, `BUTTON_DISCOVER_BRIDGE`, etc.
+- Authentication: `AUTH_MAIN_TITLE`, `AUTH_DESCRIPTION`, `BUTTON_I_PRESSED_BUTTON`, etc.
+- LightControl: `LIGHT_CONTROL_TITLE`, `BUTTON_LOGOUT`, `STATUS_CONNECTED`, etc.
+- DashboardSummary: `LABEL_LIGHTS_ON`, `LABEL_ROOMS`, `LABEL_SCENES`
+- RoomCard: `BUTTON_ALL_ON`, `SELECT_SCENE_PLACEHOLDER`, `STATUS_LIGHTS_ON_FORMAT`
+- MotionZones: `MOTION_ZONES_TITLE`, `MOTION_DETECTED`, `NO_MOTION`
+
+**When to add new constants**: Any user-visible text should be added to `UI_TEXT` rather than hardcoded in components. This includes buttons, labels, headings, error messages, status text, and placeholders.
 
 ### CSS Architecture
 - **Single CSS file**: `frontend/src/App.css` (no CSS modules)
