@@ -3,6 +3,7 @@ import hueClient from '../../services/hueClient.js';
 import colorService from '../../services/colorService.js';
 import { extractCredentials } from '../../middleware/auth.js';
 import { ResourceNotFoundError } from '../../utils/errors.js';
+import { convertToHueState } from '../../utils/stateConversion.js';
 
 const router = express.Router();
 
@@ -21,13 +22,7 @@ router.put('/:id', extractCredentials, async (req, res, next) => {
     console.log(`[LIGHTS] Updating light ${id} (auth: ${req.hue.authMethod})`);
 
     // Convert simplified state to Hue API v2 format
-    const hueState = {};
-    if (typeof state.on !== 'undefined') {
-      hueState.on = { on: state.on };
-    }
-    if (typeof state.brightness !== 'undefined') {
-      hueState.dimming = { brightness: state.brightness };
-    }
+    const hueState = convertToHueState(state);
 
     // Update light on bridge
     await hueClient.updateLight(bridgeIp, username, id, hueState);

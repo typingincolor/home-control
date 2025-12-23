@@ -3,7 +3,7 @@ import hueClient from '../../services/hueClient.js';
 import roomService from '../../services/roomService.js';
 import colorService from '../../services/colorService.js';
 import { extractCredentials } from '../../middleware/auth.js';
-import { ResourceNotFoundError } from '../../utils/errors.js';
+import { convertToHueState } from '../../utils/stateConversion.js';
 
 const router = express.Router();
 
@@ -22,11 +22,7 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
     console.log(`[ROOMS] Updating lights in room ${roomId} (auth: ${req.hue.authMethod})`);
 
     // Fetch room hierarchy to get lights in this room
-    const [lightsData, roomsData, devicesData] = await Promise.all([
-      hueClient.getLights(bridgeIp, username),
-      hueClient.getRooms(bridgeIp, username),
-      hueClient.getDevices(bridgeIp, username)
-    ]);
+    const { lightsData, roomsData, devicesData } = await hueClient.getHierarchyData(bridgeIp, username);
 
     const roomMap = roomService.buildRoomHierarchy(lightsData, roomsData, devicesData);
 
@@ -42,13 +38,7 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
     console.log(`[ROOMS] Found ${room.lights.length} lights in room`);
 
     // Convert simplified state to Hue API v2 format
-    const hueState = {};
-    if (typeof state.on !== 'undefined') {
-      hueState.on = { on: state.on };
-    }
-    if (typeof state.brightness !== 'undefined') {
-      hueState.dimming = { brightness: state.brightness };
-    }
+    const hueState = convertToHueState(state);
 
     // Update all lights in parallel
     const lightUpdates = room.lights.map(light => ({

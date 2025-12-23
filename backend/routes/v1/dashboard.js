@@ -20,12 +20,7 @@ router.get('/', extractCredentials, async (req, res, next) => {
     console.log(`[DASHBOARD] Fetching data for bridge ${bridgeIp} (auth: ${req.hue.authMethod})`);
 
     // Step 1: Fetch all data in parallel
-    const [lightsData, roomsData, devicesData, scenesData] = await Promise.all([
-      hueClient.getLights(bridgeIp, username),
-      hueClient.getRooms(bridgeIp, username),
-      hueClient.getDevices(bridgeIp, username),
-      hueClient.getScenes(bridgeIp, username)
-    ]);
+    const { lightsData, roomsData, devicesData, scenesData } = await hueClient.getDashboardData(bridgeIp, username);
 
     console.log(`[DASHBOARD] Fetched ${lightsData.data?.length || 0} lights, ${roomsData.data?.length || 0} rooms`);
 

@@ -1,3 +1,10 @@
+import {
+  buildDeviceToLightsMap,
+  getLightsFromChildren,
+  calculateLightStats,
+  getScenesForGroup
+} from '../utils/hierarchyUtils.js';
+
 /**
  * RoomService - Room hierarchy and statistics
  * Handles room organization, scene filtering, and statistics calculation
@@ -18,30 +25,15 @@ class RoomService {
       return lightsData.data.find(light => light.id === uuid);
     };
 
-    // Build device → lights map
-    const deviceToLights = {};
-    devicesData.data.forEach(device => {
-      const lightUuids = device.services
-        ?.filter(s => s.rtype === 'light')
-        .map(s => s.rid) || [];
-      deviceToLights[device.id] = lightUuids;
-    });
+    // Build device → lights map using shared utility
+    const deviceToLights = buildDeviceToLightsMap(devicesData);
 
     const roomMap = {};
 
     // Build rooms with their lights
     roomsData.data.forEach(room => {
-      const lightUuids = [];
-
-      // Get lights from room's devices
-      room.children?.forEach(child => {
-        if (child.rtype === 'device') {
-          const deviceLights = deviceToLights[child.rid] || [];
-          lightUuids.push(...deviceLights);
-        } else if (child.rtype === 'light') {
-          lightUuids.push(child.rid);
-        }
-      });
+      // Get lights from room's children using shared utility
+      const lightUuids = getLightsFromChildren(room.children, deviceToLights);
 
       if (lightUuids.length > 0) {
         roomMap[room.metadata?.name || 'Unknown Room'] = {
@@ -80,15 +72,7 @@ class RoomService {
    * @returns {Array} Array of scene objects with id and name
    */
   getScenesForRoom(scenesData, roomUuid) {
-    if (!scenesData?.data) return [];
-
-    return scenesData.data
-      .filter(scene => scene.group?.rid === roomUuid)
-      .map(scene => ({
-        id: scene.id,
-        name: scene.metadata?.name || 'Unknown Scene'
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    return getScenesForGroup(scenesData, roomUuid);
   }
 
   /**
@@ -97,24 +81,7 @@ class RoomService {
    * @returns {Object} Stats object with lightsOnCount, totalLights, averageBrightness
    */
   calculateRoomStats(roomLights) {
-    if (!roomLights || roomLights.length === 0) {
-      return { lightsOnCount: 0, totalLights: 0, averageBrightness: 0 };
-    }
-
-    const lightsOnCount = roomLights.filter(light => light.on?.on).length;
-    const totalLights = roomLights.length;
-
-    // Calculate average brightness of lights that are on
-    const lightsOn = roomLights.filter(light => light.on?.on);
-    const averageBrightness = lightsOn.length > 0
-      ? lightsOn.reduce((sum, light) => {
-          // Use 50% as default during scene transitions when brightness data is loading
-          const brightness = light.dimming?.brightness ?? 50;
-          return sum + brightness;
-        }, 0) / lightsOn.length
-      : 0;
-
-    return { lightsOnCount, totalLights, averageBrightness };
+    return calculateLightStats(roomLights);
   }
 
   /**

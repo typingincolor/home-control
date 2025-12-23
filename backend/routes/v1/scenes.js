@@ -3,7 +3,6 @@ import hueClient from '../../services/hueClient.js';
 import roomService from '../../services/roomService.js';
 import colorService from '../../services/colorService.js';
 import { extractCredentials } from '../../middleware/auth.js';
-import { ResourceNotFoundError } from '../../utils/errors.js';
 
 const router = express.Router();
 
@@ -27,12 +26,7 @@ router.post('/:id/activate', extractCredentials, async (req, res, next) => {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     // Fetch updated light states
-    const [lightsData, roomsData, devicesData, scenesData] = await Promise.all([
-      hueClient.getLights(bridgeIp, username),
-      hueClient.getRooms(bridgeIp, username),
-      hueClient.getDevices(bridgeIp, username),
-      hueClient.getScenes(bridgeIp, username)
-    ]);
+    const { lightsData, roomsData, devicesData, scenesData } = await hueClient.getDashboardData(bridgeIp, username);
 
     // Find the scene to determine affected room
     const scene = scenesData.data.find(s => s.id === sceneId);

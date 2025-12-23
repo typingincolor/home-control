@@ -212,6 +212,49 @@ class HueClient {
     );
     return Promise.all(promises);
   }
+
+  /**
+   * Get room hierarchy data (lights, rooms, devices) in parallel
+   * Used by room-based operations
+   */
+  async getHierarchyData(bridgeIp, username) {
+    const [lightsData, roomsData, devicesData] = await Promise.all([
+      this.getLights(bridgeIp, username),
+      this.getRooms(bridgeIp, username),
+      this.getDevices(bridgeIp, username)
+    ]);
+
+    return { lightsData, roomsData, devicesData };
+  }
+
+  /**
+   * Get zone hierarchy data (lights, zones, devices) in parallel
+   * Used by zone-based operations
+   */
+  async getZoneHierarchyData(bridgeIp, username) {
+    const [lightsData, zonesData, devicesData] = await Promise.all([
+      this.getLights(bridgeIp, username),
+      this.getZones(bridgeIp, username),
+      this.getDevices(bridgeIp, username)
+    ]);
+
+    return { lightsData, zonesData, devicesData };
+  }
+
+  /**
+   * Get dashboard data (lights, rooms, devices, scenes) in parallel
+   * Used by dashboard endpoint
+   */
+  async getDashboardData(bridgeIp, username) {
+    const [lightsData, roomsData, devicesData, scenesData] = await Promise.all([
+      this.getLights(bridgeIp, username),
+      this.getRooms(bridgeIp, username),
+      this.getDevices(bridgeIp, username),
+      this.getScenes(bridgeIp, username)
+    ]);
+
+    return { lightsData, roomsData, devicesData, scenesData };
+  }
 }
 
 // Export singleton instance

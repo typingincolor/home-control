@@ -1,3 +1,10 @@
+import {
+  buildDeviceToLightsMap,
+  getLightsFromChildren,
+  calculateLightStats,
+  getScenesForGroup
+} from '../utils/hierarchyUtils.js';
+
 /**
  * ZoneService - Zone hierarchy building and statistics
  * Handles zone data processing (zones are custom light groupings that can span rooms)
@@ -19,35 +26,17 @@ class ZoneService {
       lightMap.set(light.id, light);
     });
 
-    // Create device → lights map
-    const deviceToLights = {};
-    if (devicesData?.data) {
-      devicesData.data.forEach(device => {
-        const lightUuids = device.services
-          ?.filter(s => s.rtype === 'light')
-          .map(s => s.rid) || [];
-        deviceToLights[device.id] = lightUuids;
-      });
-    }
+    // Build device → lights map using shared utility
+    const deviceToLights = buildDeviceToLightsMap(devicesData);
 
     const zoneMap = {};
 
     // Process each zone
     zonesData.data.forEach(zone => {
       const zoneName = zone.metadata?.name || 'Unknown Zone';
-      const lightUuids = [];
 
-      // Walk zone children to find lights
-      zone.children?.forEach(child => {
-        if (child.rtype === 'device') {
-          // Get lights from device
-          const deviceLights = deviceToLights[child.rid] || [];
-          lightUuids.push(...deviceLights);
-        } else if (child.rtype === 'light') {
-          // Direct light reference
-          lightUuids.push(child.rid);
-        }
-      });
+      // Get lights from zone's children using shared utility
+      const lightUuids = getLightsFromChildren(zone.children, deviceToLights);
 
       // Deduplicate and filter existing lights
       const uniqueLightUuids = [...new Set(lightUuids)];
@@ -73,30 +62,11 @@ class ZoneService {
    * @returns {Object} Stats object with lightsOnCount, totalLights, averageBrightness
    */
   calculateZoneStats(lights) {
-    if (!lights || lights.length === 0) {
-      return {
-        lightsOnCount: 0,
-        totalLights: 0,
-        averageBrightness: 0
-      };
-    }
-
-    const lightsOn = lights.filter(light => light.on?.on);
-    const lightsOnCount = lightsOn.length;
-    const totalLights = lights.length;
-
-    // Calculate average brightness of lights that are on
-    const averageBrightness = lightsOnCount > 0
-      ? lightsOn.reduce((sum, light) => {
-          const brightness = light.dimming?.brightness ?? 50; // 50% fallback
-          return sum + brightness;
-        }, 0) / lightsOnCount
-      : 0;
-
+    const stats = calculateLightStats(lights);
+    // Zone stats round the average brightness
     return {
-      lightsOnCount,
-      totalLights,
-      averageBrightness: Math.round(averageBrightness)
+      ...stats,
+      averageBrightness: Math.round(stats.averageBrightness)
     };
   }
 
@@ -107,15 +77,7 @@ class ZoneService {
    * @returns {Array} Array of scene objects for the zone
    */
   getScenesForZone(scenesData, zoneUuid) {
-    if (!scenesData?.data) return [];
-
-    return scenesData.data
-      .filter(scene => scene.group?.rid === zoneUuid && scene.group?.rtype === 'zone')
-      .map(scene => ({
-        id: scene.id,
-        name: scene.metadata?.name || 'Unknown Scene'
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    return getScenesForGroup(scenesData, zoneUuid, 'zone');
   }
 }
 
