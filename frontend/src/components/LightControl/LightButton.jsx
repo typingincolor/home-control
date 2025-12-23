@@ -1,12 +1,10 @@
 import PropTypes from 'prop-types';
-import { getLightColor, getLightShadow } from '../../utils/colorConversion';
 
 export const LightButton = ({ light, onToggle, isToggling }) => {
-  const lightColor = getLightColor(light);
-  const lightShadow = getLightShadow(light, lightColor);
-  const buttonStyle = lightColor ? {
-    background: `linear-gradient(135deg, ${lightColor} 0%, ${lightColor} 100%)`,
-    boxShadow: lightShadow
+  // Use pre-computed color and shadow from backend
+  const buttonStyle = light.color ? {
+    background: `linear-gradient(135deg, ${light.color} 0%, ${light.color} 100%)`,
+    boxShadow: light.shadow
   } : {};
 
   return (
@@ -14,7 +12,7 @@ export const LightButton = ({ light, onToggle, isToggling }) => {
       <button
         onClick={() => onToggle(light.id)}
         disabled={isToggling}
-        className={`light-bulb-button ${light.on?.on ? 'on' : 'off'}`}
+        className={`light-bulb-button ${light.on ? 'on' : 'off'}`}
         style={buttonStyle}
       >
         {isToggling ? (
@@ -27,7 +25,7 @@ export const LightButton = ({ light, onToggle, isToggling }) => {
           </svg>
         )}
       </button>
-      <span className="light-label">{light.metadata?.name || 'Unknown Light'}</span>
+      <span className="light-label">{light.name || 'Unknown Light'}</span>
     </div>
   );
 };
@@ -35,24 +33,12 @@ export const LightButton = ({ light, onToggle, isToggling }) => {
 LightButton.propTypes = {
   light: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    on: PropTypes.shape({
-      on: PropTypes.bool
-    }),
-    metadata: PropTypes.shape({
-      name: PropTypes.string
-    }),
-    dimming: PropTypes.shape({
-      brightness: PropTypes.number
-    }),
-    color: PropTypes.shape({
-      xy: PropTypes.shape({
-        x: PropTypes.number,
-        y: PropTypes.number
-      })
-    }),
-    color_temperature: PropTypes.shape({
-      mirek: PropTypes.number
-    })
+    name: PropTypes.string.isRequired,
+    on: PropTypes.bool.isRequired,
+    brightness: PropTypes.number.isRequired,
+    color: PropTypes.string, // Pre-computed CSS color (e.g., "rgb(255, 180, 120)")
+    shadow: PropTypes.string, // Pre-computed CSS shadow
+    colorSource: PropTypes.oneOf(['xy', 'temperature', 'fallback', null])
   }).isRequired,
   onToggle: PropTypes.func.isRequired,
   isToggling: PropTypes.bool

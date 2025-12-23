@@ -20,7 +20,7 @@ export const SceneSelector = ({ scenes, onActivate, isActivating }) => {
           {isActivating ? '⏳ Activating...' : '🎨 Select Scene'}
         </option>
         {scenes.map((scene) => (
-          <option key={scene.uuid} value={scene.uuid}>
+          <option key={scene.id} value={scene.id}>
             {scene.name}
           </option>
         ))}
@@ -32,7 +32,7 @@ export const SceneSelector = ({ scenes, onActivate, isActivating }) => {
 SceneSelector.propTypes = {
   scenes: PropTypes.arrayOf(
     PropTypes.shape({
-      uuid: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired
     })
   ).isRequired,

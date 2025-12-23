@@ -1,21 +1,23 @@
 import PropTypes from 'prop-types';
 import { LightButton } from './LightButton';
 import { SceneSelector } from './SceneSelector';
-import { calculateRoomStats } from '../../utils/roomUtils';
 
 export const RoomCard = ({
   roomName,
-  roomData,
-  roomScenes,
+  room,
   onToggleLight,
   onToggleRoom,
   onActivateScene,
   togglingLights,
   isActivating
 }) => {
-  const { lightsOnCount, totalLights, averageBrightness } = calculateRoomStats(roomData.lights);
+  // Use pre-computed stats from backend
+  const { lightsOnCount, totalLights, averageBrightness } = room.stats;
   const anyLightsOn = lightsOnCount > 0;
-  const allLightsToggling = roomData.lightUuids.every(uuid => togglingLights.has(uuid));
+
+  // Get light UUIDs for toggling
+  const lightUuids = room.lights.map(l => l.id);
+  const allLightsToggling = lightUuids.every(uuid => togglingLights.has(uuid));
 
   return (
     <div className="room-group">
@@ -34,12 +36,12 @@ export const RoomCard = ({
 
         <div className="room-controls">
           <SceneSelector
-            scenes={roomScenes}
+            scenes={room.scenes}
             onActivate={onActivateScene}
             isActivating={isActivating}
           />
           <button
-            onClick={() => onToggleRoom(roomData.lightUuids, !anyLightsOn)}
+            onClick={() => onToggleRoom(room.id, lightUuids, !anyLightsOn)}
             disabled={allLightsToggling}
             className="room-control-button"
           >
@@ -49,7 +51,7 @@ export const RoomCard = ({
       </div>
 
       <div className="room-lights-grid">
-        {roomData.lights.map((light) => (
+        {room.lights.map((light) => (
           <LightButton
             key={light.id}
             light={light}
@@ -64,17 +66,22 @@ export const RoomCard = ({
 
 RoomCard.propTypes = {
   roomName: PropTypes.string.isRequired,
-  roomData: PropTypes.shape({
-    roomUuid: PropTypes.string,
-    lightUuids: PropTypes.arrayOf(PropTypes.string).isRequired,
-    lights: PropTypes.arrayOf(PropTypes.object).isRequired
+  room: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    stats: PropTypes.shape({
+      lightsOnCount: PropTypes.number.isRequired,
+      totalLights: PropTypes.number.isRequired,
+      averageBrightness: PropTypes.number.isRequired
+    }).isRequired,
+    lights: PropTypes.arrayOf(PropTypes.object).isRequired,
+    scenes: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired
+      })
+    ).isRequired
   }).isRequired,
-  roomScenes: PropTypes.arrayOf(
-    PropTypes.shape({
-      uuid: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
-    })
-  ).isRequired,
   onToggleLight: PropTypes.func.isRequired,
   onToggleRoom: PropTypes.func.isRequired,
   onActivateScene: PropTypes.func.isRequired,

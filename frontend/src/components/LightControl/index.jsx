@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useHueApi } from '../../hooks/useHueApi';
 import { useDemoMode } from '../../hooks/useDemoMode';
 import { usePolling } from '../../hooks/usePolling';
-import { buildRoomHierarchy, getScenesForRoom } from '../../utils/roomUtils';
 import { POLLING_INTERVALS } from '../../constants/polling';
 import { ERROR_MESSAGES } from '../../constants/messages';
 import { MotionZones } from '../MotionZones';
@@ -19,11 +18,8 @@ export const LightControl = ({
   const isDemoMode = useDemoMode();
   const api = useHueApi();
 
-  // API data
-  const [lights, setLights] = useState(null);
-  const [rooms, setRooms] = useState(null);
-  const [devices, setDevices] = useState(null);
-  const [scenes, setScenes] = useState(null);
+  // API data - single dashboard response
+  const [dashboard, setDashboard] = useState(null);
 
   // UI state
   const [loading, setLoading] = useState(true);
@@ -31,28 +27,17 @@ export const LightControl = ({
   const [togglingLights, setTogglingLights] = useState(new Set());
   const [activatingScene, setActivatingScene] = useState(null);
 
-  // Fetch all data from API
+  // Fetch all data from unified dashboard endpoint
   const fetchAllData = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Fetch all data in parallel
-      const [lightsData, roomsData, devicesData, scenesData] = await Promise.all([
-        api.getLights(bridgeIp, username),
-        api.getRooms(bridgeIp, username),
-        api.getResource(bridgeIp, username, 'device'),
-        api.getScenes(bridgeIp, username)
-      ]);
-
-      setLights(lightsData);
-      setRooms(roomsData);
-      setDevices(devicesData);
-      setScenes(scenesData);
-
-      console.log('[ConnectionTest] Fetched all data successfully');
+      const dashboardData = await api.getDashboard(bridgeIp, username);
+      setDashboard(dashboardData);
+      console.log('[ConnectionTest] Fetched dashboard successfully');
     } catch (err) {
-      console.error('[ConnectionTest] Failed to fetch data:', err);
+      console.error('[ConnectionTest] Failed to fetch dashboard:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -76,9 +61,14 @@ export const LightControl = ({
     !!(bridgeIp && username && !isDemoMode)
   );
 
-  // Helper: Get light by UUID
+  // Helper: Get light by UUID from dashboard
   const getLightByUuid = (uuid) => {
-    return lights?.data?.find(light => light.id === uuid);
+    if (!dashboard?.rooms) return null;
+    for (const room of dashboard.rooms) {
+      const light = room.lights.find(l => l.id === uuid);
+      if (light) return light;
+    }
+    return null;
   };
 
   const toggleLight = async (lightUuid) => {
@@ -88,19 +78,27 @@ export const LightControl = ({
       const light = getLightByUuid(lightUuid);
       if (!light) throw new Error('Light not found');
 
-      const currentState = light.on?.on || false;
-      const newState = { on: { on: !currentState } };
+      const currentState = light.on ?? false;
+      const newState = { on: !currentState };
 
-      await api.setLightState(bridgeIp, username, lightUuid, newState);
+      // Use v1 endpoint that returns updated light with pre-computed color
+      const response = await api.updateLight(bridgeIp, username, lightUuid, newState);
 
-      // Update local state for responsive UI
-      setLights(prev => ({
+      // Update dashboard with new light data
+      setDashboard(prev => ({
         ...prev,
-        data: prev.data.map(l =>
-          l.id === lightUuid
-            ? { ...l, on: { on: !currentState } }
-            : l
-        )
+        summary: {
+          ...prev.summary,
+          lightsOn: newState.on
+            ? prev.summary.lightsOn + 1
+            : Math.max(0, prev.summary.lightsOn - 1)
+        },
+        rooms: prev.rooms.map(room => ({
+          ...room,
+          lights: room.lights.map(l =>
+            l.id === lightUuid ? response.light : l
+          )
+        }))
       }));
     } catch (err) {
       console.error('Failed to toggle light:', err);
@@ -114,7 +112,7 @@ export const LightControl = ({
     }
   };
 
-  const toggleRoom = async (lightUuids, turnOn) => {
+  const toggleRoom = async (roomId, lightUuids, turnOn) => {
     setTogglingLights(prev => {
       const newSet = new Set(prev);
       lightUuids.forEach(id => newSet.add(id));
@@ -122,21 +120,29 @@ export const LightControl = ({
     });
 
     try {
-      const newState = { on: { on: turnOn } };
+      const newState = { on: turnOn };
 
-      await Promise.all(
-        lightUuids.map(uuid => api.setLightState(bridgeIp, username, uuid, newState))
-      );
+      // Use v1 endpoint that updates all lights in room
+      const response = await api.updateRoomLights(bridgeIp, username, roomId, newState);
 
-      // Update local state
-      setLights(prev => ({
+      // Update dashboard with new light data
+      setDashboard(prev => ({
         ...prev,
-        data: prev.data.map(l =>
-          lightUuids.includes(l.id)
-            ? { ...l, on: { on: turnOn } }
-            : l
-        )
+        rooms: prev.rooms.map(room => {
+          if (room.id === roomId) {
+            // Replace all lights in this room with updated data
+            const updatedLightMap = new Map(response.updatedLights.map(l => [l.id, l]));
+            return {
+              ...room,
+              lights: room.lights.map(l => updatedLightMap.get(l.id) || l)
+            };
+          }
+          return room;
+        })
       }));
+
+      // Refresh dashboard to get updated summary stats
+      setTimeout(() => fetchAllData(), 300);
     } catch (err) {
       console.error('Failed to toggle room:', err);
       alert(`${ERROR_MESSAGES.ROOM_TOGGLE}: ${err.message}`);
@@ -154,10 +160,27 @@ export const LightControl = ({
 
     setActivatingScene(sceneUuid);
     try {
-      await api.activateScene(bridgeIp, username, sceneUuid);
+      // Use v1 endpoint that returns affected lights with pre-computed colors
+      const response = await api.activateSceneV1(bridgeIp, username, sceneUuid);
       console.log(`Activated scene ${sceneUuid}`);
-      // Refresh lights to show updated states
-      setTimeout(() => fetchAllData(), 500);
+
+      // Update dashboard with affected lights
+      if (response.affectedLights && response.affectedLights.length > 0) {
+        const updatedLightMap = new Map(response.affectedLights.map(l => [l.id, l]));
+
+        setDashboard(prev => ({
+          ...prev,
+          rooms: prev.rooms.map(room => ({
+            ...room,
+            lights: room.lights.map(light =>
+              updatedLightMap.get(light.id) || light
+            )
+          }))
+        }));
+      }
+
+      // Refresh full dashboard after short delay to ensure all state is synced
+      setTimeout(() => fetchAllData(), 300);
     } catch (err) {
       console.error('Failed to activate scene:', err);
       alert(`${ERROR_MESSAGES.SCENE_ACTIVATION}: ${err.message}`);
@@ -165,12 +188,6 @@ export const LightControl = ({
       setActivatingScene(null);
     }
   };
-
-  const lightsCount = lights?.data?.length || 0;
-  const lightsByRoom = buildRoomHierarchy(lights, rooms, devices);
-
-  // Calculate total lights on across all rooms
-  const totalLightsOn = lights?.data?.filter(light => light.on?.on).length || 0;
 
   return (
     <div className="light-control">
@@ -189,7 +206,7 @@ export const LightControl = ({
         </div>
       </div>
 
-      {loading && !lights && (
+      {loading && !dashboard && (
         <div className="loading">
           <div className="spinner"></div>
           <p>Connecting to bridge...</p>
@@ -211,56 +228,39 @@ export const LightControl = ({
         </div>
       )}
 
-      {lights && !error && (
+      {dashboard && !error && (
         <>
           <MotionZones bridgeIp={bridgeIp} username={username} />
 
           <DashboardSummary
-            totalLightsOn={totalLightsOn}
-            roomCount={lightsByRoom ? Object.keys(lightsByRoom).length : 0}
-            sceneCount={scenes?.data?.length || 0}
+            totalLightsOn={dashboard.summary.lightsOn}
+            roomCount={dashboard.summary.roomCount}
+            sceneCount={dashboard.summary.sceneCount}
           />
 
           <div className="lights-control">
             <div className="lights-header">
-              <h3>Lights ({lightsCount})</h3>
+              <h3>Lights ({dashboard.summary.totalLights})</h3>
             </div>
 
-            {lightsByRoom ? (
-              // Show lights grouped by room
-              <div className="rooms-list">
-                {Object.entries(lightsByRoom).map(([roomName, roomData]) => {
-                  const roomScenes = roomData.roomUuid ? getScenesForRoom(scenes, roomData.roomUuid) : [];
-                  const isActivating = activatingScene && roomScenes.some(s => s.uuid === activatingScene);
+            <div className="rooms-list">
+              {dashboard.rooms.map((room) => {
+                const isActivating = activatingScene && room.scenes.some(s => s.id === activatingScene);
 
-                  return (
-                    <RoomCard
-                      key={roomName}
-                      roomName={roomName}
-                      roomData={roomData}
-                      roomScenes={roomScenes}
-                      onToggleLight={toggleLight}
-                      onToggleRoom={toggleRoom}
-                      onActivateScene={handleSceneChange}
-                      togglingLights={togglingLights}
-                      isActivating={isActivating}
-                    />
-                  );
-                })}
-              </div>
-            ) : (
-              // Show lights without grouping (fallback)
-              <div className="lights-grid-simple">
-                {lights?.data?.map((light) => (
-                  <LightButton
-                    key={light.id}
-                    light={light}
-                    onToggle={toggleLight}
-                    isToggling={togglingLights.has(light.id)}
+                return (
+                  <RoomCard
+                    key={room.id}
+                    roomName={room.name}
+                    room={room}
+                    onToggleLight={toggleLight}
+                    onToggleRoom={toggleRoom}
+                    onActivateScene={handleSceneChange}
+                    togglingLights={togglingLights}
+                    isActivating={isActivating}
                   />
-                ))}
-              </div>
-            )}
+                );
+              })}
+            </div>
           </div>
         </>
       )}

@@ -3,29 +3,21 @@ import PropTypes from 'prop-types';
 import { useHueApi } from '../hooks/useHueApi';
 import { useDemoMode } from '../hooks/useDemoMode';
 import { usePolling } from '../hooks/usePolling';
-import { parseMotionSensors } from '../utils/motionSensors';
 import { POLLING_INTERVALS } from '../constants/polling';
 
 export const MotionZones = ({ bridgeIp, username }) => {
   const isDemoMode = useDemoMode();
   const api = useHueApi();
 
-  const [behaviors, setBehaviors] = useState(null);
-  const [motionAreas, setMotionAreas] = useState(null);
+  const [zones, setZones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch MotionAware data using API
+  // Fetch MotionAware zones from unified endpoint
   const fetchSensors = async () => {
     try {
-      // Fetch behaviors (for zone names)
-      const behaviorsData = await api.getResource(bridgeIp, username, 'behavior_instance');
-
-      // Fetch convenience_area_motion (for motion status)
-      const motionAreasData = await api.getResource(bridgeIp, username, 'convenience_area_motion');
-
-      setBehaviors(behaviorsData);
-      setMotionAreas(motionAreasData);
+      const motionData = await api.getMotionZones(bridgeIp, username);
+      setZones(motionData.zones || []);
       setError(null);
     } catch (err) {
       console.error('[MotionZones] Failed to fetch MotionAware data:', err);
@@ -49,10 +41,8 @@ export const MotionZones = ({ bridgeIp, username }) => {
     !!(bridgeIp && username && !isDemoMode)
   );
 
-  const motionSensors = parseMotionSensors(behaviors, motionAreas);
-
   // Don't render if no MotionAware zones found
-  if (!loading && motionSensors.length === 0) {
+  if (!loading && zones.length === 0) {
     return null;
   }
 
@@ -69,18 +59,18 @@ export const MotionZones = ({ bridgeIp, username }) => {
         </div>
       )}
 
-      {!loading && motionSensors.length > 0 && (
+      {!loading && zones.length > 0 && (
         <div className="motion-zones-row">
-          {motionSensors.map((sensor) => (
+          {zones.map((zone) => (
             <div
-              key={sensor.id}
-              className={`motion-zone ${!sensor.reachable ? 'unreachable' : ''}`}
-              title={!sensor.reachable ? 'Sensor unreachable' : ''}
+              key={zone.id}
+              className={`motion-zone ${!zone.reachable ? 'unreachable' : ''}`}
+              title={!zone.reachable ? 'Sensor unreachable' : ''}
             >
-              <span className={`motion-dot ${sensor.motionDetected ? 'active' : 'inactive'}`}>
-                {sensor.motionDetected ? '🔴' : '🟢'}
+              <span className={`motion-dot ${zone.motionDetected ? 'active' : 'inactive'}`}>
+                {zone.motionDetected ? '🔴' : '🟢'}
               </span>
-              <span className="motion-zone-name">{sensor.name}</span>
+              <span className="motion-zone-name">{zone.name}</span>
             </div>
           ))}
         </div>
