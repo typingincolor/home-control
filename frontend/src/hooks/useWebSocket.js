@@ -3,8 +3,11 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 /**
  * WebSocket hook for real-time dashboard updates
  * Replaces polling with push-based updates from backend
+ * @param {string} sessionToken - Session token (preferred) OR bridgeIp (legacy)
+ * @param {string} username - Username (only needed for legacy mode)
+ * @param {boolean} enabled - Whether WebSocket is enabled
  */
-export const useWebSocket = (bridgeIp, username, enabled = true) => {
+export const useWebSocket = (sessionToken, username = null, enabled = true) => {
   const [isConnected, setIsConnected] = useState(false);
   const [dashboard, setDashboard] = useState(null);
   const [error, setError] = useState(null);
@@ -13,15 +16,19 @@ export const useWebSocket = (bridgeIp, username, enabled = true) => {
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = 5;
 
+  // Detect legacy mode (bridgeIp looks like an IP address)
+  const isLegacyMode = sessionToken && sessionToken.includes('.');
+
   const connect = useCallback(() => {
-    if (!enabled || !bridgeIp || !username) return;
+    if (!enabled || !sessionToken) return;
+    if (isLegacyMode && !username) return;
 
     // Determine WebSocket URL (same host as current page)
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
     const wsUrl = `${protocol}//${host}/api/v1/ws`;
 
-    console.log('[WebSocket] Connecting to', wsUrl);
+    console.log('[WebSocket] Connecting to', wsUrl, isLegacyMode ? '(legacy mode)' : '(session mode)');
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
@@ -33,11 +40,20 @@ export const useWebSocket = (bridgeIp, username, enabled = true) => {
       reconnectAttempts.current = 0;
 
       // Authenticate
-      ws.send(JSON.stringify({
-        type: 'auth',
-        bridgeIp,
-        username
-      }));
+      if (isLegacyMode) {
+        // Legacy: send bridgeIp + username
+        ws.send(JSON.stringify({
+          type: 'auth',
+          bridgeIp: sessionToken,
+          username
+        }));
+      } else {
+        // Session mode: send sessionToken
+        ws.send(JSON.stringify({
+          type: 'auth',
+          sessionToken
+        }));
+      }
     };
 
     ws.onmessage = (event) => {
@@ -72,7 +88,7 @@ export const useWebSocket = (bridgeIp, username, enabled = true) => {
         setError('Failed to connect after multiple attempts');
       }
     };
-  }, [bridgeIp, username, enabled]);
+  }, [sessionToken, username, enabled, isLegacyMode]);
 
   const handleMessage = useCallback((message) => {
     switch (message.type) {
@@ -144,8 +160,10 @@ export const useWebSocket = (bridgeIp, username, enabled = true) => {
 
   // Connect on mount and when credentials change
   useEffect(() => {
-    if (enabled && bridgeIp && username) {
-      connect();
+    if (enabled && sessionToken) {
+      if (!isLegacyMode || (isLegacyMode && username)) {
+        connect();
+      }
     }
 
     return () => {
@@ -158,7 +176,7 @@ export const useWebSocket = (bridgeIp, username, enabled = true) => {
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
-  }, [connect, bridgeIp, username, enabled]);
+  }, [connect, sessionToken, username, enabled, isLegacyMode]);
 
   // Heartbeat ping every 30 seconds
   useEffect(() => {

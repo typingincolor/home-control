@@ -1,5 +1,6 @@
 import { WebSocketServer } from 'ws';
 import dashboardService from './dashboardService.js';
+import sessionManager from './sessionManager.js';
 
 /**
  * WebSocket Service for real-time updates
@@ -81,14 +82,40 @@ class WebSocketService {
 
   /**
    * Handle client authentication
+   * Supports both session token and legacy bridgeIp/username auth
    */
   async handleAuth(ws, data) {
-    const { bridgeIp, username } = data;
+    let bridgeIp, username;
 
-    if (!bridgeIp || !username) {
+    // Method 1: Session token (preferred)
+    if (data.sessionToken) {
+      const session = sessionManager.getSession(data.sessionToken);
+
+      if (!session) {
+        ws.send(JSON.stringify({
+          type: 'error',
+          message: 'Invalid or expired session token'
+        }));
+        return;
+      }
+
+      bridgeIp = session.bridgeIp;
+      username = session.username;
+      ws.authMethod = 'session';
+      console.log(`[WebSocket] Client authenticated via session token for bridge ${bridgeIp}`);
+    }
+    // Method 2: Legacy bridgeIp + username
+    else if (data.bridgeIp && data.username) {
+      bridgeIp = data.bridgeIp;
+      username = data.username;
+      ws.authMethod = 'legacy';
+      console.log(`[WebSocket] Client authenticated via legacy credentials for bridge ${bridgeIp}`);
+    }
+    // Error: No valid auth provided
+    else {
       ws.send(JSON.stringify({
         type: 'error',
-        message: 'Missing bridgeIp or username'
+        message: 'Missing authentication: provide sessionToken OR (bridgeIp + username)'
       }));
       return;
     }
@@ -103,8 +130,6 @@ class WebSocketService {
       await this.startPolling(bridgeIp, username);
     }
     this.connections.get(bridgeIp).add(ws);
-
-    console.log(`[WebSocket] Client authenticated for bridge ${bridgeIp}`);
 
     // Send initial state
     try {
