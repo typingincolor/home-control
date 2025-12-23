@@ -1,10 +1,74 @@
 import express from 'express';
+import axios from 'axios';
+import https from 'https';
 import sessionManager from '../../services/sessionManager.js';
 import hueClient from '../../services/hueClient.js';
 import { requireSession } from '../../middleware/auth.js';
 import { MissingCredentialsError, BridgeConnectionError } from '../../utils/errors.js';
 
 const router = express.Router();
+
+// HTTPS agent for self-signed certificates
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false
+});
+
+/**
+ * POST /api/v1/auth/pair
+ * Pair with a Hue Bridge (initial link button authentication)
+ *
+ * Body:
+ *   {
+ *     "bridgeIp": "192.168.1.100",
+ *     "appName": "hue_control_app" (optional)
+ *   }
+ *
+ * Returns:
+ *   {
+ *     "username": "generated-hue-api-key"
+ *   }
+ *
+ * Note: User must press the link button on the bridge before calling this
+ */
+router.post('/pair', async (req, res, next) => {
+  try {
+    const { bridgeIp, appName = 'hue_control_app' } = req.body;
+
+    if (!bridgeIp) {
+      throw new MissingCredentialsError('bridgeIp');
+    }
+
+    console.log(`[AUTH] Pairing with bridge ${bridgeIp}`);
+
+    // Make pairing request to Hue Bridge
+    const response = await axios.post(
+      `https://${bridgeIp}/api`,
+      { devicetype: appName },
+      { httpsAgent, validateStatus: () => true }
+    );
+
+    // Check for errors
+    if (response.data && response.data[0]) {
+      if (response.data[0].error) {
+        const error = response.data[0].error;
+        return res.status(400).json({
+          error: error.description,
+          type: error.type
+        });
+      }
+
+      if (response.data[0].success) {
+        const username = response.data[0].success.username;
+        console.log(`[AUTH] Successfully paired with bridge ${bridgeIp}`);
+        return res.json({ username });
+      }
+    }
+
+    throw new Error('Unexpected response from bridge');
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * POST /api/v1/auth/session
