@@ -75,6 +75,7 @@ export const hueApi = {
     const url = `${PROXY_URL}/api/v1/auth/pair`;
     return request(url, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ bridgeIp, appName })
     }).then(data => data.username);
   },
