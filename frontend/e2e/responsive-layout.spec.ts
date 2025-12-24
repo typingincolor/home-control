@@ -479,6 +479,21 @@ test.describe('Zones View Layout', () => {
           }
         }
       });
+
+      test('all zone toggle buttons should be fully visible', async ({ page }) => {
+        const toggleButtons = page.locator('.zone-toggle-btn');
+        const count = await toggleButtons.count();
+
+        // Check each toggle button is fully within viewport
+        for (let i = 0; i < count; i++) {
+          const box = await toggleButtons.nth(i).boundingBox();
+          expect(box).not.toBeNull();
+          if (box) {
+            expect(box.x).toBeGreaterThanOrEqual(0);
+            expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+          }
+        }
+      });
     });
   }
 });
