@@ -7,8 +7,9 @@ import { test, expect } from '@playwright/test';
  * - iPad (1024x768): 2 rows x 4 buttons
  * - iPhone 14+ (390x844): 4 rows x 2 buttons
  * - Raspberry Pi 7" (800x480): 2 rows x 4 buttons
- * - Buttons: min 44px, max 200px, always square
+ * - Buttons: min 44px, always square, fill available space
  * - Buttons must not overlap toolbars
+ * - Scene drawer slides in from right
  */
 
 // Viewport definitions
@@ -29,7 +30,6 @@ const EXPECTED_LAYOUTS = {
 const TOOLBAR_HEIGHT = 56;
 const NAV_HEIGHT = 120;
 const MIN_BUTTON_SIZE = 44;
-const MAX_BUTTON_SIZE = 200;
 
 test.describe('iPad Layout (1024x768)', () => {
   test.use({ viewport: VIEWPORTS.ipad });
@@ -58,7 +58,7 @@ test.describe('iPad Layout (1024x768)', () => {
     }
   });
 
-  test('should have square buttons within size constraints', async ({ page }) => {
+  test('should have square buttons at least 44px', async ({ page }) => {
     const tile = page.locator('.light-tile').first();
     const box = await tile.boundingBox();
 
@@ -67,9 +67,8 @@ test.describe('iPad Layout (1024x768)', () => {
       // Check square (aspect ratio ~1)
       expect(Math.abs(box.width - box.height)).toBeLessThan(2);
 
-      // Check size constraints
+      // Check minimum size
       expect(box.width).toBeGreaterThanOrEqual(MIN_BUTTON_SIZE);
-      expect(box.width).toBeLessThanOrEqual(MAX_BUTTON_SIZE);
     }
   });
 
@@ -137,7 +136,7 @@ test.describe('iPhone 14 Layout (390x844)', () => {
     }
   });
 
-  test('should have square buttons within size constraints', async ({ page }) => {
+  test('should have square buttons at least 44px', async ({ page }) => {
     const tile = page.locator('.light-tile').first();
     const box = await tile.boundingBox();
 
@@ -146,9 +145,8 @@ test.describe('iPhone 14 Layout (390x844)', () => {
       // Check square (aspect ratio ~1)
       expect(Math.abs(box.width - box.height)).toBeLessThan(2);
 
-      // Check size constraints
+      // Check minimum size
       expect(box.width).toBeGreaterThanOrEqual(MIN_BUTTON_SIZE);
-      expect(box.width).toBeLessThanOrEqual(MAX_BUTTON_SIZE);
     }
   });
 
@@ -213,7 +211,7 @@ test.describe('Raspberry Pi 7" Layout (800x480)', () => {
     }
   });
 
-  test('should have square buttons within size constraints', async ({ page }) => {
+  test('should have square buttons at least 44px', async ({ page }) => {
     const tile = page.locator('.light-tile').first();
     const box = await tile.boundingBox();
 
@@ -222,9 +220,8 @@ test.describe('Raspberry Pi 7" Layout (800x480)', () => {
       // Check square (aspect ratio ~1)
       expect(Math.abs(box.width - box.height)).toBeLessThan(2);
 
-      // Check size constraints
+      // Check minimum size
       expect(box.width).toBeGreaterThanOrEqual(MIN_BUTTON_SIZE);
-      expect(box.width).toBeLessThanOrEqual(MAX_BUTTON_SIZE);
     }
   });
 
@@ -263,7 +260,7 @@ test.describe('Raspberry Pi 7" Layout (800x480)', () => {
 });
 
 test.describe('Button Size Constraints (All Devices)', () => {
-  for (const [deviceKey, viewport] of Object.entries(VIEWPORTS)) {
+  for (const [, viewport] of Object.entries(VIEWPORTS)) {
     test.describe(`${viewport.name}`, () => {
       test.use({ viewport });
 
@@ -278,20 +275,6 @@ test.describe('Button Size Constraints (All Devices)', () => {
         if (box) {
           expect(box.width).toBeGreaterThanOrEqual(MIN_BUTTON_SIZE);
           expect(box.height).toBeGreaterThanOrEqual(MIN_BUTTON_SIZE);
-        }
-      });
-
-      test('buttons should be no larger than 200px', async ({ page }) => {
-        await page.goto('/?demo=true');
-        await page.waitForSelector('.light-tile');
-
-        const tile = page.locator('.light-tile').first();
-        const box = await tile.boundingBox();
-
-        expect(box).not.toBeNull();
-        if (box) {
-          expect(box.width).toBeLessThanOrEqual(MAX_BUTTON_SIZE);
-          expect(box.height).toBeLessThanOrEqual(MAX_BUTTON_SIZE);
         }
       });
 
@@ -314,4 +297,65 @@ test.describe('Button Size Constraints (All Devices)', () => {
       });
     });
   }
+});
+
+test.describe('Scene Drawer', () => {
+  test.use({ viewport: VIEWPORTS.ipad });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/?demo=true');
+    await page.waitForSelector('.light-tile');
+  });
+
+  test('should show scene drawer trigger button', async ({ page }) => {
+    const trigger = page.locator('.scene-drawer-trigger');
+    await expect(trigger).toBeVisible();
+  });
+
+  test('should open drawer when trigger is clicked', async ({ page }) => {
+    const trigger = page.locator('.scene-drawer-trigger');
+    await trigger.click();
+
+    const drawer = page.locator('.scene-drawer');
+    await expect(drawer).toBeVisible();
+  });
+
+  test('should close drawer when overlay is clicked', async ({ page }) => {
+    const trigger = page.locator('.scene-drawer-trigger');
+    await trigger.click();
+
+    const overlay = page.locator('.scene-drawer-overlay');
+    await overlay.click({ position: { x: 10, y: 10 } });
+
+    const drawer = page.locator('.scene-drawer');
+    await expect(drawer).not.toBeVisible();
+  });
+
+  test('should close drawer when close button is clicked', async ({ page }) => {
+    const trigger = page.locator('.scene-drawer-trigger');
+    await trigger.click();
+
+    const closeButton = page.locator('.scene-drawer-close');
+    await closeButton.click();
+
+    const drawer = page.locator('.scene-drawer');
+    await expect(drawer).not.toBeVisible();
+  });
+
+  test('should display scene items in drawer', async ({ page }) => {
+    const trigger = page.locator('.scene-drawer-trigger');
+    await trigger.click();
+
+    const sceneItems = page.locator('.scene-drawer-item');
+    const count = await sceneItems.count();
+    expect(count).toBeGreaterThan(0);
+  });
+
+  test('should display toggle button in drawer footer', async ({ page }) => {
+    const trigger = page.locator('.scene-drawer-trigger');
+    await trigger.click();
+
+    const toggleButton = page.locator('.scene-drawer-toggle');
+    await expect(toggleButton).toBeVisible();
+  });
 });

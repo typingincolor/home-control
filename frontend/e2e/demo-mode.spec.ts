@@ -44,34 +44,62 @@ test.describe('Demo Mode Dashboard', () => {
     await expect(floorLampButton).toBeVisible();
   });
 
-  test('should have scene selector in rooms', async ({ page }) => {
-    // Look for scene buttons (Living Room has Bright and Relax scenes)
-    await expect(page.getByRole('button', { name: /Bright/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Relax/i })).toBeVisible();
+  test('should have scene drawer trigger button', async ({ page }) => {
+    // Look for the floating action button that opens the scene drawer
+    const drawerTrigger = page.locator('.scene-drawer-trigger');
+    await expect(drawerTrigger).toBeVisible();
   });
 
-  test('should activate scene when clicked', async ({ page }) => {
-    // Click a scene button
-    const brightScene = page.getByRole('button', { name: /Bright/i });
-    await brightScene.click();
+  test('should open scene drawer and show scenes', async ({ page }) => {
+    // Click the drawer trigger
+    const drawerTrigger = page.locator('.scene-drawer-trigger');
+    await drawerTrigger.click();
 
-    // Scene should still be visible after click
-    await expect(brightScene).toBeVisible();
+    // Drawer should appear with scene items
+    const drawer = page.locator('.scene-drawer');
+    await expect(drawer).toBeVisible();
+
+    // Scene items should be visible (Living Room has Bright and Relax scenes)
+    const sceneItems = page.locator('.scene-drawer-item');
+    await expect(sceneItems.first()).toBeVisible();
   });
 
-  test('should have All On/Off toggle button in room', async ({ page }) => {
-    // Look for room toggle button (sun/moon icon)
-    const toggleButton = page.locator('.room-toggle-all');
+  test('should activate scene from drawer', async ({ page }) => {
+    // Open the drawer
+    const drawerTrigger = page.locator('.scene-drawer-trigger');
+    await drawerTrigger.click();
+
+    // Click a scene item
+    const sceneItem = page.locator('.scene-drawer-item').first();
+    await sceneItem.click();
+
+    // Drawer should close after scene activation
+    const drawer = page.locator('.scene-drawer');
+    await expect(drawer).not.toBeVisible();
+  });
+
+  test('should have toggle button in scene drawer', async ({ page }) => {
+    // Open the drawer
+    const drawerTrigger = page.locator('.scene-drawer-trigger');
+    await drawerTrigger.click();
+
+    // Look for toggle button in drawer footer
+    const toggleButton = page.locator('.scene-drawer-toggle');
     await expect(toggleButton).toBeVisible();
   });
 
-  test('should toggle all lights in room', async ({ page }) => {
-    // Find and click the room toggle button
-    const toggleButton = page.locator('.room-toggle-all');
+  test('should toggle all lights from drawer', async ({ page }) => {
+    // Open the drawer
+    const drawerTrigger = page.locator('.scene-drawer-trigger');
+    await drawerTrigger.click();
+
+    // Click the toggle button
+    const toggleButton = page.locator('.scene-drawer-toggle');
     await toggleButton.click();
 
-    // Button should remain functional
-    await expect(toggleButton).toBeVisible();
+    // Drawer should close after toggle
+    const drawer = page.locator('.scene-drawer');
+    await expect(drawer).not.toBeVisible();
   });
 
   test('should display zones navigation', async ({ page }) => {

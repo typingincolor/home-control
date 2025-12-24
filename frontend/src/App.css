@@ -1876,7 +1876,6 @@ body.dark-theme {
 /* Light Tile */
 .light-tile {
   width: 100%;
-  max-width: 200px;
   min-width: 44px;
   aspect-ratio: 1;
   border-radius: 24px;
@@ -1887,37 +1886,28 @@ body.dark-theme {
   position: relative;
   overflow: hidden;
   padding: 0;
-  /* Center tiles in their grid cells when max-width is applied */
-  justify-self: center;
 }
 
-/* Constrain tile size based on available viewport space */
+/* Responsive gap adjustments */
 
-/* iPhone 14 (390x844): 4 rows × 2 columns need to fit */
-@media (max-width: 500px) and (min-height: 700px) {
-  .light-tile {
-    /* Available height: 100vh - 48 (toolbar) - 100 (nav) - 24 (padding) - 40 (header) - 48 (3 gaps)
-       = 100vh - 260px, divided by 4 rows */
-    max-width: calc((100vh - 280px) / 4);
-    max-height: calc((100vh - 280px) / 4);
-  }
-
+/* Mobile: slightly smaller gaps */
+@media (max-width: 500px) {
   .light-tiles-grid {
     gap: 12px;
   }
 }
 
-/* Raspberry Pi 7" (800x480): 2 rows × 4 columns need to fit */
+/* Short screens (Raspberry Pi): compact gaps and constrained tile size */
 @media (max-height: 600px) {
-  .light-tile {
-    /* Available height: 100vh - 40 (toolbar) - 70 (nav) - 24 (padding) - 30 (header) - 10 (1 gap)
-       Adding extra margin for safety = 100vh - 210px, divided by 2 rows */
-    max-width: calc((100vh - 220px) / 2);
-    max-height: calc((100vh - 220px) / 2);
-  }
-
   .light-tiles-grid {
     gap: 8px;
+  }
+
+  /* Limit tile height to fit 2 rows without overlapping nav */
+  .light-tile {
+    /* Available: 100vh - 40 (toolbar) - 70 (nav) - 24 (padding) - 8 (gap) - extra margin */
+    max-height: calc((100vh - 170px) / 2);
+    max-width: calc((100vh - 170px) / 2);
   }
 }
 
@@ -2278,5 +2268,244 @@ body.dark-theme {
     width: 100%;
     justify-content: flex-end;
     margin-top: 12px;
+  }
+}
+
+/* ==============================================
+   Scene Drawer - Slide-out panel from right
+   ============================================== */
+
+/* Floating trigger button */
+.scene-drawer-trigger {
+  position: fixed;
+  bottom: calc(var(--nav-height) + 20px);
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  border: none;
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  z-index: 90;
+}
+
+.scene-drawer-trigger:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.scene-drawer-trigger:active {
+  transform: scale(0.95);
+}
+
+/* Dark overlay behind drawer */
+.scene-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Drawer panel */
+.scene-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 85vw;
+  background: var(--bg-secondary);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.4);
+  animation: slideIn 0.25s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Drawer header */
+.scene-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.scene-drawer-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.scene-drawer-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scene-drawer-close:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Drawer content */
+.scene-drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.scene-drawer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scene-drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scene-drawer-item:hover:not(:disabled) {
+  background: var(--border-color);
+  border-color: var(--accent-primary);
+}
+
+.scene-drawer-item:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.scene-drawer-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+}
+
+.scene-drawer-item-name {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.scene-drawer-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Drawer footer */
+.scene-drawer-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.scene-drawer-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scene-drawer-toggle.on {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.scene-drawer-toggle.on:hover {
+  background: var(--border-color);
+}
+
+.scene-drawer-toggle.off {
+  background: var(--accent-primary);
+  color: #000;
+}
+
+.scene-drawer-toggle.off:hover {
+  background: var(--accent-primary-hover);
+}
+
+/* Responsive adjustments for drawer */
+@media (max-height: 600px) {
+  .scene-drawer-trigger {
+    bottom: calc(var(--nav-height) + 12px);
+    right: 12px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .scene-drawer-header {
+    padding: 12px 16px;
+  }
+
+  .scene-drawer-content {
+    padding: 12px;
+  }
+
+  .scene-drawer-item {
+    padding: 10px 12px;
+  }
+
+  .scene-drawer-footer {
+    padding: 12px;
+  }
+
+  .scene-drawer-toggle {
+    padding: 10px;
   }
 }

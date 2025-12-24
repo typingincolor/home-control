@@ -1,8 +1,8 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { LightTile } from './LightTile';
-import { SceneSelector } from './SceneSelector';
-import { UI_TEXT } from '../../constants/uiText';
-import { Moon, Sun, Home, LightbulbOff } from './Icons';
+import { SceneDrawer } from './SceneDrawer';
+import { Home, LightbulbOff, Menu } from './Icons';
 
 export const RoomContent = ({
   room,
@@ -12,6 +12,8 @@ export const RoomContent = ({
   togglingLights = new Set(),
   isActivatingScene = false,
 }) => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   if (!room) {
     return (
       <div className="empty-state-dark">
@@ -28,25 +30,6 @@ export const RoomContent = ({
 
   return (
     <div className="room-content">
-      <div className="room-header-bar">
-        <div className="scene-selector">
-          <SceneSelector
-            scenes={scenes}
-            onActivate={onActivateScene}
-            isActivating={isActivatingScene}
-          />
-        </div>
-        <div className="toggle-selector">
-          <button
-            className={`room-toggle-all ${!anyOn ? 'lights-off' : ''}`}
-            onClick={() => onToggleRoom(room.id, !anyOn)}
-            title={anyOn ? UI_TEXT.BUTTON_ALL_OFF : UI_TEXT.BUTTON_ALL_ON}
-          >
-            {anyOn ? <Moon size={20} /> : <Sun size={20} />}
-          </button>
-        </div>
-      </div>
-
       {lights.length === 0 ? (
         <div className="empty-state-dark">
           <LightbulbOff size={48} className="empty-state-dark-icon" />
@@ -64,6 +47,27 @@ export const RoomContent = ({
           ))}
         </div>
       )}
+
+      {/* Floating action button to open scene drawer */}
+      <button
+        className="scene-drawer-trigger"
+        onClick={() => setIsDrawerOpen(true)}
+        aria-label="Open scenes menu"
+      >
+        <Menu size={24} />
+      </button>
+
+      {/* Scene drawer */}
+      <SceneDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        scenes={scenes}
+        onActivateScene={onActivateScene}
+        onToggleRoom={onToggleRoom}
+        roomId={room.id}
+        anyOn={anyOn}
+        isActivating={isActivatingScene}
+      />
     </div>
   );
 };

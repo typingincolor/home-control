@@ -322,8 +322,8 @@ describe('LightControl', () => {
     });
   });
 
-  describe('Toggle room', () => {
-    it('should toggle all lights in room when room toggle clicked', async () => {
+  describe('Toggle room (via drawer)', () => {
+    it('should toggle all lights in room when room toggle clicked in drawer', async () => {
       const user = userEvent.setup();
       render(<LightControl sessionToken="test-token" />);
 
@@ -331,8 +331,13 @@ describe('LightControl', () => {
         expect(screen.getByText('Living Room')).toBeInTheDocument();
       });
 
-      // Find room toggle button by class
-      const toggleButton = document.querySelector('.room-toggle-all');
+      // Open the scene drawer
+      const drawerTrigger = document.querySelector('.scene-drawer-trigger');
+      expect(drawerTrigger).toBeTruthy();
+      await user.click(drawerTrigger);
+
+      // Find toggle button in drawer
+      const toggleButton = document.querySelector('.scene-drawer-toggle');
       expect(toggleButton).toBeTruthy();
 
       await user.click(toggleButton);
@@ -354,7 +359,11 @@ describe('LightControl', () => {
         expect(screen.getByText('Living Room')).toBeInTheDocument();
       });
 
-      const toggleButton = document.querySelector('.room-toggle-all');
+      // Open the scene drawer
+      const drawerTrigger = document.querySelector('.scene-drawer-trigger');
+      await user.click(drawerTrigger);
+
+      const toggleButton = document.querySelector('.scene-drawer-toggle');
       await user.click(toggleButton);
 
       await waitFor(() => {
@@ -363,8 +372,8 @@ describe('LightControl', () => {
     });
   });
 
-  describe('Scene activation', () => {
-    it('should activate scene when selected', async () => {
+  describe('Scene activation (via drawer)', () => {
+    it('should activate scene when selected from drawer', async () => {
       const user = userEvent.setup();
       render(<LightControl sessionToken="test-token" />);
 
@@ -372,14 +381,16 @@ describe('LightControl', () => {
         expect(screen.getByText('Living Room')).toBeInTheDocument();
       });
 
-      // Find scene button by title attribute
-      const sceneButtons = document.querySelectorAll('.scene-icon-button');
-      const brightButton = Array.from(sceneButtons).find(
-        (btn) => btn.getAttribute('title') === 'Bright'
-      );
-      expect(brightButton).toBeTruthy();
+      // Open the scene drawer
+      const drawerTrigger = document.querySelector('.scene-drawer-trigger');
+      await user.click(drawerTrigger);
 
-      await user.click(brightButton);
+      // Find scene button in drawer
+      const sceneItems = document.querySelectorAll('.scene-drawer-item');
+      expect(sceneItems.length).toBeGreaterThan(0);
+
+      // Click first scene
+      await user.click(sceneItems[0]);
 
       expect(mockApi.activateSceneV1).toHaveBeenCalledWith('test-token', 'scene-1');
     });
@@ -392,11 +403,12 @@ describe('LightControl', () => {
         expect(screen.getByText('Living Room')).toBeInTheDocument();
       });
 
-      const sceneButtons = document.querySelectorAll('.scene-icon-button');
-      const brightButton = Array.from(sceneButtons).find(
-        (btn) => btn.getAttribute('title') === 'Bright'
-      );
-      await user.click(brightButton);
+      // Open the scene drawer
+      const drawerTrigger = document.querySelector('.scene-drawer-trigger');
+      await user.click(drawerTrigger);
+
+      const sceneItems = document.querySelectorAll('.scene-drawer-item');
+      await user.click(sceneItems[0]);
 
       await waitFor(() => {
         expect(mockApi.activateSceneV1).toHaveBeenCalled();
@@ -413,11 +425,12 @@ describe('LightControl', () => {
         expect(screen.getByText('Living Room')).toBeInTheDocument();
       });
 
-      const sceneButtons = document.querySelectorAll('.scene-icon-button');
-      const brightButton = Array.from(sceneButtons).find(
-        (btn) => btn.getAttribute('title') === 'Bright'
-      );
-      await user.click(brightButton);
+      // Open the scene drawer
+      const drawerTrigger = document.querySelector('.scene-drawer-trigger');
+      await user.click(drawerTrigger);
+
+      const sceneItems = document.querySelectorAll('.scene-drawer-item');
+      await user.click(sceneItems[0]);
 
       await waitFor(() => {
         expect(mockAlert).toHaveBeenCalledWith(expect.stringContaining('Scene not found'));

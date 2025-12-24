@@ -18,6 +18,8 @@ import {
   Car as LucideCar,
   TreeDeciduous,
   DoorOpen,
+  Menu as LucideMenu,
+  X as LucideX,
   // Scene icons
   Sunrise,
   Sunset,
@@ -81,6 +83,12 @@ export const Power = (props) => <LucidePower {...defaultProps} {...props} />;
 
 // Logout icon
 export const Logout = (props) => <LogOut {...defaultProps} {...props} />;
+
+// Menu icon (hamburger)
+export const Menu = (props) => <LucideMenu {...defaultProps} {...props} />;
+
+// X/Close icon
+export const X = (props) => <LucideX {...defaultProps} {...props} />;
 
 // Sofa icon (living room)
 export const Sofa = (props) => <LucideSofa {...defaultProps} {...props} />;
