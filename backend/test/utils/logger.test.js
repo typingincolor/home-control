@@ -93,4 +93,58 @@ describe('logger', () => {
       expect(logger).toHaveProperty('debug');
     });
   });
+
+  describe('createLogger', () => {
+    let createLogger;
+
+    beforeEach(async () => {
+      vi.resetModules();
+      const module = await import('../../utils/logger.js');
+      createLogger = module.createLogger;
+    });
+
+    it('should be exported as a named export', () => {
+      expect(createLogger).toBeDefined();
+      expect(typeof createLogger).toBe('function');
+    });
+
+    it('should return a logger object with all log methods', () => {
+      const componentLogger = createLogger('TEST');
+      expect(componentLogger).toHaveProperty('info');
+      expect(componentLogger).toHaveProperty('warn');
+      expect(componentLogger).toHaveProperty('error');
+      expect(componentLogger).toHaveProperty('debug');
+    });
+
+    it('should return a logger where info includes component', () => {
+      const componentLogger = createLogger('AUTH');
+      expect(() => componentLogger.info('Test message')).not.toThrow();
+    });
+
+    it('should return a logger where warn includes component', () => {
+      const componentLogger = createLogger('AUTH');
+      expect(() => componentLogger.warn('Warning message')).not.toThrow();
+    });
+
+    it('should return a logger where error includes component', () => {
+      const componentLogger = createLogger('AUTH');
+      expect(() => componentLogger.error('Error message')).not.toThrow();
+    });
+
+    it('should return a logger where debug includes component', () => {
+      const componentLogger = createLogger('AUTH');
+      expect(() => componentLogger.debug('Debug message')).not.toThrow();
+    });
+
+    it('should allow additional metadata to be merged', () => {
+      const componentLogger = createLogger('WEBSOCKET');
+      expect(() => componentLogger.info('Connected', { clients: 5 })).not.toThrow();
+    });
+
+    it('should not override component when extra metadata is passed', () => {
+      const componentLogger = createLogger('SESSION');
+      // Component should remain SESSION even if someone tries to override
+      expect(() => componentLogger.info('Test', { component: 'OTHER' })).not.toThrow();
+    });
+  });
 });

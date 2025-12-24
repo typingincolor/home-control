@@ -4,7 +4,9 @@ import { enrichLight } from '../../utils/colorConversion.js';
 import roomService from '../../services/roomService.js';
 import statsService from '../../services/statsService.js';
 import { extractCredentials } from '../../middleware/auth.js';
+import { createLogger } from '../../utils/logger.js';
 
+const logger = createLogger('DASHBOARD_ROUTE');
 const router = express.Router();
 
 /**
@@ -17,12 +19,12 @@ router.get('/', extractCredentials, async (req, res, next) => {
   try {
     const { bridgeIp, username } = req.hue;
 
-    console.log(`[DASHBOARD] Fetching data for bridge ${bridgeIp} (auth: ${req.hue.authMethod})`);
+    logger.info('Fetching data', { bridgeIp, authMethod: req.hue.authMethod });
 
     // Step 1: Fetch all data in parallel
     const { lightsData, roomsData, devicesData, scenesData } = await hueClient.getDashboardData(bridgeIp, username);
 
-    console.log(`[DASHBOARD] Fetched ${lightsData.data?.length || 0} lights, ${roomsData.data?.length || 0} rooms`);
+    logger.debug('Fetched data', { lights: lightsData.data?.length || 0, rooms: roomsData.data?.length || 0 });
 
     // Step 2: Build room hierarchy
     const roomMap = roomService.buildRoomHierarchy(lightsData, roomsData, devicesData);
@@ -33,7 +35,7 @@ router.get('/', extractCredentials, async (req, res, next) => {
       });
     }
 
-    console.log(`[DASHBOARD] Built hierarchy with ${Object.keys(roomMap).length} rooms`);
+    logger.debug('Built hierarchy', { roomCount: Object.keys(roomMap).length });
 
     // Step 3: Process each room
     const rooms = Object.entries(roomMap).map(([roomName, roomData]) => {
@@ -60,7 +62,7 @@ router.get('/', extractCredentials, async (req, res, next) => {
     // Step 4: Calculate dashboard summary
     const summary = statsService.calculateDashboardStats(lightsData, roomMap, scenesData);
 
-    console.log(`[DASHBOARD] Summary: ${summary.lightsOn}/${summary.totalLights} lights on, ${summary.roomCount} rooms`);
+    logger.debug('Summary', { lightsOn: summary.lightsOn, totalLights: summary.totalLights, roomCount: summary.roomCount });
 
     // Step 5: Return unified response
     res.json({

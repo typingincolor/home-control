@@ -6,6 +6,9 @@ import {
   WEBSOCKET_HEARTBEAT_INTERVAL_MS,
   WEBSOCKET_CLEANUP_INTERVAL_MS
 } from '../constants/timings.js';
+import { createLogger } from '../utils/logger.js';
+
+const logger = createLogger('WEBSOCKET');
 
 /**
  * WebSocket Service for real-time updates
@@ -47,10 +50,13 @@ class WebSocketService {
    */
   logStats(context = '') {
     const stats = this.getStats();
-    console.log(`[WebSocket] Stats${context ? ` (${context})` : ''}: ${stats.totalClients} clients, ${Object.keys(stats.bridges).length} bridges, ${stats.pollingIntervals} polling intervals`);
-    for (const [bridgeIp, info] of Object.entries(stats.bridges)) {
-      console.log(`[WebSocket]   Bridge ${bridgeIp}: ${info.connections} connections, polling=${info.hasPolling}`);
-    }
+    logger.debug('Stats', {
+      context,
+      totalClients: stats.totalClients,
+      bridgeCount: Object.keys(stats.bridges).length,
+      pollingIntervals: stats.pollingIntervals,
+      bridges: stats.bridges
+    });
   }
 
   /**
@@ -63,7 +69,7 @@ class WebSocketService {
     });
 
     this.wss.on('connection', (ws) => {
-      console.log('[WebSocket] New client connected');
+      logger.info('New client connected');
 
       ws.isAlive = true;
       ws.on('pong', () => {
@@ -79,7 +85,7 @@ class WebSocketService {
       });
 
       ws.on('error', (error) => {
-        console.error('[WebSocket] Connection error:', error);
+        logger.error('Connection error', { error: error.message });
       });
     });
 
@@ -88,7 +94,7 @@ class WebSocketService {
       let terminated = 0;
       this.wss.clients.forEach((ws) => {
         if (ws.isAlive === false) {
-          console.log(`[WebSocket] Terminating unresponsive client for bridge ${ws.bridgeIp || 'unknown'}`);
+          logger.warn('Terminating unresponsive client', { bridgeIp: ws.bridgeIp || 'unknown' });
           this.handleDisconnect(ws); // Clean up before terminating
           ws.terminate();
           terminated++;
@@ -107,7 +113,7 @@ class WebSocketService {
       this.cleanupOrphanedResources();
     }, WEBSOCKET_CLEANUP_INTERVAL_MS);
 
-    console.log('[WebSocket] Server initialized on /api/v1/ws');
+    logger.info('Server initialized', { path: '/api/v1/ws' });
   }
 
   /**
@@ -120,7 +126,7 @@ class WebSocketService {
     for (const [bridgeIp, intervalId] of this.pollingIntervals) {
       const connections = this.connections.get(bridgeIp);
       if (!connections || connections.size === 0) {
-        console.log(`[WebSocket] Cleaning up orphaned polling interval for bridge ${bridgeIp}`);
+        logger.debug('Cleaning up orphaned polling interval', { bridgeIp });
         clearInterval(intervalId);
         this.pollingIntervals.delete(bridgeIp);
         this.stateCache.delete(bridgeIp);
@@ -139,14 +145,14 @@ class WebSocketService {
       });
 
       for (const ws of staleConnections) {
-        console.log(`[WebSocket] Removing stale connection for bridge ${bridgeIp} (state: ${ws.readyState})`);
+        logger.debug('Removing stale connection', { bridgeIp, readyState: ws.readyState });
         connections.delete(ws);
         cleaned = true;
       }
 
       // If no connections left, stop polling
       if (connections.size === 0 && this.pollingIntervals.has(bridgeIp)) {
-        console.log(`[WebSocket] No active connections for ${bridgeIp}, stopping polling`);
+        logger.debug('No active connections, stopping polling', { bridgeIp });
         this.stopPolling(bridgeIp);
         this.connections.delete(bridgeIp);
         this.stateCache.delete(bridgeIp);
@@ -172,7 +178,7 @@ class WebSocketService {
         ws.send(JSON.stringify({ type: 'pong' }));
       }
     } catch (error) {
-      console.error('[WebSocket] Message handling error:', error);
+      logger.error('Message handling error', { error: error.message });
       ws.send(JSON.stringify({
         type: 'error',
         message: error.message
@@ -202,14 +208,14 @@ class WebSocketService {
       bridgeIp = session.bridgeIp;
       username = session.username;
       ws.authMethod = 'session';
-      console.log(`[WebSocket] Client authenticated via session token for bridge ${bridgeIp}`);
+      logger.info('Client authenticated via session token', { bridgeIp });
     }
     // Method 2: Legacy bridgeIp + username
     else if (data.bridgeIp && data.username) {
       bridgeIp = data.bridgeIp;
       username = data.username;
       ws.authMethod = 'legacy';
-      console.log(`[WebSocket] Client authenticated via legacy credentials for bridge ${bridgeIp}`);
+      logger.info('Client authenticated via legacy credentials', { bridgeIp });
     }
     // Error: No valid auth provided
     else {
@@ -240,7 +246,7 @@ class WebSocketService {
         data: dashboard
       }));
     } catch (error) {
-      console.error('[WebSocket] Failed to send initial state:', error);
+      logger.error('Failed to send initial state', { error: error.message });
       ws.send(JSON.stringify({
         type: 'error',
         message: 'Failed to fetch initial state'
@@ -253,7 +259,7 @@ class WebSocketService {
    */
   handleDisconnect(ws) {
     const bridgeIp = ws.bridgeIp || 'unknown';
-    console.log(`[WebSocket] Client disconnected from bridge ${bridgeIp}`);
+    logger.info('Client disconnected', { bridgeIp });
 
     if (ws.bridgeIp) {
       const connections = this.connections.get(ws.bridgeIp);
@@ -262,12 +268,12 @@ class WebSocketService {
         connections.delete(ws);
 
         if (hadConnection) {
-          console.log(`[WebSocket] Removed connection for bridge ${ws.bridgeIp}, ${connections.size} remaining`);
+          logger.debug('Removed connection', { bridgeIp: ws.bridgeIp, remaining: connections.size });
         }
 
         // Stop polling if no more connections for this bridge
         if (connections.size === 0) {
-          console.log(`[WebSocket] No more connections for bridge ${ws.bridgeIp}, cleaning up`);
+          logger.debug('No more connections, cleaning up', { bridgeIp: ws.bridgeIp });
           this.stopPolling(ws.bridgeIp);
           this.connections.delete(ws.bridgeIp);
           this.stateCache.delete(ws.bridgeIp);
@@ -282,7 +288,7 @@ class WebSocketService {
    * Start polling Hue Bridge for state changes
    */
   async startPolling(bridgeIp, username) {
-    console.log(`[WebSocket] Starting polling for bridge ${bridgeIp}`);
+    logger.info('Starting polling', { bridgeIp });
 
     const poll = async () => {
       try {
@@ -301,7 +307,7 @@ class WebSocketService {
 
         this.stateCache.set(bridgeIp, currentState);
       } catch (error) {
-        console.error(`[WebSocket] Polling error for ${bridgeIp}:`, error.message);
+        logger.error('Polling error', { bridgeIp, error: error.message });
       }
     };
 
@@ -321,7 +327,7 @@ class WebSocketService {
     if (intervalId) {
       clearInterval(intervalId);
       this.pollingIntervals.delete(bridgeIp);
-      console.log(`[WebSocket] Stopped polling for bridge ${bridgeIp}`);
+      logger.info('Stopped polling', { bridgeIp });
     }
   }
 
@@ -429,7 +435,7 @@ class WebSocketService {
     });
 
     if (sent > 0) {
-      console.log(`[WebSocket] Broadcasted ${message.type} to ${sent} client(s)`);
+      logger.debug('Broadcasted update', { type: message.type, clients: sent });
     }
   }
 
@@ -437,7 +443,7 @@ class WebSocketService {
    * Shutdown WebSocket server
    */
   shutdown() {
-    console.log('[WebSocket] Shutting down...');
+    logger.info('Shutting down');
     this.logStats('before shutdown');
 
     // Stop all polling
@@ -466,7 +472,7 @@ class WebSocketService {
       this.wss.close();
     }
 
-    console.log('[WebSocket] Shutdown complete');
+    logger.info('Shutdown complete');
   }
 }
 

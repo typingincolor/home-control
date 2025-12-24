@@ -33,6 +33,28 @@ const winstonLogger = winston.createLogger({
 });
 
 /**
+ * Create a child logger with a preset component prefix
+ * @param {string} component - Component name for log prefix
+ * @returns {Object} Logger object with info, warn, error, debug methods
+ */
+export function createLogger(component) {
+  return {
+    info(message, meta = {}) {
+      winstonLogger.info(message, { component, ...meta, component });
+    },
+    warn(message, meta = {}) {
+      winstonLogger.warn(message, { component, ...meta, component });
+    },
+    error(message, meta = {}) {
+      winstonLogger.error(message, { component, ...meta, component });
+    },
+    debug(message, meta = {}) {
+      winstonLogger.debug(message, { component, ...meta, component });
+    }
+  };
+}
+
+/**
  * Logger wrapper that provides consistent interface
  */
 const logger = {

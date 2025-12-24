@@ -4,7 +4,9 @@ import { enrichLight } from '../../utils/colorConversion.js';
 import { extractCredentials } from '../../middleware/auth.js';
 import { ResourceNotFoundError } from '../../utils/errors.js';
 import { convertToHueState } from '../../utils/stateConversion.js';
+import { createLogger } from '../../utils/logger.js';
 
+const logger = createLogger('LIGHTS');
 const router = express.Router();
 
 /**
@@ -19,7 +21,7 @@ router.put('/:id', extractCredentials, async (req, res, next) => {
     const { bridgeIp, username } = req.hue;
     const state = req.body;
 
-    console.log(`[LIGHTS] Updating light ${id} (auth: ${req.hue.authMethod})`);
+    logger.info('Updating light', { lightId: id, authMethod: req.hue.authMethod });
 
     // Convert simplified state to Hue API v2 format
     const hueState = convertToHueState(state);
@@ -38,7 +40,7 @@ router.put('/:id', extractCredentials, async (req, res, next) => {
     // Enrich with color and shadow
     const enrichedLight = enrichLight(updatedLight);
 
-    console.log(`[LIGHTS] Light ${id} updated successfully`);
+    logger.info('Light updated successfully', { lightId: id });
 
     res.json({
       success: true,

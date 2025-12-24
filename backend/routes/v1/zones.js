@@ -4,7 +4,9 @@ import zoneService from '../../services/zoneService.js';
 import { enrichLight } from '../../utils/colorConversion.js';
 import { extractCredentials } from '../../middleware/auth.js';
 import { convertToHueState } from '../../utils/stateConversion.js';
+import { createLogger } from '../../utils/logger.js';
 
+const logger = createLogger('ZONES');
 const router = express.Router();
 
 /**
@@ -19,7 +21,7 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
     const { bridgeIp, username } = req.hue;
     const state = req.body;
 
-    console.log(`[ZONES] Updating lights in zone ${zoneId} (auth: ${req.hue.authMethod})`);
+    logger.info('Updating lights in zone', { zoneId, authMethod: req.hue.authMethod });
 
     // Fetch zone hierarchy to get lights in this zone
     const { lightsData, zonesData, devicesData } = await hueClient.getZoneHierarchyData(bridgeIp, username);
@@ -35,7 +37,7 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
       });
     }
 
-    console.log(`[ZONES] Found ${zone.lights.length} lights in zone`);
+    logger.debug('Found lights in zone', { count: zone.lights.length });
 
     // Convert simplified state to Hue API v2 format
     const hueState = convertToHueState(state);
@@ -48,7 +50,7 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
 
     await hueClient.updateLights(bridgeIp, username, lightUpdates);
 
-    console.log(`[ZONES] Updated ${lightUpdates.length} lights`);
+    logger.info('Updated lights', { count: lightUpdates.length });
 
     // Fetch updated light states
     const updatedLightsData = await hueClient.getLights(bridgeIp, username);

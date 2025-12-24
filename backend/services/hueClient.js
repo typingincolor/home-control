@@ -1,6 +1,9 @@
 import axios from 'axios';
 import https from 'https';
 import { CACHE_TTL_MS } from '../constants/timings.js';
+import { createLogger } from '../utils/logger.js';
+
+const logger = createLogger('HUE_CLIENT');
 
 /**
  * HueClient - Low-level Hue Bridge API client
@@ -52,10 +55,10 @@ class HueClient {
           this.cache.delete(key);
         }
       }
-      console.log(`[HueClient] Cleared cache for bridge ${bridgeIp}`);
+      logger.debug('Cleared cache', { bridgeIp });
     } else {
       this.cache.clear();
-      console.log('[HueClient] Cleared all cache');
+      logger.debug('Cleared all cache');
     }
   }
 

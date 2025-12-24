@@ -4,7 +4,9 @@ import roomService from '../../services/roomService.js';
 import { enrichLight } from '../../utils/colorConversion.js';
 import { extractCredentials } from '../../middleware/auth.js';
 import { convertToHueState } from '../../utils/stateConversion.js';
+import { createLogger } from '../../utils/logger.js';
 
+const logger = createLogger('ROOMS');
 const router = express.Router();
 
 /**
@@ -19,7 +21,7 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
     const { bridgeIp, username } = req.hue;
     const state = req.body;
 
-    console.log(`[ROOMS] Updating lights in room ${roomId} (auth: ${req.hue.authMethod})`);
+    logger.info('Updating lights in room', { roomId, authMethod: req.hue.authMethod });
 
     // Fetch room hierarchy to get lights in this room
     const { lightsData, roomsData, devicesData } = await hueClient.getHierarchyData(bridgeIp, username);
@@ -35,7 +37,7 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
       });
     }
 
-    console.log(`[ROOMS] Found ${room.lights.length} lights in room`);
+    logger.debug('Found lights in room', { count: room.lights.length });
 
     // Convert simplified state to Hue API v2 format
     const hueState = convertToHueState(state);
@@ -48,7 +50,7 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
 
     await hueClient.updateLights(bridgeIp, username, lightUpdates);
 
-    console.log(`[ROOMS] Updated ${lightUpdates.length} lights`);
+    logger.info('Updated lights', { count: lightUpdates.length });
 
     // Fetch updated light states
     const updatedLightsData = await hueClient.getLights(bridgeIp, username);

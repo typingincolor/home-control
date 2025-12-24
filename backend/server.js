@@ -10,6 +10,9 @@ import v1Routes from './routes/v1/index.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { openApiSpec } from './openapi.js';
 import websocketService from './services/websocketService.js';
+import { createLogger } from './utils/logger.js';
+
+const logger = createLogger('SERVER');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,12 +51,12 @@ app.use('/api/v1', v1Routes);
 // Discovery endpoint (no bridge IP needed)
 app.get('/api/discovery', async (req, res) => {
   try {
-    console.log('[PROXY] Discovery request');
+    logger.info('Discovery request');
     const response = await axios.get(config.hue.discoveryEndpoint);
-    console.log(`[PROXY] Found ${response.data.length} bridges`);
+    logger.info('Discovery complete', { bridgeCount: response.data.length });
     res.json(response.data);
   } catch (error) {
-    console.error('[PROXY] Discovery error:', error.message);
+    logger.error('Discovery error', { error: error.message });
     res.status(500).json({
       error: 'Discovery failed',
       message: error.message
@@ -110,18 +113,7 @@ app.use((req, res) => {
 });
 
 const server = app.listen(PORT, HOST, () => {
-  console.log(`
-╔════════════════════════════════════════════════════════╗
-║  Philips Hue Control Server                            ║
-║  Running on http://${HOST}:${PORT}                        ║
-║                                                        ║
-║  Access from other devices using your machine's IP:    ║
-║  http://<your-local-ip>:${PORT}                          ║
-║                                                        ║
-║  API proxy and frontend served on same port            ║
-║  WebSocket support enabled at /api/v1/ws               ║
-╚════════════════════════════════════════════════════════╝
-  `);
+  logger.info('Server started', { host: HOST, port: PORT, websocket: '/api/v1/ws' });
 });
 
 // Initialize WebSocket server
@@ -129,9 +121,9 @@ websocketService.initialize(server);
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received: closing HTTP server');
+  logger.info('SIGTERM received, closing HTTP server');
   websocketService.shutdown();
   server.close(() => {
-    console.log('HTTP server closed');
+    logger.info('HTTP server closed');
   });
 });

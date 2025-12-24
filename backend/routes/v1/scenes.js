@@ -4,7 +4,9 @@ import roomService from '../../services/roomService.js';
 import { enrichLight } from '../../utils/colorConversion.js';
 import { extractCredentials } from '../../middleware/auth.js';
 import { SCENE_APPLY_DELAY_MS } from '../../constants/timings.js';
+import { createLogger } from '../../utils/logger.js';
 
+const logger = createLogger('SCENES');
 const router = express.Router();
 
 /**
@@ -18,7 +20,7 @@ router.post('/:id/activate', extractCredentials, async (req, res, next) => {
     const { id: sceneId } = req.params;
     const { bridgeIp, username } = req.hue;
 
-    console.log(`[SCENES] Activating scene ${sceneId} (auth: ${req.hue.authMethod})`);
+    logger.info('Activating scene', { sceneId, authMethod: req.hue.authMethod });
 
     // Activate scene
     await hueClient.activateScene(bridgeIp, username, sceneId);
@@ -47,7 +49,7 @@ router.post('/:id/activate', extractCredentials, async (req, res, next) => {
       ? room.lights.map(light => enrichLight(light))
       : [];
 
-    console.log(`[SCENES] Scene activated, ${affectedLights.length} lights affected`);
+    logger.info('Scene activated', { affectedLights: affectedLights.length });
 
     res.json({
       success: true,

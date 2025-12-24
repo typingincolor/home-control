@@ -5,7 +5,9 @@ import sessionManager from '../../services/sessionManager.js';
 import hueClient from '../../services/hueClient.js';
 import { requireSession } from '../../middleware/auth.js';
 import { MissingCredentialsError, BridgeConnectionError } from '../../utils/errors.js';
+import { createLogger } from '../../utils/logger.js';
 
+const logger = createLogger('AUTH');
 const router = express.Router();
 
 // HTTPS agent for self-signed certificates
@@ -38,7 +40,7 @@ router.post('/pair', async (req, res, next) => {
       throw new MissingCredentialsError('bridgeIp');
     }
 
-    console.log(`[AUTH] Pairing with bridge ${bridgeIp}`);
+    logger.info('Pairing with bridge', { bridgeIp });
 
     // Make pairing request to Hue Bridge
     const response = await axios.post(
@@ -59,7 +61,7 @@ router.post('/pair', async (req, res, next) => {
 
       if (response.data[0].success) {
         const username = response.data[0].success.username;
-        console.log(`[AUTH] Successfully paired with bridge ${bridgeIp}`);
+        logger.info('Successfully paired with bridge', { bridgeIp });
         return res.json({ username });
       }
     }
@@ -100,7 +102,7 @@ router.post('/session', async (req, res, next) => {
       throw new MissingCredentialsError('username');
     }
 
-    console.log(`[AUTH] Creating session for bridge ${bridgeIp}`);
+    logger.info('Creating session', { bridgeIp });
 
     // Validate credentials by making a test request to the bridge
     try {
@@ -181,7 +183,7 @@ router.get('/session', requireSession, (req, res) => {
 router.post('/refresh', requireSession, (req, res) => {
   const { bridgeIp, username, sessionToken: oldToken } = req.hue;
 
-  console.log(`[AUTH] Refreshing session for bridge ${bridgeIp}`);
+  logger.info('Refreshing session', { bridgeIp });
 
   // Revoke old token
   sessionManager.revokeSession(oldToken);

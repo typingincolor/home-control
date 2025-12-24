@@ -4,6 +4,9 @@ import roomService from './roomService.js';
 import statsService from './statsService.js';
 import motionService from './motionService.js';
 import zoneService from './zoneService.js';
+import { createLogger } from '../utils/logger.js';
+
+const logger = createLogger('DASHBOARD');
 
 /**
  * Dashboard Service
@@ -17,7 +20,7 @@ class DashboardService {
    * @returns {Promise<Object>} Dashboard data with summary and rooms
    */
   async getDashboard(bridgeIp, username) {
-    console.log(`[DASHBOARD SERVICE] Fetching data for bridge ${bridgeIp}`);
+    logger.debug('Fetching data', { bridgeIp });
 
     // Step 1: Fetch all data in parallel (including motion zones and zones)
     const [lightsData, roomsData, devicesData, scenesData, zonesData, motionZonesResult] = await Promise.all([
@@ -26,16 +29,21 @@ class DashboardService {
       hueClient.getDevices(bridgeIp, username),
       hueClient.getScenes(bridgeIp, username),
       hueClient.getZones(bridgeIp, username).catch(err => {
-        console.error(`[DASHBOARD SERVICE] Failed to fetch zones: ${err.message}`);
+        logger.warn('Failed to fetch zones', { error: err.message });
         return { data: [] }; // Return empty array on error
       }),
       motionService.getMotionZones(bridgeIp, username).catch(err => {
-        console.error(`[DASHBOARD SERVICE] Failed to fetch motion zones: ${err.message}`);
+        logger.warn('Failed to fetch motion zones', { error: err.message });
         return { zones: [] }; // Return empty array on error
       })
     ]);
 
-    console.log(`[DASHBOARD SERVICE] Fetched ${lightsData.data?.length || 0} lights, ${roomsData.data?.length || 0} rooms, ${zonesData.data?.length || 0} zones, ${motionZonesResult.zones?.length || 0} motion zones`);
+    logger.debug('Fetched data', {
+      lights: lightsData.data?.length || 0,
+      rooms: roomsData.data?.length || 0,
+      zones: zonesData.data?.length || 0,
+      motionZones: motionZonesResult.zones?.length || 0
+    });
 
     // Step 2: Build room hierarchy
     const roomMap = roomService.buildRoomHierarchy(lightsData, roomsData, devicesData);
@@ -44,7 +52,7 @@ class DashboardService {
       throw new Error('Failed to build room hierarchy');
     }
 
-    console.log(`[DASHBOARD SERVICE] Built hierarchy with ${Object.keys(roomMap).length} rooms`);
+    logger.debug('Built room hierarchy', { roomCount: Object.keys(roomMap).length });
 
     // Step 3: Process each room
     const rooms = Object.entries(roomMap).map(([roomName, roomData]) => {
@@ -95,7 +103,12 @@ class DashboardService {
     // Step 5: Calculate dashboard summary
     const summary = statsService.calculateDashboardStats(lightsData, roomMap, scenesData);
 
-    console.log(`[DASHBOARD SERVICE] Summary: ${summary.lightsOn}/${summary.totalLights} lights on, ${summary.roomCount} rooms, ${zones.length} zones`);
+    logger.debug('Summary', {
+      lightsOn: summary.lightsOn,
+      totalLights: summary.totalLights,
+      roomCount: summary.roomCount,
+      zoneCount: zones.length
+    });
 
     // Step 6: Return unified response with zones and motion zones
     return {

@@ -1,7 +1,9 @@
 import express from 'express';
 import motionService from '../../services/motionService.js';
 import { extractCredentials } from '../../middleware/auth.js';
+import { createLogger } from '../../utils/logger.js';
 
+const logger = createLogger('MOTION_ZONES');
 const router = express.Router();
 
 /**
@@ -14,12 +16,12 @@ router.get('/', extractCredentials, async (req, res, next) => {
   try {
     const { bridgeIp, username } = req.hue;
 
-    console.log(`[MOTION-ZONES] Fetching motion zones for bridge ${bridgeIp} (auth: ${req.hue.authMethod})`);
+    logger.info('Fetching motion zones', { bridgeIp, authMethod: req.hue.authMethod });
 
     // Fetch and parse motion zones
     const result = await motionService.getMotionZones(bridgeIp, username);
 
-    console.log(`[MOTION-ZONES] Found ${result.zones.length} motion zones`);
+    logger.debug('Found motion zones', { count: result.zones.length });
 
     res.json(result);
   } catch (error) {

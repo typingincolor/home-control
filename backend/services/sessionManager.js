@@ -1,5 +1,8 @@
 import crypto from 'crypto';
 import { SESSION_EXPIRY_MS, SESSION_CLEANUP_INTERVAL_MS } from '../constants/timings.js';
+import { createLogger } from '../utils/logger.js';
+
+const logger = createLogger('SESSION');
 
 /**
  * SessionManager - Manages user sessions to avoid repeating bridge credentials
@@ -36,7 +39,7 @@ class SessionManager {
       lastUsed: Date.now()
     });
 
-    console.log(`[SESSION] Created session ${sessionToken.substring(0, 8)}... for bridge ${bridgeIp}`);
+    logger.info('Created session', { token: sessionToken.substring(0, 8), bridgeIp });
 
     return {
       sessionToken,
@@ -61,7 +64,7 @@ class SessionManager {
     const age = Date.now() - session.createdAt;
     if (age > this.SESSION_EXPIRY) {
       this.sessions.delete(sessionToken);
-      console.log(`[SESSION] Expired session ${sessionToken.substring(0, 8)}...`);
+      logger.debug('Expired session', { token: sessionToken.substring(0, 8) });
       return null;
     }
 
@@ -84,7 +87,7 @@ class SessionManager {
     this.sessions.delete(sessionToken);
 
     if (existed) {
-      console.log(`[SESSION] Revoked session ${sessionToken.substring(0, 8)}...`);
+      logger.info('Revoked session', { token: sessionToken.substring(0, 8) });
     }
 
     return existed;
@@ -117,7 +120,7 @@ class SessionManager {
     }
 
     if (cleaned > 0) {
-      console.log(`[SESSION] Cleaned up ${cleaned} expired session(s)`);
+      logger.debug('Cleaned up expired sessions', { count: cleaned });
     }
 
     return cleaned;
@@ -131,7 +134,7 @@ class SessionManager {
       this.cleanup();
     }, this.CLEANUP_INTERVAL);
 
-    console.log('[SESSION] Started automatic session cleanup');
+    logger.info('Started automatic session cleanup');
   }
 
   /**
@@ -141,7 +144,7 @@ class SessionManager {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
-      console.log('[SESSION] Stopped automatic session cleanup');
+      logger.info('Stopped automatic session cleanup');
     }
   }
 
