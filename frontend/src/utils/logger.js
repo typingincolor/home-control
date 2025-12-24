@@ -1,4 +1,4 @@
-/* eslint-disable no-console -- This is the logger utility, console is intentional */
+ 
 /**
  * Frontend logger utility
  * Provides structured logging with component prefixes

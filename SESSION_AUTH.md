@@ -72,7 +72,7 @@ WebSocket connections also support dual authentication:
 ws.send(
   JSON.stringify({
     type: 'auth',
-    sessionToken: 'hue_sess_abc123...'
+    sessionToken: 'hue_sess_abc123...',
   })
 );
 ```
@@ -84,7 +84,7 @@ ws.send(
   JSON.stringify({
     type: 'auth',
     bridgeIp: '192.168.1.100',
-    username: 'permanent-api-key'
+    username: 'permanent-api-key',
   })
 );
 ```
@@ -105,7 +105,7 @@ const {
   isValid, // Whether session is valid
   timeRemaining, // Seconds until expiration
   createSession, // Create new session
-  clearSession // Clear current session
+  clearSession, // Clear current session
 } = useSession();
 ```
 
@@ -126,7 +126,7 @@ const {
   bridgeIp,
   sessionToken, // Session token for API calls
   authenticate, // Pair + create session
-  reset // Logout + clear session
+  reset, // Logout + clear session
 } = useHueBridge();
 ```
 
@@ -383,7 +383,7 @@ await hueApi.revokeSession(sessionToken);
    ```javascript
    // Check network tab - should see Authorization header
    fetch('/api/v1/dashboard', {
-     headers: { Authorization: 'Bearer hue_sess_...' }
+     headers: { Authorization: 'Bearer hue_sess_...' },
    });
    ```
 

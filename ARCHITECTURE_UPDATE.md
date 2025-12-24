@@ -293,7 +293,7 @@ enrichLight(light) {
 <button
   style={{
     backgroundColor: light.color, // Already computed
-    boxShadow: light.shadow // Already computed
+    boxShadow: light.shadow, // Already computed
   }}
 />
 ```

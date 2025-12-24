@@ -179,7 +179,7 @@ Example v2 request:
 
 ```javascript
 fetch('/api/hue/clip/v2/resource/light?bridgeIp={ip}', {
-  headers: { 'hue-application-key': username }
+  headers: { 'hue-application-key': username },
 });
 ```
 
@@ -577,7 +577,7 @@ import { renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
 
 vi.mock('./useDemoMode', () => ({
-  useDemoMode: vi.fn()
+  useDemoMode: vi.fn(),
 }));
 
 it('should return hueApi when not in demo mode', () => {
@@ -668,18 +668,18 @@ const getLightsByRoom = () => {
 
   // Step 1: Build device → lights map from services
   const deviceToLights = {};
-  devices.data.forEach(device => {
-    const lightUuids = device.services?.filter(s => s.rtype === 'light').map(s => s.rid) || [];
+  devices.data.forEach((device) => {
+    const lightUuids = device.services?.filter((s) => s.rtype === 'light').map((s) => s.rid) || [];
     deviceToLights[device.id] = lightUuids;
   });
 
   const roomMap = {};
 
   // Step 2: Walk room → device → light hierarchy
-  rooms.data.forEach(room => {
+  rooms.data.forEach((room) => {
     const lightUuids = [];
 
-    room.children?.forEach(child => {
+    room.children?.forEach((child) => {
       if (child.rtype === 'device') {
         // Get lights from this device
         const deviceLights = deviceToLights[child.rid] || [];
@@ -694,7 +694,7 @@ const getLightsByRoom = () => {
       roomMap[room.metadata?.name || 'Unknown Room'] = {
         roomUuid: room.id,
         lightUuids: [...new Set(lightUuids)], // Deduplicate
-        lights: lightUuids.map(uuid => getLightByUuid(uuid)).filter(Boolean)
+        lights: lightUuids.map((uuid) => getLightByUuid(uuid)).filter(Boolean),
       };
     }
   });

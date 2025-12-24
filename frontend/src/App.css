@@ -1867,8 +1867,12 @@ body.dark-theme {
   /* Reserve space for vertical centering (half above, half below) */
   --centering-buffer: 32px;
   --grid-content-height: calc(var(--available-height) - var(--centering-buffer));
-  --tile-size-by-height: calc((var(--grid-content-height) - (var(--grid-rows) - 1) * var(--light-tile-gap)) / var(--grid-rows));
-  --tile-size-by-width: calc((var(--available-width) - (var(--grid-cols) - 1) * var(--light-tile-gap)) / var(--grid-cols));
+  --tile-size-by-height: calc(
+    (var(--grid-content-height) - (var(--grid-rows) - 1) * var(--light-tile-gap)) / var(--grid-rows)
+  );
+  --tile-size-by-width: calc(
+    (var(--available-width) - (var(--grid-cols) - 1) * var(--light-tile-gap)) / var(--grid-cols)
+  );
   /* Use the smaller of width or height constrained size */
   --tile-size: min(var(--tile-size-by-height), var(--tile-size-by-width));
 

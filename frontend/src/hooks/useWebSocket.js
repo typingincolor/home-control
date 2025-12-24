@@ -180,7 +180,7 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
 
         reconnectTimeoutRef.current = setTimeout(() => {
           reconnectAttempts.current++;
-          // eslint-disable-next-line react-hooks/immutability -- Recursive reconnection requires self-reference
+           
           connect();
         }, delay);
       } else if (reconnectAttempts.current >= maxReconnectAttempts) {

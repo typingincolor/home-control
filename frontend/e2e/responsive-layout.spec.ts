@@ -346,7 +346,9 @@ test.describe('Vertical Centering', () => {
           const bottomSpacing = navBox.y - (lastRowTileBox.y + lastRowTileBox.height);
 
           // Log for debugging
-          console.log(`${viewport.name}: topSpacing=${topSpacing.toFixed(1)}px, bottomSpacing=${bottomSpacing.toFixed(1)}px`);
+          console.log(
+            `${viewport.name}: topSpacing=${topSpacing.toFixed(1)}px, bottomSpacing=${bottomSpacing.toFixed(1)}px`
+          );
 
           // Assert equal spacing within tolerance
           expect(Math.abs(topSpacing - bottomSpacing)).toBeLessThanOrEqual(SPACING_TOLERANCE);

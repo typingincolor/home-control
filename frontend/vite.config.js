@@ -21,14 +21,14 @@ export default defineConfig({
       '/api': {
         target: `http://localhost:${config.development.backendPort}`,
         changeOrigin: true,
-        ws: true // Enable WebSocket proxying
-      }
-    }
+        ws: true, // Enable WebSocket proxying
+      },
+    },
   },
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
     // Ensure paths work when served from root
-    base: '/'
-  }
+    base: '/',
+  },
 });

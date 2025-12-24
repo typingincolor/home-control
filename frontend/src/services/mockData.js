@@ -1,4 +1,4 @@
-/* eslint-disable no-console -- Mock data logging is intentional for debugging */
+ 
 // Mock data for testing without a Hue bridge
 
 export const mockLights = {

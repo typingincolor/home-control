@@ -98,17 +98,21 @@ View mutation report: `open reports/mutation/html/index.html`
 ### Mutation Score by Category
 
 **Hooks** - Variable mutation scores
+
 - useSession, useWebSocket have good coverage
 - useHueBridge has lower coverage due to async complexity
 
 **Components** - Generally good coverage
+
 - LightButton, RoomCard, ZoneCard well-tested
 - Some UI components have lower scores
 
 **Services** - Good coverage
+
 - hueApi.js well-tested with mocks
 
 **Utilities** - High coverage
+
 - validation.js ~94% mutation score
 
 ### Notable Survived Mutants
@@ -337,6 +341,7 @@ e2e/
 ### Demo Mode Testing
 
 All E2E tests use `?demo=true` URL parameter:
+
 - No real Hue Bridge required
 - Deterministic mock data
 - Fast execution
@@ -345,6 +350,7 @@ All E2E tests use `?demo=true` URL parameter:
 ### Configuration
 
 See `playwright.config.ts` for:
+
 - Base URL: `http://localhost:5173`
 - Browser: Chromium only (for speed)
 - Screenshots on failure

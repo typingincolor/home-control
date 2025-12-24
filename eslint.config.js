@@ -37,6 +37,7 @@ export default [
         Buffer: 'readonly',
         URL: 'readonly',
         URLSearchParams: 'readonly',
+        alert: 'readonly',
       },
     },
     settings: {
@@ -79,6 +80,8 @@ export default [
       '**/.stryker-tmp/**',
       '**/test-results/**',
       '**/playwright-report/**',
+      '**/backend/public/**',
+      '**/e2e/**/*.ts',
     ],
   },
 ];
