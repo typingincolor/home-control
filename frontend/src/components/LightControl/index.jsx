@@ -72,12 +72,37 @@ export const LightControl = ({ sessionToken, onLogout }) => {
         setLoading(false);
         setError(null);
         setLocalDashboard(wsDashboard);
-      }
-      if (wsError && !wsDashboard && !loading) {
+      } else if (wsError) {
+        // Show error and stop loading spinner
+        setLoading(false);
         setError(wsError);
       }
     }
-  }, [wsDashboard, wsError, isDemoMode, loading]);
+  }, [wsDashboard, wsError, isDemoMode]);
+
+  // Fallback: If WebSocket doesn't deliver dashboard within 5 seconds, fetch via REST
+  useEffect(() => {
+    if (!isDemoMode && sessionToken && loading && !localDashboard) {
+      const timeoutId = setTimeout(async () => {
+        // Only fetch if still loading and no dashboard
+        if (loading && !localDashboard) {
+          logger.warn('WebSocket timeout, falling back to REST API');
+          try {
+            const dashboardData = await api.getDashboard(sessionToken);
+            setLocalDashboard(dashboardData);
+            setLoading(false);
+            logger.info('Fetched dashboard via REST fallback');
+          } catch (err) {
+            logger.error('REST fallback failed:', err);
+            setError(err.message);
+            setLoading(false);
+          }
+        }
+      }, 5000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isDemoMode, sessionToken, loading, localDashboard, api]);
 
   // Set default selected room when dashboard loads
   useEffect(() => {
