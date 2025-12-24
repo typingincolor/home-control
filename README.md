@@ -2,6 +2,8 @@
 
 A modern React web application for controlling Philips Hue lights locally using the official Hue API v2. Features a responsive interface with visual light controls, room organization, scene management, and real-time motion zone detection. Built with a **backend-heavy architecture** where the backend handles business logic and exposes a simplified v1 REST API with WebSocket support for real-time updates.
 
+![Dashboard Screenshot](docs/dashboard-screenshot.png)
+
 ## Features
 
 ### Core Functionality
