@@ -321,4 +321,116 @@ describe('RoomService', () => {
       expect(result.averageBrightness).toBeCloseTo(33.333, 2);
     });
   });
+
+  describe('findUnassignedLights', () => {
+    it('should return empty array when lightsData is null', () => {
+      const result = roomService.findUnassignedLights(null, {});
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when roomMap is null', () => {
+      const result = roomService.findUnassignedLights({ data: [] }, null);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when lightsData.data is undefined', () => {
+      const result = roomService.findUnassignedLights({}, {});
+      expect(result).toEqual([]);
+    });
+
+    it('should find lights not in any room', () => {
+      const lightsData = {
+        data: [
+          { id: 'light-1', metadata: { name: 'Assigned Light' } },
+          { id: 'light-2', metadata: { name: 'Unassigned Light' } },
+          { id: 'light-3', metadata: { name: 'Another Unassigned' } }
+        ]
+      };
+      const roomMap = {
+        'Living Room': {
+          roomUuid: 'room-1',
+          lightUuids: ['light-1']
+        }
+      };
+
+      const result = roomService.findUnassignedLights(lightsData, roomMap);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('light-2');
+      expect(result[1].id).toBe('light-3');
+    });
+
+    it('should return empty array when all lights are assigned', () => {
+      const lightsData = {
+        data: [
+          { id: 'light-1', metadata: { name: 'Light 1' } },
+          { id: 'light-2', metadata: { name: 'Light 2' } }
+        ]
+      };
+      const roomMap = {
+        'Living Room': {
+          roomUuid: 'room-1',
+          lightUuids: ['light-1', 'light-2']
+        }
+      };
+
+      const result = roomService.findUnassignedLights(lightsData, roomMap);
+
+      expect(result).toHaveLength(0);
+    });
+
+    it('should exclude lights from Unassigned room (roomUuid: null) when counting', () => {
+      const lightsData = {
+        data: [
+          { id: 'light-1', metadata: { name: 'Light 1' } },
+          { id: 'light-2', metadata: { name: 'Light 2' } },
+          { id: 'light-3', metadata: { name: 'Light 3' } }
+        ]
+      };
+      const roomMap = {
+        'Living Room': {
+          roomUuid: 'room-1',
+          lightUuids: ['light-1']
+        },
+        'Unassigned': {
+          roomUuid: null, // Special Unassigned room
+          lightUuids: ['light-2']
+        }
+      };
+
+      const result = roomService.findUnassignedLights(lightsData, roomMap);
+
+      // Should find light-2 and light-3 as unassigned
+      // (Unassigned room's lights are not counted as "assigned")
+      expect(result).toHaveLength(2);
+      expect(result.map(l => l.id)).toContain('light-2');
+      expect(result.map(l => l.id)).toContain('light-3');
+    });
+
+    it('should handle multiple rooms correctly', () => {
+      const lightsData = {
+        data: [
+          { id: 'light-1', metadata: { name: 'Light 1' } },
+          { id: 'light-2', metadata: { name: 'Light 2' } },
+          { id: 'light-3', metadata: { name: 'Light 3' } },
+          { id: 'light-4', metadata: { name: 'Unassigned' } }
+        ]
+      };
+      const roomMap = {
+        'Living Room': {
+          roomUuid: 'room-1',
+          lightUuids: ['light-1']
+        },
+        'Bedroom': {
+          roomUuid: 'room-2',
+          lightUuids: ['light-2', 'light-3']
+        }
+      };
+
+      const result = roomService.findUnassignedLights(lightsData, roomMap);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('light-4');
+    });
+  });
 });
