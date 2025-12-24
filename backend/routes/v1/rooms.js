@@ -24,7 +24,10 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
     logger.info('Updating lights in room', { roomId, authMethod: req.hue.authMethod });
 
     // Fetch room hierarchy to get lights in this room
-    const { lightsData, roomsData, devicesData } = await hueClient.getHierarchyData(bridgeIp, username);
+    const { lightsData, roomsData, devicesData } = await hueClient.getHierarchyData(
+      bridgeIp,
+      username
+    );
 
     const roomMap = roomService.buildRoomHierarchy(lightsData, roomsData, devicesData);
 
@@ -54,10 +57,12 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
 
     // Fetch updated light states
     const updatedLightsData = await hueClient.getLights(bridgeIp, username);
-    const updatedLights = room.lights.map(light => {
-      const updated = updatedLightsData.data.find(l => l.id === light.id);
-      return updated ? enrichLight(updated) : null;
-    }).filter(Boolean);
+    const updatedLights = room.lights
+      .map(light => {
+        const updated = updatedLightsData.data.find(l => l.id === light.id);
+        return updated ? enrichLight(updated) : null;
+      })
+      .filter(Boolean);
 
     res.json({
       success: true,

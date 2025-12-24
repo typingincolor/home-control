@@ -21,7 +21,7 @@ export const BridgeDiscovery = ({ onBridgeSelected }) => {
       if (bridges.length === 0) {
         setError(ERROR_MESSAGES.BRIDGE_DISCOVERY);
       }
-    } catch (err) {
+    } catch {
       setError(ERROR_MESSAGES.BRIDGE_DISCOVERY);
     } finally {
       setLoading(false);

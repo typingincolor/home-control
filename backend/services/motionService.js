@@ -27,8 +27,9 @@ class MotionService {
 
     // Extract MotionAware zones from behaviors and combine with motion status
     const motionZones = behaviorsData.data
-      .filter(behavior =>
-        behavior.configuration?.motion?.motion_service?.rtype === 'convenience_area_motion'
+      .filter(
+        behavior =>
+          behavior.configuration?.motion?.motion_service?.rtype === 'convenience_area_motion'
       )
       .map(behavior => {
         const motionServiceId = behavior.configuration.motion.motion_service.rid;

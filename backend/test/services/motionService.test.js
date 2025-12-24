@@ -363,16 +363,18 @@ describe('MotionService', () => {
       const result = await motionService.getMotionZones(bridgeIp, username);
 
       expect(hueClient.getResource).toHaveBeenCalledWith(bridgeIp, username, 'behavior_instance');
-      expect(hueClient.getResource).toHaveBeenCalledWith(bridgeIp, username, 'convenience_area_motion');
+      expect(hueClient.getResource).toHaveBeenCalledWith(
+        bridgeIp,
+        username,
+        'convenience_area_motion'
+      );
       expect(result.zones).toHaveLength(1);
       expect(result.zones[0].name).toBe('Test Zone');
       expect(result.zones[0].motionDetected).toBe(true);
     });
 
     it('should return empty zones when no motion behaviors exist', async () => {
-      hueClient.getResource
-        .mockResolvedValueOnce({ data: [] })
-        .mockResolvedValueOnce({ data: [] });
+      hueClient.getResource.mockResolvedValueOnce({ data: [] }).mockResolvedValueOnce({ data: [] });
 
       const result = await motionService.getMotionZones(bridgeIp, username);
 
@@ -382,8 +384,9 @@ describe('MotionService', () => {
     it('should throw error when hueClient fails', async () => {
       hueClient.getResource.mockRejectedValue(new Error('Network error'));
 
-      await expect(motionService.getMotionZones(bridgeIp, username))
-        .rejects.toThrow('Failed to get motion zones: Network error');
+      await expect(motionService.getMotionZones(bridgeIp, username)).rejects.toThrow(
+        'Failed to get motion zones: Network error'
+      );
     });
 
     it('should handle partial failure (behaviors succeeds, motion fails)', async () => {
@@ -391,8 +394,9 @@ describe('MotionService', () => {
         .mockResolvedValueOnce({ data: [] })
         .mockRejectedValueOnce(new Error('Motion fetch failed'));
 
-      await expect(motionService.getMotionZones(bridgeIp, username))
-        .rejects.toThrow('Failed to get motion zones: Motion fetch failed');
+      await expect(motionService.getMotionZones(bridgeIp, username)).rejects.toThrow(
+        'Failed to get motion zones: Motion fetch failed'
+      );
     });
   });
 });

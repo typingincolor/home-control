@@ -5,7 +5,7 @@ import logger from '../utils/logger.js';
  * Global error handler middleware
  * Converts all errors to standardized, client-friendly JSON responses
  */
-export function errorHandler(err, req, res, next) {
+export function errorHandler(err, req, res, _next) {
   // Convert to ApiError if needed
   const apiError = toApiError(err);
 

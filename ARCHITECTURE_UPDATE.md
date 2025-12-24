@@ -5,6 +5,7 @@
 As of v2.0.0, business logic has been moved from frontend to backend, exposing a simplified v1 REST API with WebSocket support that pre-computes colors, shadows, and statistics. The legacy `/api/hue/*` proxy has been completely removed in favor of controlled v1 endpoints.
 
 **v3.0.0 additions:**
+
 - Backend caching for static resources (5-minute TTL)
 - WebSocket cleanup mechanisms (orphaned interval cleanup, heartbeat monitoring, stale connection removal)
 - Stats endpoint for debugging (`/api/v1/stats/websocket`)
@@ -14,6 +15,7 @@ As of v2.0.0, business logic has been moved from frontend to backend, exposing a
 ## Backend API (v1)
 
 ### Philosophy
+
 - **Resource-oriented** REST API with clear endpoints
 - **Pre-computed** data - colors, shadows, and stats calculated server-side
 - **Single-call efficiency** - dashboard endpoint replaces 4-6 API calls
@@ -22,13 +24,16 @@ As of v2.0.0, business logic has been moved from frontend to backend, exposing a
 ### Key Endpoints
 
 #### `GET /api/v1/dashboard`
+
 Unified endpoint returning all dashboard data in one call.
 
 **Query Parameters:**
+
 - `bridgeIp` (required) - Bridge IP address
 - `username` (required) - Hue API username
 
 **Response:**
+
 ```json
 {
   "summary": {
@@ -52,20 +57,19 @@ Unified endpoint returning all dashboard data in one call.
           "name": "Living Room 1",
           "on": true,
           "brightness": 80,
-          "color": "rgb(255, 180, 120)",  // Pre-computed!
-          "shadow": "0 0 20px rgba(255, 180, 120, 0.4)",  // Pre-computed!
+          "color": "rgb(255, 180, 120)", // Pre-computed!
+          "shadow": "0 0 20px rgba(255, 180, 120, 0.4)", // Pre-computed!
           "colorSource": "xy"
         }
       ],
-      "scenes": [
-        { "id": "scene-uuid", "name": "Bright" }
-      ]
+      "scenes": [{ "id": "scene-uuid", "name": "Bright" }]
     }
   ]
 }
 ```
 
 **Backend Processing:**
+
 1. Fetches lights, rooms, devices, scenes in parallel from Hue Bridge
 2. Builds room hierarchy (3-way join: room → device → light)
 3. Converts xy/mirek to RGB with brightness-aware warm dim blending
@@ -74,9 +78,11 @@ Unified endpoint returning all dashboard data in one call.
 6. Returns ready-to-render data
 
 #### `GET /api/v1/motion-zones`
+
 Returns parsed MotionAware zones with motion status.
 
 **Response:**
+
 ```json
 {
   "zones": [
@@ -92,18 +98,23 @@ Returns parsed MotionAware zones with motion status.
 ```
 
 #### `PUT /api/v1/lights/:id`
+
 Update individual light, returns updated light with pre-computed color.
 
 #### `PUT /api/v1/rooms/:id/lights`
+
 Bulk update all lights in a room.
 
 #### `POST /api/v1/scenes/:id/activate`
+
 Activate scene, returns affected lights with pre-computed colors.
 
 #### `WebSocket /api/v1/ws`
+
 Real-time dashboard updates via WebSocket connection.
 
 **Connection Flow:**
+
 1. Client connects to `ws://localhost:3001/api/v1/ws`
 2. Client sends authentication:
    ```json
@@ -117,7 +128,9 @@ Real-time dashboard updates via WebSocket connection.
    ```json
    {
      "type": "initial_state",
-     "data": { /* full dashboard object */ }
+     "data": {
+       /* full dashboard object */
+     }
    }
    ```
 4. Server pushes updates when state changes:
@@ -127,7 +140,9 @@ Real-time dashboard updates via WebSocket connection.
      "changes": [
        {
          "type": "light",
-         "data": { /* updated light */ },
+         "data": {
+           /* updated light */
+         },
          "roomId": "room-uuid"
        }
      ]
@@ -135,6 +150,7 @@ Real-time dashboard updates via WebSocket connection.
    ```
 
 **Benefits:**
+
 - Eliminates polling overhead (no more 30-second intervals)
 - Instant updates when lights change (5-second polling on backend)
 - All connected clients see changes simultaneously
@@ -146,12 +162,14 @@ Real-time dashboard updates via WebSocket connection.
 Three methods supported (in order of preference):
 
 1. **Session Token** (recommended):
+
    ```
    POST /api/v1/auth/session
    Authorization: Bearer <token>
    ```
 
 2. **Headers**:
+
    ```
    X-Bridge-IP: 192.168.1.100
    X-Hue-Username: abc123
@@ -165,6 +183,7 @@ Three methods supported (in order of preference):
 ## Frontend Architecture Changes
 
 ### Before (v0.4.x)
+
 - 4-6 API calls per page load
 - Complex 3-way joins in frontend
 - Color conversion calculations on every render
@@ -172,6 +191,7 @@ Three methods supported (in order of preference):
 - 75 unit tests for business logic
 
 ### After (v0.5.0)
+
 - **1 initial API call** (WebSocket initial state)
 - **Real-time updates** via WebSocket (no polling)
 - Zero frontend data transformation
@@ -182,6 +202,7 @@ Three methods supported (in order of preference):
 ### Data Flow
 
 **Old Pattern:**
+
 ```javascript
 const [lights, rooms, devices, scenes] = await Promise.all([...4 calls]);
 const lightsByRoom = buildRoomHierarchy(lights, rooms, devices);
@@ -190,6 +211,7 @@ const shadow = getLightShadow(light, color);
 ```
 
 **New Pattern:**
+
 ```javascript
 // WebSocket provides initial state and real-time updates
 const { dashboard, isConnected } = useWebSocket(bridgeIp, username);
@@ -201,6 +223,7 @@ const { dashboard, isConnected } = useWebSocket(bridgeIp, username);
 ## Backend Services
 
 ### Service Layer
+
 - **hueClient.js** - Low-level Hue Bridge API wrapper
 - **roomService.js** - Room hierarchy building, scene filtering, stats
 - **motionService.js** - Motion sensor parsing
@@ -210,6 +233,7 @@ const { dashboard, isConnected } = useWebSocket(bridgeIp, username);
 - **websocketService.js** - Real-time WebSocket connection management, state change detection, broadcasting
 
 ### Testing
+
 - **139 backend tests** (81% coverage)
 - **193 frontend tests**
 - **332 tests total**
@@ -218,6 +242,7 @@ const { dashboard, isConnected } = useWebSocket(bridgeIp, username);
 ## Migration Benefits
 
 ### Performance
+
 - **67-83% fewer API calls** (1 initial vs 4-6 on every load)
 - **No polling overhead** - WebSocket pushes updates only when needed
 - **Network overhead reduced** by 3× (fewer round trips)
@@ -225,12 +250,14 @@ const { dashboard, isConnected } = useWebSocket(bridgeIp, username);
 - **~1,323 lines of code removed** from frontend
 
 ### Maintainability
+
 - Business logic centralized in backend
 - Frontend focuses on UI rendering only
 - Backend unit tests for transformations
 - Clear API contracts with OpenAPI docs
 
 ### Extensibility
+
 - Easy to add new endpoints
 - Can add server-side caching
 - **WebSocket support implemented** for real-time updates
@@ -241,6 +268,7 @@ const { dashboard, isConnected } = useWebSocket(bridgeIp, username);
 Light buttons display actual bulb colors using mathematical color space conversions with **brightness-aware warm dim blending**, now computed server-side:
 
 **Backend Color Service** (`backend/services/colorService.js`):
+
 ```javascript
 // Convert Hue xy coordinates (CIE 1931) to RGB
 xyToRgb(x, y, brightness)
@@ -259,12 +287,15 @@ enrichLight(light) {
 ```
 
 **Frontend** (`LightButton.jsx`):
+
 ```javascript
 // Just use pre-computed values!
-<button style={{
-  backgroundColor: light.color,  // Already computed
-  boxShadow: light.shadow       // Already computed
-}} />
+<button
+  style={{
+    backgroundColor: light.color, // Already computed
+    boxShadow: light.shadow // Already computed
+  }}
+/>
 ```
 
 ## API Documentation

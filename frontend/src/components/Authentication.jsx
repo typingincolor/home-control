@@ -77,7 +77,7 @@ export const Authentication = ({ bridgeIp, onAuthenticate, loading, error }) => 
               <h5>CORS Troubleshooting:</h5>
               <p>The browser is blocking requests to your bridge. Try these solutions:</p>
               <ul>
-                <li>Install a CORS browser extension (e.g., "Allow CORS" or "CORS Unblock")</li>
+                <li>Install a CORS browser extension (e.g., &quot;Allow CORS&quot; or &quot;CORS Unblock&quot;)</li>
                 <li>Visit <code>http://{bridgeIp}/api/config</code> directly in a new tab first</li>
                 <li>Make sure your device is on the same network as the bridge</li>
               </ul>

@@ -56,9 +56,7 @@ describe('RoomService', () => {
 
     it('should return empty array when no scenes match room', () => {
       const scenesData = {
-        data: [
-          { id: 'scene-1', group: { rid: 'room-2' }, metadata: { name: 'Scene 1' } }
-        ]
+        data: [{ id: 'scene-1', group: { rid: 'room-2' }, metadata: { name: 'Scene 1' } }]
       };
       const result = roomService.getScenesForRoom(scenesData, 'room-1');
       expect(result).toEqual([]);
@@ -392,7 +390,7 @@ describe('RoomService', () => {
           roomUuid: 'room-1',
           lightUuids: ['light-1']
         },
-        'Unassigned': {
+        Unassigned: {
           roomUuid: null, // Special Unassigned room
           lightUuids: ['light-2']
         }
@@ -421,7 +419,7 @@ describe('RoomService', () => {
           roomUuid: 'room-1',
           lightUuids: ['light-1']
         },
-        'Bedroom': {
+        Bedroom: {
           roomUuid: 'room-2',
           lightUuids: ['light-2', 'light-3']
         }

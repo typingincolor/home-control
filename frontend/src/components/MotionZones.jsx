@@ -6,20 +6,22 @@ import { useHueApi } from '../hooks/useHueApi';
 export const MotionZones = ({ sessionToken, motionZones }) => {
   const api = useHueApi();
 
-  const [zones, setZones] = useState([]);
+  const [fetchedZones, setFetchedZones] = useState([]);
   const [activeAlerts, setActiveAlerts] = useState([]);
   const previousMotionState = useRef({});
 
-  // Use WebSocket data if available, otherwise fallback to API
+  // Use WebSocket data if available, otherwise use fetched data
+  const zones = motionZones || fetchedZones;
+
+  // Fetch from API only when no WebSocket data is provided
   useEffect(() => {
-    if (motionZones) {
-      setZones(motionZones);
-    } else if (sessionToken) {
+    if (!motionZones && sessionToken) {
       const fetchSensors = async () => {
         try {
           const motionData = await api.getMotionZones(sessionToken);
-          setZones(motionData.zones || []);
+          setFetchedZones(motionData.zones || []);
         } catch (err) {
+          // eslint-disable-next-line no-console -- Intentional error logging
           console.error('[MotionZones] Failed to fetch MotionAware data:', err);
         }
       };

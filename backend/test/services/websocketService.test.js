@@ -70,7 +70,10 @@ describe('WebSocketService', () => {
 
     it('should report multiple bridges', () => {
       websocketService.connections.set('192.168.1.100', new Set([{ readyState: 1 }]));
-      websocketService.connections.set('192.168.1.101', new Set([{ readyState: 1 }, { readyState: 1 }]));
+      websocketService.connections.set(
+        '192.168.1.101',
+        new Set([{ readyState: 1 }, { readyState: 1 }])
+      );
 
       const stats = websocketService.getStats();
 
@@ -664,9 +667,7 @@ describe('WebSocketService', () => {
       const current = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
         rooms: [],
-        zones: [
-          { id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 1 } }
-        ]
+        zones: [{ id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 1 } }]
       };
 
       const changes = websocketService.detectChanges(previous, current);
@@ -729,16 +730,12 @@ describe('WebSocketService', () => {
     it('should detect room changes', () => {
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: [
-          { id: 'room-1', name: 'Living Room', stats: { lightsOnCount: 0 }, lights: [] }
-        ]
+        rooms: [{ id: 'room-1', name: 'Living Room', stats: { lightsOnCount: 0 }, lights: [] }]
       };
 
       const current = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: [
-          { id: 'room-1', name: 'Living Room', stats: { lightsOnCount: 1 }, lights: [] }
-        ]
+        rooms: [{ id: 'room-1', name: 'Living Room', stats: { lightsOnCount: 1 }, lights: [] }]
       };
 
       const changes = websocketService.detectChanges(previous, current);
@@ -757,9 +754,7 @@ describe('WebSocketService', () => {
 
       const current = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: [
-          { id: 'room-1', name: 'New Room', stats: { lightsOnCount: 1 }, lights: [] }
-        ]
+        rooms: [{ id: 'room-1', name: 'New Room', stats: { lightsOnCount: 1 }, lights: [] }]
       };
 
       const changes = websocketService.detectChanges(previous, current);
@@ -810,7 +805,12 @@ describe('WebSocketService', () => {
 
     it('should not detect light changes when lights are identical', () => {
       const light = { id: 'light-1', name: 'Lamp', on: { on: true }, dimming: { brightness: 100 } };
-      const room = { id: 'room-1', name: 'Living Room', stats: { lightsOnCount: 1 }, lights: [light] };
+      const room = {
+        id: 'room-1',
+        name: 'Living Room',
+        stats: { lightsOnCount: 1 },
+        lights: [light]
+      };
 
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
@@ -831,9 +831,7 @@ describe('WebSocketService', () => {
     it('should skip light comparison for new rooms', () => {
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: [
-          { id: 'room-1', name: 'Old Room', stats: {}, lights: [] }
-        ]
+        rooms: [{ id: 'room-1', name: 'Old Room', stats: {}, lights: [] }]
       };
 
       const current = {
@@ -915,10 +913,12 @@ describe('WebSocketService', () => {
       expect(mockWs.bridgeIp).toBe('192.168.1.100');
       expect(mockWs.username).toBe('test-user');
       expect(mockWs.authMethod).toBe('session');
-      expect(mockWs.send).toHaveBeenCalledWith(JSON.stringify({
-        type: 'initial_state',
-        data: mockDashboard
-      }));
+      expect(mockWs.send).toHaveBeenCalledWith(
+        JSON.stringify({
+          type: 'initial_state',
+          data: mockDashboard
+        })
+      );
     });
 
     it('should reject invalid session token', async () => {
@@ -927,10 +927,12 @@ describe('WebSocketService', () => {
 
       await websocketService.handleAuth(mockWs, { sessionToken: 'invalid-token' });
 
-      expect(mockWs.send).toHaveBeenCalledWith(JSON.stringify({
-        type: 'error',
-        message: 'Invalid or expired session token'
-      }));
+      expect(mockWs.send).toHaveBeenCalledWith(
+        JSON.stringify({
+          type: 'error',
+          message: 'Invalid or expired session token'
+        })
+      );
     });
 
     it('should authenticate with legacy credentials', async () => {
@@ -951,10 +953,12 @@ describe('WebSocketService', () => {
 
       await websocketService.handleAuth(mockWs, {});
 
-      expect(mockWs.send).toHaveBeenCalledWith(JSON.stringify({
-        type: 'error',
-        message: 'Missing authentication: provide sessionToken OR (bridgeIp + username)'
-      }));
+      expect(mockWs.send).toHaveBeenCalledWith(
+        JSON.stringify({
+          type: 'error',
+          message: 'Missing authentication: provide sessionToken OR (bridgeIp + username)'
+        })
+      );
     });
 
     it('should add connection to map for new bridge', async () => {
@@ -1009,10 +1013,12 @@ describe('WebSocketService', () => {
         username: 'test-user'
       });
 
-      expect(mockWs.send).toHaveBeenCalledWith(JSON.stringify({
-        type: 'error',
-        message: 'Failed to fetch initial state'
-      }));
+      expect(mockWs.send).toHaveBeenCalledWith(
+        JSON.stringify({
+          type: 'error',
+          message: 'Failed to fetch initial state'
+        })
+      );
     });
   });
 
@@ -1080,9 +1086,7 @@ describe('WebSocketService', () => {
 
       expect(broadcastSpy).toHaveBeenCalledWith(bridgeIp, {
         type: 'state_update',
-        changes: expect.arrayContaining([
-          { type: 'summary', data: updatedState.summary }
-        ])
+        changes: expect.arrayContaining([{ type: 'summary', data: updatedState.summary }])
       });
     });
 
@@ -1111,8 +1115,9 @@ describe('WebSocketService', () => {
       await websocketService.startPolling(bridgeIp, 'test-user');
 
       // Should not throw when poll fails
-      await expect(vi.advanceTimersByTimeAsync(websocketService.pollInterval))
-        .resolves.not.toThrow();
+      await expect(
+        vi.advanceTimersByTimeAsync(websocketService.pollInterval)
+      ).resolves.not.toThrow();
     });
   });
 

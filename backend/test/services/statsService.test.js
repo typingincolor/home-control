@@ -14,7 +14,7 @@ describe('StatsService', () => {
       };
       const roomMap = {
         'Living Room': { lightUuids: ['light-1', 'light-2'] },
-        'Bedroom': { lightUuids: ['light-3'] }
+        Bedroom: { lightUuids: ['light-3'] }
       };
       const scenesData = {
         data: [
@@ -87,8 +87,8 @@ describe('StatsService', () => {
     it('should count rooms correctly including Unassigned', () => {
       const roomMap = {
         'Living Room': { lightUuids: ['light-1'] },
-        'Bedroom': { lightUuids: ['light-2'] },
-        'Unassigned': { lightUuids: ['light-3'] }
+        Bedroom: { lightUuids: ['light-2'] },
+        Unassigned: { lightUuids: ['light-3'] }
       };
 
       const result = statsService.calculateDashboardStats(null, roomMap, null);

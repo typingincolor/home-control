@@ -41,11 +41,15 @@ export function extractCredentials(req, res, next) {
 
     // Validate we got credentials
     if (!bridgeIp) {
-      throw new MissingCredentialsError('bridgeIp (via session token, X-Bridge-IP header, or query param)');
+      throw new MissingCredentialsError(
+        'bridgeIp (via session token, X-Bridge-IP header, or query param)'
+      );
     }
 
     if (!username) {
-      throw new MissingCredentialsError('username (via session token, X-Hue-Username header, or query param)');
+      throw new MissingCredentialsError(
+        'username (via session token, X-Hue-Username header, or query param)'
+      );
     }
 
     // Attach credentials to request for route handlers

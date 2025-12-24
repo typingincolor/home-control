@@ -38,6 +38,7 @@ const request = async (url, options = {}, sessionToken = null) => {
 
     return data;
   } catch (error) {
+    // eslint-disable-next-line no-console -- Intentional error logging
     console.error(`[HueApi] Request failed:`, error);
 
     // Network error detection
@@ -60,6 +61,7 @@ export const hueApi = {
       const data = await response.json();
       return data;
     } catch (error) {
+      // eslint-disable-next-line no-console -- Intentional error logging
       console.error('Bridge discovery error:', error);
       throw new Error('Could not discover bridges. Please enter IP manually.');
     }

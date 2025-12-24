@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import zoneService from '../../services/zoneService.js';
 
 describe('ZoneService', () => {
@@ -57,9 +57,7 @@ describe('ZoneService', () => {
 
     it('should handle zones with device references', () => {
       const lightsData = {
-        data: [
-          { id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }
-        ]
+        data: [{ id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }]
       };
 
       const zonesData = {
@@ -67,9 +65,7 @@ describe('ZoneService', () => {
           {
             id: 'zone-1',
             metadata: { name: 'All Lights' },
-            children: [
-              { rid: 'device-1', rtype: 'device' }
-            ]
+            children: [{ rid: 'device-1', rtype: 'device' }]
           }
         ]
       };
@@ -92,9 +88,7 @@ describe('ZoneService', () => {
 
     it('should handle zones with missing name gracefully', () => {
       const lightsData = {
-        data: [
-          { id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }
-        ]
+        data: [{ id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }]
       };
 
       const zonesData = {
@@ -116,9 +110,7 @@ describe('ZoneService', () => {
 
     it('should deduplicate lights in zones', () => {
       const lightsData = {
-        data: [
-          { id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }
-        ]
+        data: [{ id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }]
       };
 
       const zonesData = {

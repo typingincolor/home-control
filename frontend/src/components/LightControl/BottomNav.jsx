@@ -12,8 +12,7 @@ import {
   Shower,
   Car,
   Tree,
-  Door,
-  LightbulbOff
+  Door
 } from './Icons';
 
 // Icon size for nav tabs

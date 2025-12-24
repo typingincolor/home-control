@@ -183,7 +183,12 @@ class HueClient {
       const cached = this._getCached(cacheKey);
       if (cached) return cached;
 
-      const data = await this._request('GET', bridgeIp, `/clip/v2/resource/${resourceType}`, username);
+      const data = await this._request(
+        'GET',
+        bridgeIp,
+        `/clip/v2/resource/${resourceType}`,
+        username
+      );
       this._setCache(cacheKey, data);
       return data;
     }

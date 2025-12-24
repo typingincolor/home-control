@@ -68,7 +68,7 @@ class WebSocketService {
       path: '/api/v1/ws'
     });
 
-    this.wss.on('connection', (ws) => {
+    this.wss.on('connection', ws => {
       logger.info('New client connected');
 
       ws.isAlive = true;
@@ -76,7 +76,7 @@ class WebSocketService {
         ws.isAlive = true;
       });
 
-      ws.on('message', (message) => {
+      ws.on('message', message => {
         this.handleMessage(ws, message);
       });
 
@@ -84,7 +84,7 @@ class WebSocketService {
         this.handleDisconnect(ws);
       });
 
-      ws.on('error', (error) => {
+      ws.on('error', error => {
         logger.error('Connection error', { error: error.message });
       });
     });
@@ -92,7 +92,7 @@ class WebSocketService {
     // Heartbeat check - terminates dead connections
     this.heartbeatInterval = setInterval(() => {
       let terminated = 0;
-      this.wss.clients.forEach((ws) => {
+      this.wss.clients.forEach(ws => {
         if (ws.isAlive === false) {
           logger.warn('Terminating unresponsive client', { bridgeIp: ws.bridgeIp || 'unknown' });
           this.handleDisconnect(ws); // Clean up before terminating
@@ -139,7 +139,8 @@ class WebSocketService {
     for (const [bridgeIp, connections] of this.connections) {
       const staleConnections = [];
       connections.forEach(ws => {
-        if (ws.readyState !== 1) { // Not OPEN
+        if (ws.readyState !== 1) {
+          // Not OPEN
           staleConnections.push(ws);
         }
       });
@@ -179,10 +180,12 @@ class WebSocketService {
       }
     } catch (error) {
       logger.error('Message handling error', { error: error.message });
-      ws.send(JSON.stringify({
-        type: 'error',
-        message: error.message
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'error',
+          message: error.message
+        })
+      );
     }
   }
 
@@ -198,10 +201,12 @@ class WebSocketService {
       const session = sessionManager.getSession(data.sessionToken);
 
       if (!session) {
-        ws.send(JSON.stringify({
-          type: 'error',
-          message: 'Invalid or expired session token'
-        }));
+        ws.send(
+          JSON.stringify({
+            type: 'error',
+            message: 'Invalid or expired session token'
+          })
+        );
         return;
       }
 
@@ -219,10 +224,12 @@ class WebSocketService {
     }
     // Error: No valid auth provided
     else {
-      ws.send(JSON.stringify({
-        type: 'error',
-        message: 'Missing authentication: provide sessionToken OR (bridgeIp + username)'
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'error',
+          message: 'Missing authentication: provide sessionToken OR (bridgeIp + username)'
+        })
+      );
       return;
     }
 
@@ -241,16 +248,20 @@ class WebSocketService {
     // Send initial state
     try {
       const dashboard = await dashboardService.getDashboard(bridgeIp, username);
-      ws.send(JSON.stringify({
-        type: 'initial_state',
-        data: dashboard
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'initial_state',
+          data: dashboard
+        })
+      );
     } catch (error) {
       logger.error('Failed to send initial state', { error: error.message });
-      ws.send(JSON.stringify({
-        type: 'error',
-        message: 'Failed to fetch initial state'
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'error',
+          message: 'Failed to fetch initial state'
+        })
+      );
     }
   }
 
@@ -268,7 +279,10 @@ class WebSocketService {
         connections.delete(ws);
 
         if (hadConnection) {
-          logger.debug('Removed connection', { bridgeIp: ws.bridgeIp, remaining: connections.size });
+          logger.debug('Removed connection', {
+            bridgeIp: ws.bridgeIp,
+            remaining: connections.size
+          });
         }
 
         // Stop polling if no more connections for this bridge
@@ -428,7 +442,8 @@ class WebSocketService {
     let sent = 0;
 
     connections.forEach(ws => {
-      if (ws.readyState === 1) { // OPEN state
+      if (ws.readyState === 1) {
+        // OPEN state
         ws.send(messageStr);
         sent++;
       }

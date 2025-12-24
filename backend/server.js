@@ -29,7 +29,8 @@ const HOST = process.env.HOST || config.server.host;
 const API_VERSION = '2.0.0';
 
 // Create an HTTPS agent that accepts self-signed certificates
-const httpsAgent = new https.Agent({
+// Note: Currently unused as hueClient handles its own agent, kept for potential future use
+const _httpsAgent = new https.Agent({
   rejectUnauthorized: false
 });
 
@@ -40,10 +41,14 @@ app.use(cors());
 app.use(express.json());
 
 // API Documentation (Swagger UI)
-app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec, {
-  customSiteTitle: 'Hue Control API Docs',
-  customCss: '.swagger-ui .topbar { display: none }'
-}));
+app.use(
+  '/api/v1/docs',
+  swaggerUi.serve,
+  swaggerUi.setup(openApiSpec, {
+    customSiteTitle: 'Hue Control API Docs',
+    customCss: '.swagger-ui .topbar { display: none }'
+  })
+);
 
 // Mount v1 API routes
 app.use('/api/v1', v1Routes);
@@ -91,7 +96,7 @@ app.get('/api/health', (req, res) => {
 // Config endpoint - expose configuration to frontend
 app.get('/api/config', (req, res) => {
   res.json({
-    hue: config.hue,
+    hue: config.hue
     // Only expose safe config values to frontend
   });
 });

@@ -24,7 +24,10 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
     logger.info('Updating lights in zone', { zoneId, authMethod: req.hue.authMethod });
 
     // Fetch zone hierarchy to get lights in this zone
-    const { lightsData, zonesData, devicesData } = await hueClient.getZoneHierarchyData(bridgeIp, username);
+    const { lightsData, zonesData, devicesData } = await hueClient.getZoneHierarchyData(
+      bridgeIp,
+      username
+    );
 
     const zoneMap = zoneService.buildZoneHierarchy(lightsData, zonesData, devicesData);
 
@@ -54,10 +57,12 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
 
     // Fetch updated light states
     const updatedLightsData = await hueClient.getLights(bridgeIp, username);
-    const updatedLights = zone.lights.map(light => {
-      const updated = updatedLightsData.data.find(l => l.id === light.id);
-      return updated ? enrichLight(updated) : null;
-    }).filter(Boolean);
+    const updatedLights = zone.lights
+      .map(light => {
+        const updated = updatedLightsData.data.find(l => l.id === light.id);
+        return updated ? enrichLight(updated) : null;
+      })
+      .filter(Boolean);
 
     res.json({
       success: true,

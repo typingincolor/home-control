@@ -1,10 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { xyToRgb, mirekToRgb, getLightColor, getLightShadow, enrichLight, enrichLights } from '../../utils/colorConversion.js';
+import {
+  xyToRgb,
+  mirekToRgb,
+  getLightColor,
+  getLightShadow,
+  enrichLight,
+  enrichLights
+} from '../../utils/colorConversion.js';
 
 describe('colorConversion', () => {
   describe('xyToRgb', () => {
     it('should convert xy coordinates to RGB with default brightness', () => {
-      const result = xyToRgb(0.3127, 0.3290); // D65 white point
+      const result = xyToRgb(0.3127, 0.329); // D65 white point
       expect(result).toHaveProperty('r');
       expect(result).toHaveProperty('g');
       expect(result).toHaveProperty('b');
@@ -29,15 +36,15 @@ describe('colorConversion', () => {
     });
 
     it('should scale brightness correctly at 50%', () => {
-      const bright = xyToRgb(0.3127, 0.3290, 100);
-      const dim = xyToRgb(0.3127, 0.3290, 50);
+      const bright = xyToRgb(0.3127, 0.329, 100);
+      const dim = xyToRgb(0.3127, 0.329, 50);
       expect(dim.r).toBeLessThan(bright.r);
       expect(dim.g).toBeLessThan(bright.g);
       expect(dim.b).toBeLessThan(bright.b);
     });
 
     it('should scale brightness correctly at 0%', () => {
-      const result = xyToRgb(0.3127, 0.3290, 0);
+      const result = xyToRgb(0.3127, 0.329, 0);
       expect(result.r).toBe(0);
       expect(result.g).toBe(0);
       expect(result.b).toBe(0);
@@ -125,7 +132,7 @@ describe('colorConversion', () => {
       const light = {
         on: { on: true },
         dimming: { brightness: 100 },
-        color: { xy: { x: 0.3127, y: 0.3290 } }
+        color: { xy: { x: 0.3127, y: 0.329 } }
       };
       const result = getLightColor(light);
       expect(result).toMatch(/^rgb\(\d+, \d+, \d+\)$/);
@@ -196,7 +203,7 @@ describe('colorConversion', () => {
       const light = {
         on: { on: true },
         dimming: { brightness: 20 }, // Dim
-        color: { xy: { x: 0.3127, y: 0.3290 } }
+        color: { xy: { x: 0.3127, y: 0.329 } }
       };
       const result = getLightColor(light);
       expect(result).toMatch(/^rgb\(\d+, \d+, \d+\)$/);
@@ -347,7 +354,7 @@ describe('colorConversion', () => {
         id: 'light-5',
         on: { on: true },
         dimming: { brightness: 50 },
-        color: { xy: { x: 0.3127, y: 0.3290 } }
+        color: { xy: { x: 0.3127, y: 0.329 } }
       };
 
       const result = enrichLight(light);
@@ -467,7 +474,7 @@ describe('colorConversion', () => {
         metadata: { name: 'Dim Light' },
         on: { on: true },
         dimming: { brightness: 30 },
-        color: { xy: { x: 0.3127, y: 0.3290 } }
+        color: { xy: { x: 0.3127, y: 0.329 } }
       };
 
       const result = enrichLight(light);

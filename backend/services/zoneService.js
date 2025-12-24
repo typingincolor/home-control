@@ -40,9 +40,7 @@ class ZoneService {
 
       // Deduplicate and filter existing lights
       const uniqueLightUuids = [...new Set(lightUuids)];
-      const lights = uniqueLightUuids
-        .map(uuid => lightMap.get(uuid))
-        .filter(Boolean);
+      const lights = uniqueLightUuids.map(uuid => lightMap.get(uuid)).filter(Boolean);
 
       if (uniqueLightUuids.length > 0) {
         zoneMap[zoneName] = {

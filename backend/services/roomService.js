@@ -21,7 +21,7 @@ class RoomService {
     if (!lightsData?.data || !roomsData?.data || !devicesData?.data) return null;
 
     // Helper to get light by UUID
-    const getLightByUuid = (uuid) => {
+    const getLightByUuid = uuid => {
       return lightsData.data.find(light => light.id === uuid);
     };
 
@@ -39,20 +39,14 @@ class RoomService {
         roomMap[room.metadata?.name || 'Unknown Room'] = {
           roomUuid: room.id,
           lightUuids: [...new Set(lightUuids)], // Deduplicate
-          lights: lightUuids
-            .map(uuid => getLightByUuid(uuid))
-            .filter(Boolean)
+          lights: lightUuids.map(uuid => getLightByUuid(uuid)).filter(Boolean)
         };
       }
     });
 
     // Add unassigned lights
-    const assignedLightUuids = new Set(
-      Object.values(roomMap).flatMap(r => r.lightUuids)
-    );
-    const unassignedLights = lightsData.data.filter(
-      light => !assignedLightUuids.has(light.id)
-    );
+    const assignedLightUuids = new Set(Object.values(roomMap).flatMap(r => r.lightUuids));
+    const unassignedLights = lightsData.data.filter(light => !assignedLightUuids.has(light.id));
 
     if (unassignedLights.length > 0) {
       roomMap['Unassigned'] = {

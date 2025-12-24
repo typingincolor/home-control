@@ -22,9 +22,15 @@ router.get('/', extractCredentials, async (req, res, next) => {
     logger.info('Fetching data', { bridgeIp, authMethod: req.hue.authMethod });
 
     // Step 1: Fetch all data in parallel
-    const { lightsData, roomsData, devicesData, scenesData } = await hueClient.getDashboardData(bridgeIp, username);
+    const { lightsData, roomsData, devicesData, scenesData } = await hueClient.getDashboardData(
+      bridgeIp,
+      username
+    );
 
-    logger.debug('Fetched data', { lights: lightsData.data?.length || 0, rooms: roomsData.data?.length || 0 });
+    logger.debug('Fetched data', {
+      lights: lightsData.data?.length || 0,
+      rooms: roomsData.data?.length || 0
+    });
 
     // Step 2: Build room hierarchy
     const roomMap = roomService.buildRoomHierarchy(lightsData, roomsData, devicesData);
@@ -62,7 +68,11 @@ router.get('/', extractCredentials, async (req, res, next) => {
     // Step 4: Calculate dashboard summary
     const summary = statsService.calculateDashboardStats(lightsData, roomMap, scenesData);
 
-    logger.debug('Summary', { lightsOn: summary.lightsOn, totalLights: summary.totalLights, roomCount: summary.roomCount });
+    logger.debug('Summary', {
+      lightsOn: summary.lightsOn,
+      totalLights: summary.totalLights,
+      roomCount: summary.roomCount
+    });
 
     // Step 5: Return unified response
     res.json({

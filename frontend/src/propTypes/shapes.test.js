@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import PropTypes from 'prop-types';
 import {
   LightShape,
   SceneShape,

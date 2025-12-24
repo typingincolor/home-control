@@ -42,13 +42,15 @@ describe('HueClient', () => {
 
       const result = await hueClient._request('GET', bridgeIp, '/clip/v2/resource/light', username);
 
-      expect(axios).toHaveBeenCalledWith(expect.objectContaining({
-        method: 'GET',
-        url: `https://${bridgeIp}/clip/v2/resource/light`,
-        headers: expect.objectContaining({
-          'hue-application-key': username
+      expect(axios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'GET',
+          url: `https://${bridgeIp}/clip/v2/resource/light`,
+          headers: expect.objectContaining({
+            'hue-application-key': username
+          })
         })
-      }));
+      );
       expect(result).toEqual(mockResponse.data);
     });
 
@@ -59,37 +61,45 @@ describe('HueClient', () => {
 
       await hueClient._request('PUT', bridgeIp, '/clip/v2/resource/light/123', username, bodyData);
 
-      expect(axios).toHaveBeenCalledWith(expect.objectContaining({
-        method: 'PUT',
-        data: bodyData
-      }));
+      expect(axios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PUT',
+          data: bodyData
+        })
+      );
     });
 
     it('should not include data for GET requests', async () => {
       const mockResponse = { status: 200, data: {} };
       axios.mockResolvedValue(mockResponse);
 
-      await hueClient._request('GET', bridgeIp, '/clip/v2/resource/light', username, { someData: true });
+      await hueClient._request('GET', bridgeIp, '/clip/v2/resource/light', username, {
+        someData: true
+      });
 
-      expect(axios).toHaveBeenCalledWith(expect.not.objectContaining({
-        data: expect.anything()
-      }));
+      expect(axios).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          data: expect.anything()
+        })
+      );
     });
 
     it('should throw on HTTP 4xx errors', async () => {
       const mockResponse = { status: 401, data: { message: 'Unauthorized' } };
       axios.mockResolvedValue(mockResponse);
 
-      await expect(hueClient._request('GET', bridgeIp, '/path', username))
-        .rejects.toThrow('Bridge returned 401');
+      await expect(hueClient._request('GET', bridgeIp, '/path', username)).rejects.toThrow(
+        'Bridge returned 401'
+      );
     });
 
     it('should throw on HTTP 5xx errors', async () => {
       const mockResponse = { status: 500, data: { message: 'Server error' } };
       axios.mockResolvedValue(mockResponse);
 
-      await expect(hueClient._request('GET', bridgeIp, '/path', username))
-        .rejects.toThrow('Bridge returned 500');
+      await expect(hueClient._request('GET', bridgeIp, '/path', username)).rejects.toThrow(
+        'Bridge returned 500'
+      );
     });
 
     it('should throw on Hue API v2 errors', async () => {
@@ -99,8 +109,9 @@ describe('HueClient', () => {
       };
       axios.mockResolvedValue(mockResponse);
 
-      await expect(hueClient._request('GET', bridgeIp, '/path', username))
-        .rejects.toThrow('Hue API error: Resource not found');
+      await expect(hueClient._request('GET', bridgeIp, '/path', username)).rejects.toThrow(
+        'Hue API error: Resource not found'
+      );
     });
 
     it('should handle Hue API v2 errors without description', async () => {
@@ -110,8 +121,9 @@ describe('HueClient', () => {
       };
       axios.mockResolvedValue(mockResponse);
 
-      await expect(hueClient._request('GET', bridgeIp, '/path', username))
-        .rejects.toThrow('Hue API error:');
+      await expect(hueClient._request('GET', bridgeIp, '/path', username)).rejects.toThrow(
+        'Hue API error:'
+      );
     });
 
     it('should handle ECONNREFUSED error', async () => {
@@ -119,8 +131,9 @@ describe('HueClient', () => {
       error.code = 'ECONNREFUSED';
       axios.mockRejectedValue(error);
 
-      await expect(hueClient._request('GET', bridgeIp, '/path', username))
-        .rejects.toThrow(`Cannot connect to bridge at ${bridgeIp}`);
+      await expect(hueClient._request('GET', bridgeIp, '/path', username)).rejects.toThrow(
+        `Cannot connect to bridge at ${bridgeIp}`
+      );
     });
 
     it('should handle ETIMEDOUT error', async () => {
@@ -128,16 +141,18 @@ describe('HueClient', () => {
       error.code = 'ETIMEDOUT';
       axios.mockRejectedValue(error);
 
-      await expect(hueClient._request('GET', bridgeIp, '/path', username))
-        .rejects.toThrow(`Bridge at ${bridgeIp} timed out`);
+      await expect(hueClient._request('GET', bridgeIp, '/path', username)).rejects.toThrow(
+        `Bridge at ${bridgeIp} timed out`
+      );
     });
 
     it('should propagate other errors', async () => {
       const error = new Error('Unknown error');
       axios.mockRejectedValue(error);
 
-      await expect(hueClient._request('GET', bridgeIp, '/path', username))
-        .rejects.toThrow('Unknown error');
+      await expect(hueClient._request('GET', bridgeIp, '/path', username)).rejects.toThrow(
+        'Unknown error'
+      );
     });
   });
 
@@ -316,11 +331,13 @@ describe('HueClient', () => {
       const state = { on: { on: true }, dimming: { brightness: 50 } };
       await hueClient.updateLight(bridgeIp, username, 'light-123', state);
 
-      expect(axios).toHaveBeenCalledWith(expect.objectContaining({
-        method: 'PUT',
-        url: `https://${bridgeIp}/clip/v2/resource/light/light-123`,
-        data: state
-      }));
+      expect(axios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PUT',
+          url: `https://${bridgeIp}/clip/v2/resource/light/light-123`,
+          data: state
+        })
+      );
     });
   });
 
@@ -351,8 +368,9 @@ describe('HueClient', () => {
         { lightId: 'light-3', state: {} }
       ];
 
-      await expect(hueClient.updateLights(bridgeIp, username, updates))
-        .rejects.toThrow('Update failed');
+      await expect(hueClient.updateLights(bridgeIp, username, updates)).rejects.toThrow(
+        'Update failed'
+      );
     });
   });
 
@@ -363,11 +381,13 @@ describe('HueClient', () => {
 
       await hueClient.activateScene(bridgeIp, username, 'scene-123');
 
-      expect(axios).toHaveBeenCalledWith(expect.objectContaining({
-        method: 'PUT',
-        url: `https://${bridgeIp}/clip/v2/resource/scene/scene-123`,
-        data: { recall: { action: 'active' } }
-      }));
+      expect(axios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PUT',
+          url: `https://${bridgeIp}/clip/v2/resource/scene/scene-123`,
+          data: { recall: { action: 'active' } }
+        })
+      );
     });
   });
 
@@ -378,9 +398,11 @@ describe('HueClient', () => {
 
       const result = await hueClient.getLights(bridgeIp, username);
 
-      expect(axios).toHaveBeenCalledWith(expect.objectContaining({
-        url: `https://${bridgeIp}/clip/v2/resource/light`
-      }));
+      expect(axios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: `https://${bridgeIp}/clip/v2/resource/light`
+        })
+      );
       expect(result).toEqual(mockData);
     });
   });
@@ -413,8 +435,9 @@ describe('HueClient', () => {
       vi.spyOn(hueClient, 'getRooms').mockResolvedValue({ data: [] });
       vi.spyOn(hueClient, 'getDevices').mockResolvedValue({ data: [] });
 
-      await expect(hueClient.getHierarchyData(bridgeIp, username))
-        .rejects.toThrow('Connection failed');
+      await expect(hueClient.getHierarchyData(bridgeIp, username)).rejects.toThrow(
+        'Connection failed'
+      );
     });
   });
 

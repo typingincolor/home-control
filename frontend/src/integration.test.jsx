@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterEach, afterAll, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterEach, afterAll, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
@@ -230,7 +230,7 @@ const server = setupServer(
   }),
 
   // Scene activation endpoint
-  http.post('/api/v1/scenes/:id/activate', ({ request, params }) => {
+  http.post('/api/v1/scenes/:id/activate', ({ request }) => {
     const authHeader = request.headers.get('authorization');
 
     if (!authHeader) {
@@ -598,9 +598,8 @@ describe('Integration Tests', () => {
 
       // Count pairing requests
       server.use(
-        http.post('/api/v1/auth/pair', async ({ request }) => {
+        http.post('/api/v1/auth/pair', async () => {
           pairCallCount++;
-          const body = await request.json();
           return HttpResponse.json({ username: mockUsername });
         })
       );

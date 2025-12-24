@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+coverage
+.stryker-tmp
+reports
+backend/public
+package-lock.json

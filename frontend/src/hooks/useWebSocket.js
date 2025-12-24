@@ -19,110 +19,13 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
   // Detect legacy mode (bridgeIp looks like an IP address)
   const isLegacyMode = sessionToken && sessionToken.includes('.');
 
-  const connect = useCallback(() => {
-    if (!enabled || !sessionToken) return;
-    if (isLegacyMode && !username) return;
-
-    // Determine WebSocket URL (same host as current page)
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/api/v1/ws`;
-
-    console.log('[WebSocket] Connecting to', wsUrl, isLegacyMode ? '(legacy mode)' : '(session mode)');
-
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      console.log('[WebSocket] Connected');
-      setIsConnected(true);
-      setError(null);
-      reconnectAttempts.current = 0;
-
-      // Authenticate
-      if (isLegacyMode) {
-        // Legacy: send bridgeIp + username
-        ws.send(JSON.stringify({
-          type: 'auth',
-          bridgeIp: sessionToken,
-          username
-        }));
-      } else {
-        // Session mode: send sessionToken
-        ws.send(JSON.stringify({
-          type: 'auth',
-          sessionToken
-        }));
-      }
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-        handleMessage(message);
-      } catch (err) {
-        console.error('[WebSocket] Failed to parse message:', err);
-      }
-    };
-
-    ws.onerror = (event) => {
-      console.error('[WebSocket] Error:', event);
-      setError('WebSocket connection error');
-    };
-
-    ws.onclose = () => {
-      console.log('[WebSocket] Disconnected');
-      setIsConnected(false);
-      wsRef.current = null;
-
-      // Attempt to reconnect with exponential backoff
-      if (enabled && reconnectAttempts.current < maxReconnectAttempts) {
-        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
-        console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current + 1}/${maxReconnectAttempts})`);
-
-        reconnectTimeoutRef.current = setTimeout(() => {
-          reconnectAttempts.current++;
-          connect();
-        }, delay);
-      } else if (reconnectAttempts.current >= maxReconnectAttempts) {
-        setError('Failed to connect after multiple attempts');
-      }
-    };
-  }, [sessionToken, username, enabled, isLegacyMode]);
-
-  const handleMessage = useCallback((message) => {
-    switch (message.type) {
-      case 'initial_state':
-        console.log('[WebSocket] Received initial state');
-        setDashboard(message.data);
-        break;
-
-      case 'state_update':
-        console.log('[WebSocket] Received state update:', message.changes?.length, 'changes');
-        applyChanges(message.changes);
-        break;
-
-      case 'error':
-        console.error('[WebSocket] Server error:', message.message);
-        setError(message.message);
-        break;
-
-      case 'pong':
-        // Heartbeat response
-        break;
-
-      default:
-        console.warn('[WebSocket] Unknown message type:', message.type);
-    }
-  }, []);
-
   const applyChanges = useCallback((changes) => {
     if (!changes || changes.length === 0) return;
 
     setDashboard((prev) => {
       if (!prev) return prev;
 
-      let updated = { ...prev };
+      const updated = { ...prev };
 
       for (const change of changes) {
         switch (change.type) {
@@ -168,6 +71,7 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
             break;
 
           default:
+            // eslint-disable-next-line no-console -- Intentional warning for debugging
             console.warn('[WebSocket] Unknown change type:', change.type);
         }
       }
@@ -175,6 +79,114 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
       return updated;
     });
   }, []);
+
+  const handleMessage = useCallback((message) => {
+    switch (message.type) {
+      case 'initial_state':
+        // eslint-disable-next-line no-console -- Intentional debug logging
+        console.log('[WebSocket] Received initial state');
+        setDashboard(message.data);
+        break;
+
+      case 'state_update':
+        // eslint-disable-next-line no-console -- Intentional debug logging
+        console.log('[WebSocket] Received state update:', message.changes?.length, 'changes');
+        applyChanges(message.changes);
+        break;
+
+      case 'error':
+        // eslint-disable-next-line no-console -- Intentional error logging
+        console.error('[WebSocket] Server error:', message.message);
+        setError(message.message);
+        break;
+
+      case 'pong':
+        // Heartbeat response
+        break;
+
+      default:
+        // eslint-disable-next-line no-console -- Intentional warning for debugging
+        console.warn('[WebSocket] Unknown message type:', message.type);
+    }
+  }, [applyChanges]);
+
+  const connect = useCallback(() => {
+    if (!enabled || !sessionToken) return;
+    if (isLegacyMode && !username) return;
+
+    // Determine WebSocket URL (same host as current page)
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    const wsUrl = `${protocol}//${host}/api/v1/ws`;
+
+    // eslint-disable-next-line no-console -- Intentional debug logging
+    console.log('[WebSocket] Connecting to', wsUrl, isLegacyMode ? '(legacy mode)' : '(session mode)');
+
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      // eslint-disable-next-line no-console -- Intentional debug logging
+      console.log('[WebSocket] Connected');
+      setIsConnected(true);
+      setError(null);
+      reconnectAttempts.current = 0;
+
+      // Authenticate
+      if (isLegacyMode) {
+        // Legacy: send bridgeIp + username
+        ws.send(JSON.stringify({
+          type: 'auth',
+          bridgeIp: sessionToken,
+          username
+        }));
+      } else {
+        // Session mode: send sessionToken
+        ws.send(JSON.stringify({
+          type: 'auth',
+          sessionToken
+        }));
+      }
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        handleMessage(message);
+      } catch (err) {
+        // eslint-disable-next-line no-console -- Intentional error logging
+        console.error('[WebSocket] Failed to parse message:', err);
+      }
+    };
+
+    ws.onerror = (event) => {
+      // eslint-disable-next-line no-console -- Intentional error logging
+      console.error('[WebSocket] Error:', event);
+      setError('WebSocket connection error');
+    };
+
+    ws.onclose = () => {
+      // eslint-disable-next-line no-console -- Intentional debug logging
+      console.log('[WebSocket] Disconnected');
+      setIsConnected(false);
+      wsRef.current = null;
+
+      // Attempt to reconnect with exponential backoff
+      if (enabled && reconnectAttempts.current < maxReconnectAttempts) {
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
+        // eslint-disable-next-line no-console -- Intentional debug logging
+        console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current + 1}/${maxReconnectAttempts})`);
+
+        reconnectTimeoutRef.current = setTimeout(() => {
+          reconnectAttempts.current++;
+          // eslint-disable-next-line react-hooks/immutability -- Recursive reconnection requires self-reference
+          connect();
+        }, delay);
+      } else if (reconnectAttempts.current >= maxReconnectAttempts) {
+        setError('Failed to connect after multiple attempts');
+      }
+    };
+  }, [sessionToken, username, enabled, isLegacyMode, handleMessage]);
 
   // Connect on mount and when credentials change
   useEffect(() => {
@@ -186,6 +198,7 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
 
     return () => {
       if (wsRef.current) {
+        // eslint-disable-next-line no-console -- Intentional debug logging
         console.log('[WebSocket] Closing connection');
         wsRef.current.close();
         wsRef.current = null;

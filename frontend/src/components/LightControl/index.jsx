@@ -48,8 +48,10 @@ export const LightControl = ({
     try {
       const dashboardData = await api.getDashboard(sessionToken);
       setLocalDashboard(dashboardData);
+      // eslint-disable-next-line no-console -- Intentional debug logging
       console.log('[Dashboard] Fetched dashboard successfully');
     } catch (err) {
+      // eslint-disable-next-line no-console -- Intentional error logging
       console.error('[Dashboard] Failed to fetch dashboard:', err);
       setError(err.message);
     } finally {
@@ -62,6 +64,7 @@ export const LightControl = ({
     if (sessionToken && isDemoMode) {
       fetchAllData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchAllData changes on every render, we only want to fetch once
   }, [sessionToken, isDemoMode]);
 
   // Update loading state based on WebSocket connection in real mode
@@ -149,6 +152,7 @@ export const LightControl = ({
         }))
       }));
     } catch (err) {
+      // eslint-disable-next-line no-console -- Intentional error logging
       console.error('Failed to toggle light:', err);
       alert(`${ERROR_MESSAGES.LIGHT_TOGGLE}: ${err.message}`);
     } finally {
@@ -191,6 +195,7 @@ export const LightControl = ({
         })
       }));
     } catch (err) {
+      // eslint-disable-next-line no-console -- Intentional error logging
       console.error('Failed to toggle room:', err);
       alert(`${ERROR_MESSAGES.ROOM_TOGGLE}: ${err.message}`);
     } finally {
@@ -234,6 +239,7 @@ export const LightControl = ({
         })
       }));
     } catch (err) {
+      // eslint-disable-next-line no-console -- Intentional error logging
       console.error('Failed to toggle zone:', err);
       alert(`${ERROR_MESSAGES.ZONE_TOGGLE}: ${err.message}`);
     } finally {
@@ -256,6 +262,7 @@ export const LightControl = ({
     setActivatingScene(zoneId || sceneUuid);
     try {
       const response = await api.activateSceneV1(sessionToken, sceneUuid);
+      // eslint-disable-next-line no-console -- Intentional debug logging
       console.log(`Activated scene ${sceneUuid}`, response.affectedLights?.length, 'lights affected');
 
       // Optimistic update - apply immediately for responsive UI
@@ -277,6 +284,7 @@ export const LightControl = ({
         });
       }
     } catch (err) {
+      // eslint-disable-next-line no-console -- Intentional error logging
       console.error('Failed to activate scene:', err);
       alert(`${ERROR_MESSAGES.SCENE_ACTIVATION}: ${err.message}`);
     } finally {

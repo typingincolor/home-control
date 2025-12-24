@@ -24,7 +24,6 @@ export const RoomContent = ({
   const { lights = [], scenes = [] } = room;
   // Calculate from actual light states (not pre-computed stats) so toggle updates immediately
   const lightsOn = lights.filter(l => l.on).length;
-  const allOn = lightsOn === lights.length && lights.length > 0;
   const anyOn = lightsOn > 0;
 
   return (

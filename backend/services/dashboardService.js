@@ -23,20 +23,21 @@ class DashboardService {
     logger.debug('Fetching data', { bridgeIp });
 
     // Step 1: Fetch all data in parallel (including motion zones and zones)
-    const [lightsData, roomsData, devicesData, scenesData, zonesData, motionZonesResult] = await Promise.all([
-      hueClient.getLights(bridgeIp, username),
-      hueClient.getRooms(bridgeIp, username),
-      hueClient.getDevices(bridgeIp, username),
-      hueClient.getScenes(bridgeIp, username),
-      hueClient.getZones(bridgeIp, username).catch(err => {
-        logger.warn('Failed to fetch zones', { error: err.message });
-        return { data: [] }; // Return empty array on error
-      }),
-      motionService.getMotionZones(bridgeIp, username).catch(err => {
-        logger.warn('Failed to fetch motion zones', { error: err.message });
-        return { zones: [] }; // Return empty array on error
-      })
-    ]);
+    const [lightsData, roomsData, devicesData, scenesData, zonesData, motionZonesResult] =
+      await Promise.all([
+        hueClient.getLights(bridgeIp, username),
+        hueClient.getRooms(bridgeIp, username),
+        hueClient.getDevices(bridgeIp, username),
+        hueClient.getScenes(bridgeIp, username),
+        hueClient.getZones(bridgeIp, username).catch(err => {
+          logger.warn('Failed to fetch zones', { error: err.message });
+          return { data: [] }; // Return empty array on error
+        }),
+        motionService.getMotionZones(bridgeIp, username).catch(err => {
+          logger.warn('Failed to fetch motion zones', { error: err.message });
+          return { zones: [] }; // Return empty array on error
+        })
+      ]);
 
     logger.debug('Fetched data', {
       lights: lightsData.data?.length || 0,

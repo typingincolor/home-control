@@ -16,9 +16,7 @@ describe('DashboardService', () => {
 
   describe('getDashboard', () => {
     const mockLightsData = {
-      data: [
-        { id: 'light-1', on: { on: true }, metadata: { name: 'Light 1' } }
-      ]
+      data: [{ id: 'light-1', on: { on: true }, metadata: { name: 'Light 1' } }]
     };
 
     const mockRoomsData = {
@@ -41,9 +39,7 @@ describe('DashboardService', () => {
     };
 
     const mockScenesData = {
-      data: [
-        { id: 'scene-1', metadata: { name: 'Bright' }, group: { rid: 'room-1' } }
-      ]
+      data: [{ id: 'scene-1', metadata: { name: 'Bright' }, group: { rid: 'room-1' } }]
     };
 
     const mockMotionZones = [
@@ -152,12 +148,12 @@ describe('DashboardService', () => {
     };
 
     const mockZoneMap = {
-      'Upstairs': {
+      Upstairs: {
         zoneUuid: 'zone-1',
         lightUuids: ['light-1'],
         lights: [{ id: 'light-1', on: { on: true }, metadata: { name: 'Light 1' } }]
       },
-      'Downstairs': {
+      Downstairs: {
         zoneUuid: 'zone-2',
         lightUuids: ['light-1'],
         lights: [{ id: 'light-1', on: { on: true }, metadata: { name: 'Light 1' } }]
@@ -173,7 +169,11 @@ describe('DashboardService', () => {
       hueClient.getZones.mockResolvedValue(mockZonesData);
       motionService.getMotionZones.mockResolvedValue({ zones: [] });
       zoneService.buildZoneHierarchy.mockReturnValue(mockZoneMap);
-      zoneService.calculateZoneStats.mockReturnValue({ lightsOnCount: 1, totalLights: 1, averageBrightness: 100 });
+      zoneService.calculateZoneStats.mockReturnValue({
+        lightsOnCount: 1,
+        totalLights: 1,
+        averageBrightness: 100
+      });
       zoneService.getScenesForZone.mockReturnValue([]);
 
       // Act
@@ -230,13 +230,17 @@ describe('DashboardService', () => {
       hueClient.getZones.mockResolvedValue(mockZonesData);
       motionService.getMotionZones.mockResolvedValue({ zones: [] });
       zoneService.buildZoneHierarchy.mockReturnValue({
-        'Upstairs': {
+        Upstairs: {
           zoneUuid: 'zone-1',
           lightUuids: ['light-1'],
           lights: [{ id: 'light-1', on: { on: true }, dimming: { brightness: 80 } }]
         }
       });
-      zoneService.calculateZoneStats.mockReturnValue({ lightsOnCount: 1, totalLights: 1, averageBrightness: 80 });
+      zoneService.calculateZoneStats.mockReturnValue({
+        lightsOnCount: 1,
+        totalLights: 1,
+        averageBrightness: 80
+      });
       zoneService.getScenesForZone.mockReturnValue([{ id: 'scene-1', name: 'Bright' }]);
 
       // Act

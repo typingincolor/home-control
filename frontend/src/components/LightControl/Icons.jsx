@@ -61,6 +61,7 @@ export const LightbulbOff = (props) => (
 );
 
 // Loading spinner with rotation animation
+// eslint-disable-next-line react/prop-types -- className is optional and well-known
 export const Spinner = ({ className = '', ...props }) => (
   <Loader2 {...defaultProps} className={`icon-spin ${className}`} {...props} />
 );
@@ -232,7 +233,10 @@ export const getSceneIcon = (sceneName) => {
 };
 
 // Scene icon component that auto-selects icon based on name
+// eslint-disable-next-line react/prop-types -- name is validated by usage
 export const SceneIcon = ({ name, ...props }) => {
+  // Get the icon component constructor - this is a valid pattern for dynamic icon selection
   const IconComponent = getSceneIcon(name);
+  // eslint-disable-next-line react-hooks/static-components -- Dynamic component selection is intentional
   return <IconComponent {...defaultProps} {...props} />;
 };

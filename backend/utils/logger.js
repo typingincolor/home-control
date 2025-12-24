@@ -40,16 +40,16 @@ const winstonLogger = winston.createLogger({
 export function createLogger(component) {
   return {
     info(message, meta = {}) {
-      winstonLogger.info(message, { component, ...meta, component });
+      winstonLogger.info(message, { ...meta, component });
     },
     warn(message, meta = {}) {
-      winstonLogger.warn(message, { component, ...meta, component });
+      winstonLogger.warn(message, { ...meta, component });
     },
     error(message, meta = {}) {
-      winstonLogger.error(message, { component, ...meta, component });
+      winstonLogger.error(message, { ...meta, component });
     },
     debug(message, meta = {}) {
-      winstonLogger.debug(message, { component, ...meta, component });
+      winstonLogger.debug(message, { ...meta, component });
     }
   };
 }

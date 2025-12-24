@@ -29,7 +29,10 @@ router.post('/:id/activate', extractCredentials, async (req, res, next) => {
     await new Promise(resolve => setTimeout(resolve, SCENE_APPLY_DELAY_MS));
 
     // Fetch updated light states
-    const { lightsData, roomsData, devicesData, scenesData } = await hueClient.getDashboardData(bridgeIp, username);
+    const { lightsData, roomsData, devicesData, scenesData } = await hueClient.getDashboardData(
+      bridgeIp,
+      username
+    );
 
     // Find the scene to determine affected room
     const scene = scenesData.data.find(s => s.id === sceneId);
@@ -45,9 +48,7 @@ router.post('/:id/activate', extractCredentials, async (req, res, next) => {
     const roomMap = roomService.buildRoomHierarchy(lightsData, roomsData, devicesData);
     const room = Object.values(roomMap).find(r => r.roomUuid === scene.group?.rid);
 
-    const affectedLights = room
-      ? room.lights.map(light => enrichLight(light))
-      : [];
+    const affectedLights = room ? room.lights.map(light => enrichLight(light)) : [];
 
     logger.info('Scene activated', { affectedLights: affectedLights.length });
 

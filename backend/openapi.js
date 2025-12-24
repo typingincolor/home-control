@@ -65,7 +65,7 @@ export const openApiSpec = {
           },
           message: {
             type: 'string',
-            example: 'The light \'abc123\' was not found'
+            example: "The light 'abc123' was not found"
           },
           suggestion: {
             type: 'string',
@@ -228,7 +228,7 @@ export const openApiSpec = {
           }
         },
         responses: {
-          '200': {
+          200: {
             description: 'Session created successfully',
             content: {
               'application/json': {
@@ -253,11 +253,11 @@ export const openApiSpec = {
               }
             }
           },
-          '400': {
+          400: {
             description: 'Missing credentials',
             content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
           },
-          '503': {
+          503: {
             description: 'Cannot connect to bridge',
             content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
           }
@@ -268,7 +268,7 @@ export const openApiSpec = {
         tags: ['Authentication'],
         security: [{ BearerAuth: [] }],
         responses: {
-          '200': {
+          200: {
             description: 'Session info',
             content: {
               'application/json': {
@@ -282,7 +282,7 @@ export const openApiSpec = {
               }
             }
           },
-          '401': {
+          401: {
             description: 'Invalid or expired session',
             content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
           }
@@ -293,7 +293,7 @@ export const openApiSpec = {
         tags: ['Authentication'],
         security: [{ BearerAuth: [] }],
         responses: {
-          '200': {
+          200: {
             description: 'Session revoked',
             content: {
               'application/json': {
@@ -313,15 +313,12 @@ export const openApiSpec = {
     '/dashboard': {
       get: {
         summary: 'Get unified dashboard data',
-        description: 'Returns all data needed to render the dashboard in a single request with pre-computed colors and stats',
+        description:
+          'Returns all data needed to render the dashboard in a single request with pre-computed colors and stats',
         tags: ['Dashboard'],
-        security: [
-          { BearerAuth: [] },
-          { HeaderAuth: [] },
-          { QueryAuth: [] }
-        ],
+        security: [{ BearerAuth: [] }, { HeaderAuth: [] }, { QueryAuth: [] }],
         responses: {
-          '200': {
+          200: {
             description: 'Dashboard data',
             content: {
               'application/json': {
@@ -356,7 +353,7 @@ export const openApiSpec = {
               }
             }
           },
-          '401': {
+          401: {
             description: 'Missing or invalid credentials',
             content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
           }
@@ -392,7 +389,7 @@ export const openApiSpec = {
           }
         },
         responses: {
-          '200': {
+          200: {
             description: 'Light updated',
             content: {
               'application/json': {
@@ -406,7 +403,7 @@ export const openApiSpec = {
               }
             }
           },
-          '404': {
+          404: {
             description: 'Light not found',
             content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
           }
@@ -442,7 +439,7 @@ export const openApiSpec = {
           }
         },
         responses: {
-          '200': {
+          200: {
             description: 'Lights updated',
             content: {
               'application/json': {
@@ -459,7 +456,7 @@ export const openApiSpec = {
               }
             }
           },
-          '404': {
+          404: {
             description: 'Room not found',
             content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
           }
@@ -495,7 +492,7 @@ export const openApiSpec = {
           }
         },
         responses: {
-          '200': {
+          200: {
             description: 'Lights updated',
             content: {
               'application/json': {
@@ -512,7 +509,7 @@ export const openApiSpec = {
               }
             }
           },
-          '404': {
+          404: {
             description: 'Zone not found',
             content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
           }
@@ -535,7 +532,7 @@ export const openApiSpec = {
           }
         ],
         responses: {
-          '200': {
+          200: {
             description: 'Scene activated',
             content: {
               'application/json': {
@@ -552,7 +549,7 @@ export const openApiSpec = {
               }
             }
           },
-          '404': {
+          404: {
             description: 'Scene not found',
             content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
           }
@@ -566,7 +563,7 @@ export const openApiSpec = {
         tags: ['Motion'],
         security: [{ BearerAuth: [] }, { HeaderAuth: [] }, { QueryAuth: [] }],
         responses: {
-          '200': {
+          200: {
             description: 'Motion zones',
             content: {
               'application/json': {

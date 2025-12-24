@@ -13,12 +13,10 @@ function App() {
     step,
     bridgeIp,
     sessionToken,
-    lights,
     loading,
     error,
     setBridgeIp,
     authenticate,
-    testConnection,
     reset
   } = useHueBridge();
 

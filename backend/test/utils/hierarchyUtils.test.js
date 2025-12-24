@@ -11,7 +11,13 @@ describe('hierarchyUtils', () => {
     it('should build device to lights mapping', () => {
       const devicesData = {
         data: [
-          { id: 'device-1', services: [{ rid: 'light-1', rtype: 'light' }, { rid: 'light-2', rtype: 'light' }] },
+          {
+            id: 'device-1',
+            services: [
+              { rid: 'light-1', rtype: 'light' },
+              { rid: 'light-2', rtype: 'light' }
+            ]
+          },
           { id: 'device-2', services: [{ rid: 'light-3', rtype: 'light' }] }
         ]
       };
@@ -25,11 +31,14 @@ describe('hierarchyUtils', () => {
     it('should filter out non-light services', () => {
       const devicesData = {
         data: [
-          { id: 'device-1', services: [
-            { rid: 'light-1', rtype: 'light' },
-            { rid: 'button-1', rtype: 'button' },
-            { rid: 'sensor-1', rtype: 'motion' }
-          ]}
+          {
+            id: 'device-1',
+            services: [
+              { rid: 'light-1', rtype: 'light' },
+              { rid: 'button-1', rtype: 'button' },
+              { rid: 'sensor-1', rtype: 'motion' }
+            ]
+          }
         ]
       };
 
@@ -64,9 +73,7 @@ describe('hierarchyUtils', () => {
     };
 
     it('should get lights from device children', () => {
-      const children = [
-        { rid: 'device-1', rtype: 'device' }
-      ];
+      const children = [{ rid: 'device-1', rtype: 'device' }];
 
       const result = getLightsFromChildren(children, deviceToLights);
 
@@ -85,9 +92,7 @@ describe('hierarchyUtils', () => {
     });
 
     it('should handle direct light references', () => {
-      const children = [
-        { rid: 'light-4', rtype: 'light' }
-      ];
+      const children = [{ rid: 'light-4', rtype: 'light' }];
 
       const result = getLightsFromChildren(children, deviceToLights);
 
@@ -114,9 +119,7 @@ describe('hierarchyUtils', () => {
     });
 
     it('should handle unknown device references', () => {
-      const children = [
-        { rid: 'unknown-device', rtype: 'device' }
-      ];
+      const children = [{ rid: 'unknown-device', rtype: 'device' }];
 
       const result = getLightsFromChildren(children, deviceToLights);
 
@@ -240,9 +243,7 @@ describe('hierarchyUtils', () => {
 
     it('should handle scenes without metadata', () => {
       const scenesWithoutMetadata = {
-        data: [
-          { id: 'scene-1', group: { rid: 'room-1' } }
-        ]
+        data: [{ id: 'scene-1', group: { rid: 'room-1' } }]
       };
 
       const result = getScenesForGroup(scenesWithoutMetadata, 'room-1');

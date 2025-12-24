@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- Mock data logging is intentional for debugging */
 // Mock data for testing without a Hue bridge
 
 export const mockLights = {
@@ -580,7 +581,7 @@ export const mockApi = {
     return { affectedLights: [] };
   },
 
-  async createSession(bridgeIp, username) {
+  async createSession(bridgeIp, _username) {
     await delay(100);
     console.log('[MOCK] createSession called');
     return {
@@ -590,7 +591,7 @@ export const mockApi = {
     };
   },
 
-  async refreshSession(sessionToken) {
+  async refreshSession(_sessionToken) {
     await delay(100);
     console.log('[MOCK] refreshSession called');
     return {

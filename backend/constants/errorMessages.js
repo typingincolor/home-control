@@ -30,7 +30,7 @@ export const ERROR_CODES = {
  */
 export const ERROR_MESSAGES = {
   // Bridge
-  BRIDGE_CONNECTION: (bridgeIp) => `Cannot connect to Philips Hue Bridge at ${bridgeIp}`,
+  BRIDGE_CONNECTION: bridgeIp => `Cannot connect to Philips Hue Bridge at ${bridgeIp}`,
 
   // Session
   SESSION_EXPIRED: 'Your session has expired or is invalid',
@@ -53,19 +53,21 @@ export const ERROR_SUGGESTIONS = {
 
   // Bridge
   BRIDGE_POWERED_ON: 'Check that the bridge IP address is correct and the bridge is powered on',
-  BRIDGE_TIMEOUT: 'The bridge is not responding. Check your network connection and bridge IP address',
+  BRIDGE_TIMEOUT:
+    'The bridge is not responding. Check your network connection and bridge IP address',
   BRIDGE_REFUSED: 'Connection refused. Verify the bridge IP address is correct',
   CHECK_API_KEY: 'Check your username/API key is valid',
 
   // Retry
   TRY_AGAIN: 'This might be a temporary issue. Try again in a moment',
   CONTACT_SUPPORT: 'Try again or contact support if the problem persists',
-  RATE_LIMIT: (seconds) => `Wait ${seconds} seconds before trying again`,
+  RATE_LIMIT: seconds => `Wait ${seconds} seconds before trying again`,
 
   // Resources
-  CHECK_RESOURCE: (resourceType) => `Check the ${resourceType} ID or refresh the dashboard to get current ${resourceType}s`,
-  CHECK_RESOURCE_FORMAT: (resourceType) => `Check the ${resourceType} data format`,
-  MISSING_PARAM: (param) => `Provide ${param} in the request headers or query parameters`,
+  CHECK_RESOURCE: resourceType =>
+    `Check the ${resourceType} ID or refresh the dashboard to get current ${resourceType}s`,
+  CHECK_RESOURCE_FORMAT: resourceType => `Check the ${resourceType} data format`,
+  MISSING_PARAM: param => `Provide ${param} in the request headers or query parameters`,
 
   // API
   CHECK_API_DOCS: 'Check the API documentation at /api/v1/docs'
