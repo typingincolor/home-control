@@ -33,18 +33,18 @@ export const MotionZones = ({ sessionToken, motionZones }) => {
 
   // Detect motion changes and trigger alerts
   useEffect(() => {
-    zones.forEach(zone => {
+    zones.forEach((zone) => {
       const wasDetected = previousMotionState.current[zone.id];
       const isDetected = zone.motionDetected && zone.reachable !== false;
 
       // Show alert when motion newly detected
       if (isDetected && !wasDetected) {
         const alertId = `${zone.id}-${Date.now()}`;
-        setActiveAlerts(prev => [...prev, { id: alertId, name: zone.name }]);
+        setActiveAlerts((prev) => [...prev, { id: alertId, name: zone.name }]);
 
         // Auto-dismiss after 3 seconds
         setTimeout(() => {
-          setActiveAlerts(prev => prev.filter(a => a.id !== alertId));
+          setActiveAlerts((prev) => prev.filter((a) => a.id !== alertId));
         }, 3000);
       }
 
@@ -59,7 +59,7 @@ export const MotionZones = ({ sessionToken, motionZones }) => {
 
   return (
     <div className="motion-alert-container">
-      {activeAlerts.map(alert => (
+      {activeAlerts.map((alert) => (
         <div key={alert.id} className="motion-alert">
           <span className="motion-alert-dot">🔴</span>
           <span className="motion-alert-text">Motion: {alert.name}</span>
@@ -71,5 +71,5 @@ export const MotionZones = ({ sessionToken, motionZones }) => {
 
 MotionZones.propTypes = {
   sessionToken: PropTypes.string.isRequired,
-  motionZones: PropTypes.arrayOf(MotionZoneShape)
+  motionZones: PropTypes.arrayOf(MotionZoneShape),
 };

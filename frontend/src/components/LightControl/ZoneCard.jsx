@@ -8,15 +8,15 @@ export const ZoneCard = ({
   onToggleZone,
   onActivateScene,
   togglingLights,
-  isActivating
+  isActivating,
 }) => {
   // Use pre-computed stats from backend
   const { lightsOnCount, totalLights, averageBrightness } = zone.stats;
   const anyLightsOn = lightsOnCount > 0;
 
   // Get light UUIDs for toggling
-  const lightUuids = zone.lights.map(l => l.id);
-  const allLightsToggling = lightUuids.every(uuid => togglingLights.has(uuid));
+  const lightUuids = zone.lights.map((l) => l.id);
+  const allLightsToggling = lightUuids.every((uuid) => togglingLights.has(uuid));
 
   return (
     <div className="zone-bar">
@@ -56,5 +56,5 @@ ZoneCard.propTypes = {
   onToggleZone: PropTypes.func.isRequired,
   onActivateScene: PropTypes.func.isRequired,
   togglingLights: PropTypes.instanceOf(Set).isRequired,
-  isActivating: PropTypes.bool
+  isActivating: PropTypes.bool,
 };

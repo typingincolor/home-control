@@ -11,7 +11,7 @@ import {
   SessionNotFoundError,
   ValidationError,
   RateLimitError,
-  toApiError
+  toApiError,
 } from '../../utils/errors.js';
 import { ERROR_CODES, ERROR_MESSAGES, ERROR_SUGGESTIONS } from '../../constants/errorMessages.js';
 

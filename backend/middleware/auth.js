@@ -63,7 +63,7 @@ export function extractCredentials(req, res, next) {
     req.hue = {
       bridgeIp,
       username,
-      authMethod
+      authMethod,
     };
 
     next();
@@ -100,7 +100,7 @@ export function requireSession(req, res, next) {
       bridgeIp: session.bridgeIp,
       username: session.username,
       authMethod: 'session',
-      sessionToken
+      sessionToken,
     };
 
     next();

@@ -5,7 +5,7 @@ import { STORAGE_KEYS } from './constants/storage';
 
 // Mock hooks
 vi.mock('./hooks/useDemoMode', () => ({
-  useDemoMode: vi.fn(() => false)
+  useDemoMode: vi.fn(() => false),
 }));
 
 // Mock hueApi for session validation
@@ -13,43 +13,43 @@ vi.mock('./services/hueApi', () => ({
   hueApi: {
     getDashboard: vi.fn(() => Promise.resolve({ summary: {}, rooms: [] })),
     connect: vi.fn(() => Promise.reject(new Error('PAIRING_REQUIRED'))),
-    createSession: vi.fn(() => Promise.resolve({ sessionToken: 'test', expiresIn: 86400 }))
-  }
+    createSession: vi.fn(() => Promise.resolve({ sessionToken: 'test', expiresIn: 86400 })),
+  },
 }));
 
 // Mock components to simplify testing
 vi.mock('./components/BridgeDiscovery', () => ({
-  BridgeDiscovery: () => <div data-testid="bridge-discovery">Bridge Discovery</div>
+  BridgeDiscovery: () => <div data-testid="bridge-discovery">Bridge Discovery</div>,
 }));
 
 vi.mock('./components/Authentication', () => ({
-  Authentication: () => <div data-testid="authentication">Authentication</div>
+  Authentication: () => <div data-testid="authentication">Authentication</div>,
 }));
 
 vi.mock('./components/LightControl', () => ({
-  LightControl: () => <div data-testid="light-control">Light Control</div>
+  LightControl: () => <div data-testid="light-control">Light Control</div>,
 }));
 
 // Mock localStorage
 const localStorageMock = (() => {
   let store = {};
   return {
-    getItem: key => store[key] || null,
+    getItem: (key) => store[key] || null,
     setItem: (key, value) => {
       store[key] = value ? value.toString() : '';
     },
-    removeItem: key => {
+    removeItem: (key) => {
       delete store[key];
     },
     clear: () => {
       store = {};
-    }
+    },
   };
 })();
 
 Object.defineProperty(global, 'localStorage', {
   value: localStorageMock,
-  writable: true
+  writable: true,
 });
 
 describe('App - Login Page Flicker Fix', () => {

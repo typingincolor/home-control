@@ -5,7 +5,7 @@ import {
   getLightColor,
   getLightShadow,
   enrichLight,
-  enrichLights
+  enrichLights,
 } from '../../utils/colorConversion.js';
 
 describe('colorConversion', () => {
@@ -132,7 +132,7 @@ describe('colorConversion', () => {
       const light = {
         on: { on: true },
         dimming: { brightness: 100 },
-        color: { xy: { x: 0.3127, y: 0.329 } }
+        color: { xy: { x: 0.3127, y: 0.329 } },
       };
       const result = getLightColor(light);
       expect(result).toMatch(/^rgb\(\d+, \d+, \d+\)$/);
@@ -142,7 +142,7 @@ describe('colorConversion', () => {
       const light = {
         on: { on: true },
         dimming: { brightness: 100 },
-        color_temperature: { mirek: 250 }
+        color_temperature: { mirek: 250 },
       };
       const result = getLightColor(light);
       expect(result).toMatch(/^rgb\(\d+, \d+, \d+\)$/);
@@ -153,7 +153,7 @@ describe('colorConversion', () => {
         on: { on: true },
         dimming: { brightness: 100 },
         color: { xy: { x: 0.6915, y: 0.3083 } }, // Red
-        color_temperature: { mirek: 250 } // White
+        color_temperature: { mirek: 250 }, // White
       };
       const result = getLightColor(light);
       expect(result).toMatch(/^rgb\(\d+, \d+, \d+\)$/);
@@ -164,7 +164,7 @@ describe('colorConversion', () => {
     it('should return warm dim color for very dim lights without color data', () => {
       const light = {
         on: { on: true },
-        dimming: { brightness: 10 }
+        dimming: { brightness: 10 },
       };
       const result = getLightColor(light);
       expect(result).toMatch(/^rgb\(255, 200, 130\)$/); // WARM_DIM_COLOR
@@ -173,7 +173,7 @@ describe('colorConversion', () => {
     it('should blend warm dim at mid brightness without color data', () => {
       const light = {
         on: { on: true },
-        dimming: { brightness: 30 } // Between DIM_START (15) and BRIGHT_START (50)
+        dimming: { brightness: 30 }, // Between DIM_START (15) and BRIGHT_START (50)
       };
       const result = getLightColor(light);
       expect(result).toMatch(/^rgb\(\d+, \d+, \d+\)$/);
@@ -184,7 +184,7 @@ describe('colorConversion', () => {
     it('should return default white for bright lights without color data', () => {
       const light = {
         on: { on: true },
-        dimming: { brightness: 100 }
+        dimming: { brightness: 100 },
       };
       const result = getLightColor(light);
       expect(result).toMatch(/^rgb\(255, 245, 235\)$/); // DEFAULT_WHITE
@@ -192,7 +192,7 @@ describe('colorConversion', () => {
 
     it('should handle missing dimming data (default to 100)', () => {
       const light = {
-        on: { on: true }
+        on: { on: true },
       };
       const result = getLightColor(light);
       expect(result).toBeTruthy();
@@ -203,7 +203,7 @@ describe('colorConversion', () => {
       const light = {
         on: { on: true },
         dimming: { brightness: 20 }, // Dim
-        color: { xy: { x: 0.3127, y: 0.329 } }
+        color: { xy: { x: 0.3127, y: 0.329 } },
       };
       const result = getLightColor(light);
       expect(result).toMatch(/^rgb\(\d+, \d+, \d+\)$/);
@@ -214,7 +214,7 @@ describe('colorConversion', () => {
       const light = {
         on: { on: true },
         dimming: { brightness: 80 },
-        color: { xy: { x: 0.6915, y: 0.3083 } } // Red
+        color: { xy: { x: 0.6915, y: 0.3083 } }, // Red
       };
       const result = getLightColor(light);
       expect(result).toMatch(/^rgb\(\d+, \d+, \d+\)$/);
@@ -287,7 +287,7 @@ describe('colorConversion', () => {
         metadata: { name: 'Living Room 1' },
         on: { on: true },
         dimming: { brightness: 80 },
-        color: { xy: { x: 0.6915, y: 0.3083 } }
+        color: { xy: { x: 0.6915, y: 0.3083 } },
       };
 
       const result = enrichLight(light);
@@ -308,7 +308,7 @@ describe('colorConversion', () => {
         metadata: { name: 'Bedroom' },
         on: { on: true },
         dimming: { brightness: 60 },
-        color_temperature: { mirek: 250 }
+        color_temperature: { mirek: 250 },
       };
 
       const result = enrichLight(light);
@@ -324,7 +324,7 @@ describe('colorConversion', () => {
         id: 'light-3',
         metadata: { name: 'Kitchen' },
         on: { on: true },
-        dimming: { brightness: 100 }
+        dimming: { brightness: 100 },
       };
 
       const result = enrichLight(light);
@@ -338,7 +338,7 @@ describe('colorConversion', () => {
         id: 'light-4',
         metadata: { name: 'Hallway' },
         on: { on: false },
-        dimming: { brightness: 0 }
+        dimming: { brightness: 0 },
       };
 
       const result = enrichLight(light);
@@ -354,7 +354,7 @@ describe('colorConversion', () => {
         id: 'light-5',
         on: { on: true },
         dimming: { brightness: 50 },
-        color: { xy: { x: 0.3127, y: 0.329 } }
+        color: { xy: { x: 0.3127, y: 0.329 } },
       };
 
       const result = enrichLight(light);
@@ -366,7 +366,7 @@ describe('colorConversion', () => {
       const light = {
         id: 'light-6',
         metadata: { name: 'Test' },
-        dimming: { brightness: 50 }
+        dimming: { brightness: 50 },
       };
 
       const result = enrichLight(light);
@@ -379,7 +379,7 @@ describe('colorConversion', () => {
         id: 'light-7',
         metadata: { name: 'Test' },
         on: { on: true },
-        dimming: { brightness: 0 }
+        dimming: { brightness: 0 },
       };
 
       const result = enrichLight(light);
@@ -391,7 +391,7 @@ describe('colorConversion', () => {
       const light = {
         id: 'light-8',
         metadata: { name: 'Test' },
-        on: { on: true }
+        on: { on: true },
       };
 
       const result = enrichLight(light);
@@ -404,7 +404,7 @@ describe('colorConversion', () => {
         id: 'light-9',
         metadata: { name: 'Test' },
         on: { on: true },
-        dimming: { brightness: 2 }
+        dimming: { brightness: 2 },
       };
 
       const result = enrichLight(light);
@@ -417,7 +417,7 @@ describe('colorConversion', () => {
         id: 'light-10',
         metadata: { name: 'Test' },
         on: { on: false },
-        dimming: { brightness: 50 }
+        dimming: { brightness: 50 },
       };
 
       const result = enrichLight(light);
@@ -430,7 +430,7 @@ describe('colorConversion', () => {
         id: 'light-11',
         metadata: { name: 'Test' },
         on: { on: true },
-        dimming: { brightness: 80 }
+        dimming: { brightness: 80 },
       };
 
       const result = enrichLight(light);
@@ -445,7 +445,7 @@ describe('colorConversion', () => {
         on: { on: true },
         dimming: { brightness: 100 },
         color: { xy: { x: 0.6915, y: 0.3083 } },
-        color_temperature: { mirek: 250 }
+        color_temperature: { mirek: 250 },
       };
 
       const result = enrichLight(light);
@@ -459,7 +459,7 @@ describe('colorConversion', () => {
         metadata: { name: 'Bright Light' },
         on: { on: true },
         dimming: { brightness: 100 },
-        color: { xy: { x: 0.6915, y: 0.3083 } }
+        color: { xy: { x: 0.6915, y: 0.3083 } },
       };
 
       const result = enrichLight(light);
@@ -474,7 +474,7 @@ describe('colorConversion', () => {
         metadata: { name: 'Dim Light' },
         on: { on: true },
         dimming: { brightness: 30 },
-        color: { xy: { x: 0.3127, y: 0.329 } }
+        color: { xy: { x: 0.3127, y: 0.329 } },
       };
 
       const result = enrichLight(light);
@@ -489,7 +489,7 @@ describe('colorConversion', () => {
         metadata: { name: 'Test' },
         on: { on: true },
         dimming: { brightness: 50 },
-        customField: 'custom value'
+        customField: 'custom value',
       };
 
       const result = enrichLight(light);
@@ -507,14 +507,14 @@ describe('colorConversion', () => {
           metadata: { name: 'Light 1' },
           on: { on: true },
           dimming: { brightness: 80 },
-          color: { xy: { x: 0.6915, y: 0.3083 } }
+          color: { xy: { x: 0.6915, y: 0.3083 } },
         },
         {
           id: 'light-2',
           metadata: { name: 'Light 2' },
           on: { on: false },
-          dimming: { brightness: 0 }
-        }
+          dimming: { brightness: 0 },
+        },
       ];
 
       const result = enrichLights(lights);
@@ -537,7 +537,7 @@ describe('colorConversion', () => {
       const lights = [
         { id: 'light-a', on: { on: true } },
         { id: 'light-b', on: { on: true } },
-        { id: 'light-c', on: { on: true } }
+        { id: 'light-c', on: { on: true } },
       ];
 
       const result = enrichLights(lights);

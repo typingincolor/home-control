@@ -7,7 +7,7 @@ describe('SceneSelector', () => {
   const mockScenes = [
     { id: 'scene-1', name: 'Bright' },
     { id: 'scene-2', name: 'Relax' },
-    { id: 'scene-3', name: 'Concentrate' }
+    { id: 'scene-3', name: 'Concentrate' },
   ];
 
   it('should render scene icon buttons', () => {
@@ -43,7 +43,7 @@ describe('SceneSelector', () => {
     render(<SceneSelector scenes={mockScenes} onActivate={onActivate} isActivating={true} />);
 
     const buttons = screen.getAllByRole('button');
-    buttons.forEach(button => {
+    buttons.forEach((button) => {
       expect(button).toBeDisabled();
     });
   });

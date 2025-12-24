@@ -6,7 +6,7 @@ import {
   BridgeConnectionError,
   ResourceNotFoundError,
   RateLimitError,
-  ValidationError
+  ValidationError,
 } from '../../utils/errors.js';
 import logger from '../../utils/logger.js';
 
@@ -19,12 +19,12 @@ describe('errorHandler middleware', () => {
   beforeEach(() => {
     req = {
       method: 'GET',
-      path: '/api/v1/test'
+      path: '/api/v1/test',
     };
     res = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn().mockReturnThis(),
-      set: vi.fn().mockReturnThis()
+      set: vi.fn().mockReturnThis(),
     };
     next = vi.fn();
     loggerSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
@@ -45,7 +45,7 @@ describe('errorHandler middleware', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'test_error',
         message: 'Test error message',
-        suggestion: 'Try again'
+        suggestion: 'Try again',
       });
     });
 
@@ -58,7 +58,7 @@ describe('errorHandler middleware', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'authentication_error',
         message: 'Invalid credentials',
-        suggestion: 'Check your bridge IP and username'
+        suggestion: 'Check your bridge IP and username',
       });
     });
 
@@ -70,7 +70,7 @@ describe('errorHandler middleware', () => {
       expect(res.status).toHaveBeenCalledWith(503);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          error: 'bridge_connection_error'
+          error: 'bridge_connection_error',
         })
       );
     });
@@ -84,7 +84,7 @@ describe('errorHandler middleware', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'resource_not_found',
         message: "The light 'abc-123' was not found",
-        suggestion: 'Check the light ID or refresh the dashboard to get current lights'
+        suggestion: 'Check the light ID or refresh the dashboard to get current lights',
       });
     });
 
@@ -99,7 +99,7 @@ describe('errorHandler middleware', () => {
         error: 'rate_limit_exceeded',
         message: 'Too many requests',
         suggestion: 'Wait 30 seconds before trying again',
-        retryAfter: 30
+        retryAfter: 30,
       });
     });
 
@@ -112,7 +112,7 @@ describe('errorHandler middleware', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'validation_error',
         message: 'Invalid brightness: must be between 0 and 100',
-        suggestion: 'Check the brightness format and try again'
+        suggestion: 'Check the brightness format and try again',
       });
     });
 
@@ -125,7 +125,7 @@ describe('errorHandler middleware', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'internal_error',
         message: 'An unexpected error occurred',
-        suggestion: 'Try again or contact support if the problem persists'
+        suggestion: 'Try again or contact support if the problem persists',
       });
     });
 
@@ -138,7 +138,7 @@ describe('errorHandler middleware', () => {
       expect(res.status).toHaveBeenCalledWith(503);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          error: 'bridge_connection_error'
+          error: 'bridge_connection_error',
         })
       );
     });
@@ -152,7 +152,7 @@ describe('errorHandler middleware', () => {
       expect(res.status).toHaveBeenCalledWith(503);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          error: 'bridge_connection_error'
+          error: 'bridge_connection_error',
         })
       );
     });
@@ -188,7 +188,7 @@ describe('errorHandler middleware', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'route_not_found',
         message: 'Route GET /api/v1/test not found',
-        suggestion: 'Check the API documentation at /api/v1/docs'
+        suggestion: 'Check the API documentation at /api/v1/docs',
       });
     });
 
@@ -201,7 +201,7 @@ describe('errorHandler middleware', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'route_not_found',
         message: 'Route POST /api/v1/nonexistent not found',
-        suggestion: 'Check the API documentation at /api/v1/docs'
+        suggestion: 'Check the API documentation at /api/v1/docs',
       });
     });
   });

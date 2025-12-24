@@ -26,7 +26,7 @@ router.post('/:id/activate', extractCredentials, async (req, res, next) => {
     await hueClient.activateScene(bridgeIp, username, sceneId);
 
     // Wait for lights to update (Hue Bridge takes time to apply scene)
-    await new Promise(resolve => setTimeout(resolve, SCENE_APPLY_DELAY_MS));
+    await new Promise((resolve) => setTimeout(resolve, SCENE_APPLY_DELAY_MS));
 
     // Fetch updated light states
     const { lightsData, roomsData, devicesData, scenesData } = await hueClient.getDashboardData(
@@ -35,26 +35,26 @@ router.post('/:id/activate', extractCredentials, async (req, res, next) => {
     );
 
     // Find the scene to determine affected room
-    const scene = scenesData.data.find(s => s.id === sceneId);
+    const scene = scenesData.data.find((s) => s.id === sceneId);
     if (!scene) {
       // Scene activated but couldn't find it - just return success
       return res.json({
         success: true,
-        affectedLights: []
+        affectedLights: [],
       });
     }
 
     // Get lights in the scene's room
     const roomMap = roomService.buildRoomHierarchy(lightsData, roomsData, devicesData);
-    const room = Object.values(roomMap).find(r => r.roomUuid === scene.group?.rid);
+    const room = Object.values(roomMap).find((r) => r.roomUuid === scene.group?.rid);
 
-    const affectedLights = room ? room.lights.map(light => enrichLight(light)) : [];
+    const affectedLights = room ? room.lights.map((light) => enrichLight(light)) : [];
 
     logger.info('Scene activated', { affectedLights: affectedLights.length });
 
     res.json({
       success: true,
-      affectedLights
+      affectedLights,
     });
   } catch (error) {
     next(error);

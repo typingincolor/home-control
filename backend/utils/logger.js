@@ -24,7 +24,7 @@ const winstonLogger = winston.createLogger({
       ? winston.format.json()
       : winston.format.combine(winston.format.colorize(), consoleFormat)
   ),
-  transports: [new winston.transports.Console()]
+  transports: [new winston.transports.Console()],
 });
 
 /**
@@ -45,7 +45,7 @@ export function createLogger(component) {
     },
     debug(message, meta = {}) {
       winstonLogger.debug(message, { ...meta, component });
-    }
+    },
   };
 }
 
@@ -87,7 +87,7 @@ const logger = {
    */
   debug(message, meta) {
     winstonLogger.debug(message, meta);
-  }
+  },
 };
 
 export default logger;

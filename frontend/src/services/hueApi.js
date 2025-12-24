@@ -19,7 +19,7 @@ const request = async (url, options = {}, sessionToken = null) => {
     if (sessionToken) {
       options.headers = {
         ...options.headers,
-        Authorization: `Bearer ${sessionToken}`
+        Authorization: `Bearer ${sessionToken}`,
       };
     }
 
@@ -81,7 +81,7 @@ export const hueApi = {
     const data = await request(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bridgeIp, appName })
+      body: JSON.stringify({ bridgeIp, appName }),
     });
     logger.info('createUser: received response', { username: data.username });
     return data.username;
@@ -99,7 +99,7 @@ export const hueApi = {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bridgeIp })
+      body: JSON.stringify({ bridgeIp }),
     });
 
     const data = await response.json();
@@ -147,7 +147,7 @@ export const hueApi = {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bridgeIp, username })
+      body: JSON.stringify({ bridgeIp, username }),
     });
 
     if (!response.ok) {
@@ -195,7 +195,7 @@ export const hueApi = {
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state)
+        body: JSON.stringify(state),
       },
       sessionToken
     );
@@ -216,7 +216,7 @@ export const hueApi = {
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state)
+        body: JSON.stringify(state),
       },
       sessionToken
     );
@@ -237,7 +237,7 @@ export const hueApi = {
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state)
+        body: JSON.stringify(state),
       },
       sessionToken
     );
@@ -272,5 +272,5 @@ export const hueApi = {
   async revokeSession(sessionToken) {
     const url = `${PROXY_URL}/api/v1/auth/session`;
     return request(url, { method: 'DELETE' }, sessionToken);
-  }
+  },
 };

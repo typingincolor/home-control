@@ -17,7 +17,7 @@ describe('hueApi', () => {
     it('should send POST request with correct headers and body', async () => {
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ username: 'test-user-123' })
+        json: () => Promise.resolve({ username: 'test-user-123' }),
       });
 
       const result = await hueApi.createUser('192.168.1.100', 'test-app');
@@ -28,12 +28,12 @@ describe('hueApi', () => {
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           }),
           body: JSON.stringify({
             bridgeIp: '192.168.1.100',
-            appName: 'test-app'
-          })
+            appName: 'test-app',
+          }),
         })
       );
 
@@ -44,7 +44,7 @@ describe('hueApi', () => {
     it('should use default appName if not provided', async () => {
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ username: 'test-user' })
+        json: () => Promise.resolve({ username: 'test-user' }),
       });
 
       await hueApi.createUser('192.168.1.100');
@@ -58,7 +58,7 @@ describe('hueApi', () => {
     it('should throw error on HTTP failure', async () => {
       fetch.mockResolvedValue({
         ok: false,
-        status: 500
+        status: 500,
       });
 
       await expect(hueApi.createUser('192.168.1.100')).rejects.toThrow('HTTP error! status: 500');
@@ -70,12 +70,12 @@ describe('hueApi', () => {
       const mockSession = {
         sessionToken: 'hue_sess_abc123',
         expiresIn: 86400,
-        bridgeIp: '192.168.1.100'
+        bridgeIp: '192.168.1.100',
       };
 
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockSession)
+        json: () => Promise.resolve(mockSession),
       });
 
       const result = await hueApi.createSession('192.168.1.100', 'test-user');
@@ -85,12 +85,12 @@ describe('hueApi', () => {
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           }),
           body: JSON.stringify({
             bridgeIp: '192.168.1.100',
-            username: 'test-user'
-          })
+            username: 'test-user',
+          }),
         })
       );
 
@@ -100,7 +100,7 @@ describe('hueApi', () => {
     it('should throw error if response not ok', async () => {
       fetch.mockResolvedValue({
         ok: false,
-        json: () => Promise.resolve({ message: 'Invalid credentials' })
+        json: () => Promise.resolve({ message: 'Invalid credentials' }),
       });
 
       await expect(hueApi.createSession('192.168.1.100', 'bad-user')).rejects.toThrow();
@@ -111,12 +111,12 @@ describe('hueApi', () => {
     it('should send GET request with Authorization header', async () => {
       const mockDashboard = {
         summary: { totalLights: 10, lightsOn: 5 },
-        rooms: []
+        rooms: [],
       };
 
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockDashboard)
+        json: () => Promise.resolve(mockDashboard),
       });
 
       const result = await hueApi.getDashboard('hue_sess_test123');
@@ -125,8 +125,8 @@ describe('hueApi', () => {
         '/api/v1/dashboard',
         expect.objectContaining({
           headers: expect.objectContaining({
-            Authorization: 'Bearer hue_sess_test123'
-          })
+            Authorization: 'Bearer hue_sess_test123',
+          }),
         })
       );
 
@@ -136,7 +136,7 @@ describe('hueApi', () => {
     it('should handle 401 Unauthorized as session expiration', async () => {
       fetch.mockResolvedValue({
         ok: false,
-        status: 401
+        status: 401,
       });
 
       await expect(hueApi.getDashboard('expired-token')).rejects.toThrow(
@@ -151,7 +151,7 @@ describe('hueApi', () => {
 
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockZones)
+        json: () => Promise.resolve(mockZones),
       });
 
       const result = await hueApi.getMotionZones('hue_sess_test123');
@@ -160,8 +160,8 @@ describe('hueApi', () => {
         '/api/v1/motion-zones',
         expect.objectContaining({
           headers: expect.objectContaining({
-            Authorization: 'Bearer hue_sess_test123'
-          })
+            Authorization: 'Bearer hue_sess_test123',
+          }),
         })
       );
 
@@ -172,17 +172,17 @@ describe('hueApi', () => {
   describe('updateLight', () => {
     it('should send PUT request with correct headers and body', async () => {
       const mockResponse = {
-        light: { id: 'light-1', on: true, brightness: 80 }
+        light: { id: 'light-1', on: true, brightness: 80 },
       };
 
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockResponse)
+        json: () => Promise.resolve(mockResponse),
       });
 
       const result = await hueApi.updateLight('hue_sess_test123', 'light-1', {
         on: true,
-        brightness: 80
+        brightness: 80,
       });
 
       expect(fetch).toHaveBeenCalledWith(
@@ -191,9 +191,9 @@ describe('hueApi', () => {
           method: 'PUT',
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
-            Authorization: 'Bearer hue_sess_test123'
+            Authorization: 'Bearer hue_sess_test123',
           }),
-          body: JSON.stringify({ on: true, brightness: 80 })
+          body: JSON.stringify({ on: true, brightness: 80 }),
         })
       );
 
@@ -206,13 +206,13 @@ describe('hueApi', () => {
       const mockResponse = {
         updatedLights: [
           { id: 'light-1', on: true },
-          { id: 'light-2', on: true }
-        ]
+          { id: 'light-2', on: true },
+        ],
       };
 
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockResponse)
+        json: () => Promise.resolve(mockResponse),
       });
 
       const result = await hueApi.updateRoomLights('hue_sess_test123', 'room-1', { on: true });
@@ -223,9 +223,9 @@ describe('hueApi', () => {
           method: 'PUT',
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
-            Authorization: 'Bearer hue_sess_test123'
+            Authorization: 'Bearer hue_sess_test123',
           }),
-          body: JSON.stringify({ on: true })
+          body: JSON.stringify({ on: true }),
         })
       );
 
@@ -236,12 +236,12 @@ describe('hueApi', () => {
   describe('activateSceneV1', () => {
     it('should send POST request with Authorization header', async () => {
       const mockResponse = {
-        affectedLights: [{ id: 'light-1', on: true }]
+        affectedLights: [{ id: 'light-1', on: true }],
       };
 
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockResponse)
+        json: () => Promise.resolve(mockResponse),
       });
 
       const result = await hueApi.activateSceneV1('hue_sess_test123', 'scene-1');
@@ -251,8 +251,8 @@ describe('hueApi', () => {
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
-            Authorization: 'Bearer hue_sess_test123'
-          })
+            Authorization: 'Bearer hue_sess_test123',
+          }),
         })
       );
 
@@ -265,12 +265,12 @@ describe('hueApi', () => {
       const mockNewSession = {
         sessionToken: 'hue_sess_new456',
         expiresIn: 86400,
-        bridgeIp: '192.168.1.100'
+        bridgeIp: '192.168.1.100',
       };
 
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockNewSession)
+        json: () => Promise.resolve(mockNewSession),
       });
 
       const result = await hueApi.refreshSession('hue_sess_old123');
@@ -280,8 +280,8 @@ describe('hueApi', () => {
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
-            Authorization: 'Bearer hue_sess_old123'
-          })
+            Authorization: 'Bearer hue_sess_old123',
+          }),
         })
       );
 
@@ -293,12 +293,12 @@ describe('hueApi', () => {
     it('should send DELETE request with Authorization header', async () => {
       const mockResponse = {
         success: true,
-        message: 'Session revoked'
+        message: 'Session revoked',
       };
 
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockResponse)
+        json: () => Promise.resolve(mockResponse),
       });
 
       const result = await hueApi.revokeSession('hue_sess_test123');
@@ -308,8 +308,8 @@ describe('hueApi', () => {
         expect.objectContaining({
           method: 'DELETE',
           headers: expect.objectContaining({
-            Authorization: 'Bearer hue_sess_test123'
-          })
+            Authorization: 'Bearer hue_sess_test123',
+          }),
         })
       );
 
@@ -332,8 +332,8 @@ describe('hueApi', () => {
         json: () =>
           Promise.resolve({
             errors: [{ description: 'Invalid parameter' }],
-            data: []
-          })
+            data: [],
+          }),
       });
 
       await expect(hueApi.getDashboard('test-token')).rejects.toThrow('Invalid parameter');
@@ -345,12 +345,12 @@ describe('hueApi', () => {
       const mockSession = {
         sessionToken: 'hue_sess_abc123',
         expiresIn: 86400,
-        bridgeIp: '192.168.1.100'
+        bridgeIp: '192.168.1.100',
       };
 
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockSession)
+        json: () => Promise.resolve(mockSession),
       });
 
       const result = await hueApi.connect('192.168.1.100');
@@ -360,9 +360,9 @@ describe('hueApi', () => {
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           }),
-          body: JSON.stringify({ bridgeIp: '192.168.1.100' })
+          body: JSON.stringify({ bridgeIp: '192.168.1.100' }),
         })
       );
 
@@ -376,8 +376,8 @@ describe('hueApi', () => {
         json: () =>
           Promise.resolve({
             error: 'No stored credentials',
-            requiresPairing: true
-          })
+            requiresPairing: true,
+          }),
       });
 
       await expect(hueApi.connect('192.168.1.100')).rejects.toThrow('PAIRING_REQUIRED');
@@ -390,8 +390,8 @@ describe('hueApi', () => {
         json: () =>
           Promise.resolve({
             error: 'Stored credentials are no longer valid',
-            requiresPairing: true
-          })
+            requiresPairing: true,
+          }),
       });
 
       await expect(hueApi.connect('192.168.1.100')).rejects.toThrow('PAIRING_REQUIRED');
@@ -405,8 +405,8 @@ describe('hueApi', () => {
         json: () =>
           Promise.resolve({
             bridgeIp: '192.168.1.100',
-            hasCredentials: true
-          })
+            hasCredentials: true,
+          }),
       });
 
       const result = await hueApi.checkBridgeStatus('192.168.1.100');
@@ -422,8 +422,8 @@ describe('hueApi', () => {
         json: () =>
           Promise.resolve({
             bridgeIp: '192.168.1.100',
-            hasCredentials: false
-          })
+            hasCredentials: false,
+          }),
       });
 
       const result = await hueApi.checkBridgeStatus('192.168.1.100');
@@ -442,7 +442,7 @@ describe('hueApi', () => {
     it('should URL-encode the bridgeIp parameter', async () => {
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ hasCredentials: false })
+        json: () => Promise.resolve({ hasCredentials: false }),
       });
 
       await hueApi.checkBridgeStatus('192.168.1.100');

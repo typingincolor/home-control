@@ -6,11 +6,11 @@ import {
   RoomShape,
   MotionZoneShape,
   ZoneShape,
-  DashboardSummaryShape
+  DashboardSummaryShape,
 } from './shapes';
 
 // Helper to check if a PropType validator exists
-const isPropTypeValidator = validator => {
+const isPropTypeValidator = (validator) => {
   return (
     typeof validator === 'function' || (validator && typeof validator.isRequired === 'function')
   );

@@ -27,8 +27,8 @@ describe('ZoneService', () => {
         data: [
           { id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } },
           { id: 'light-2', metadata: { name: 'Light 2' }, on: { on: false } },
-          { id: 'light-3', metadata: { name: 'Light 3' }, on: { on: true } }
-        ]
+          { id: 'light-3', metadata: { name: 'Light 3' }, on: { on: true } },
+        ],
       };
 
       const zonesData = {
@@ -38,10 +38,10 @@ describe('ZoneService', () => {
             metadata: { name: 'Upstairs' },
             children: [
               { rid: 'light-1', rtype: 'light' },
-              { rid: 'light-2', rtype: 'light' }
-            ]
-          }
-        ]
+              { rid: 'light-2', rtype: 'light' },
+            ],
+          },
+        ],
       };
 
       const devicesData = { data: [] };
@@ -57,7 +57,7 @@ describe('ZoneService', () => {
 
     it('should handle zones with device references', () => {
       const lightsData = {
-        data: [{ id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }]
+        data: [{ id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }],
       };
 
       const zonesData = {
@@ -65,18 +65,18 @@ describe('ZoneService', () => {
           {
             id: 'zone-1',
             metadata: { name: 'All Lights' },
-            children: [{ rid: 'device-1', rtype: 'device' }]
-          }
-        ]
+            children: [{ rid: 'device-1', rtype: 'device' }],
+          },
+        ],
       };
 
       const devicesData = {
         data: [
           {
             id: 'device-1',
-            services: [{ rid: 'light-1', rtype: 'light' }]
-          }
-        ]
+            services: [{ rid: 'light-1', rtype: 'light' }],
+          },
+        ],
       };
 
       const result = zoneService.buildZoneHierarchy(lightsData, zonesData, devicesData);
@@ -88,7 +88,7 @@ describe('ZoneService', () => {
 
     it('should handle zones with missing name gracefully', () => {
       const lightsData = {
-        data: [{ id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }]
+        data: [{ id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }],
       };
 
       const zonesData = {
@@ -96,9 +96,9 @@ describe('ZoneService', () => {
           {
             id: 'zone-1',
             metadata: {}, // No name
-            children: [{ rid: 'light-1', rtype: 'light' }]
-          }
-        ]
+            children: [{ rid: 'light-1', rtype: 'light' }],
+          },
+        ],
       };
 
       const devicesData = { data: [] };
@@ -110,7 +110,7 @@ describe('ZoneService', () => {
 
     it('should deduplicate lights in zones', () => {
       const lightsData = {
-        data: [{ id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }]
+        data: [{ id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } }],
       };
 
       const zonesData = {
@@ -120,10 +120,10 @@ describe('ZoneService', () => {
             metadata: { name: 'Test Zone' },
             children: [
               { rid: 'light-1', rtype: 'light' },
-              { rid: 'light-1', rtype: 'light' } // Duplicate
-            ]
-          }
-        ]
+              { rid: 'light-1', rtype: 'light' }, // Duplicate
+            ],
+          },
+        ],
       };
 
       const devicesData = { data: [] };
@@ -139,7 +139,7 @@ describe('ZoneService', () => {
       const lights = [
         { id: 'light-1', on: { on: true }, dimming: { brightness: 80 } },
         { id: 'light-2', on: { on: true }, dimming: { brightness: 60 } },
-        { id: 'light-3', on: { on: false }, dimming: { brightness: 0 } }
+        { id: 'light-3', on: { on: false }, dimming: { brightness: 0 } },
       ];
 
       const stats = zoneService.calculateZoneStats(lights);
@@ -152,7 +152,7 @@ describe('ZoneService', () => {
     it('should return zero average brightness when no lights on', () => {
       const lights = [
         { id: 'light-1', on: { on: false } },
-        { id: 'light-2', on: { on: false } }
+        { id: 'light-2', on: { on: false } },
       ];
 
       const stats = zoneService.calculateZoneStats(lights);
@@ -171,7 +171,7 @@ describe('ZoneService', () => {
 
     it('should handle missing dimming data with fallback', () => {
       const lights = [
-        { id: 'light-1', on: { on: true } } // No dimming property
+        { id: 'light-1', on: { on: true } }, // No dimming property
       ];
 
       const stats = zoneService.calculateZoneStats(lights);
@@ -187,8 +187,8 @@ describe('ZoneService', () => {
         data: [
           { id: 'scene-1', metadata: { name: 'Bright' }, group: { rid: 'zone-1', rtype: 'zone' } },
           { id: 'scene-2', metadata: { name: 'Relax' }, group: { rid: 'zone-1', rtype: 'zone' } },
-          { id: 'scene-3', metadata: { name: 'Other' }, group: { rid: 'zone-2', rtype: 'zone' } }
-        ]
+          { id: 'scene-3', metadata: { name: 'Other' }, group: { rid: 'zone-2', rtype: 'zone' } },
+        ],
       };
 
       const scenes = zoneService.getScenesForZone(scenesData, 'zone-1');
@@ -201,8 +201,8 @@ describe('ZoneService', () => {
     it('should return empty array when no scenes for zone', () => {
       const scenesData = {
         data: [
-          { id: 'scene-1', metadata: { name: 'Bright' }, group: { rid: 'room-1', rtype: 'room' } }
-        ]
+          { id: 'scene-1', metadata: { name: 'Bright' }, group: { rid: 'room-1', rtype: 'room' } },
+        ],
       };
 
       const scenes = zoneService.getScenesForZone(scenesData, 'zone-1');
@@ -220,8 +220,8 @@ describe('ZoneService', () => {
         data: [
           { id: 'scene-1', metadata: { name: 'Zebra' }, group: { rid: 'zone-1', rtype: 'zone' } },
           { id: 'scene-2', metadata: { name: 'Apple' }, group: { rid: 'zone-1', rtype: 'zone' } },
-          { id: 'scene-3', metadata: { name: 'Mango' }, group: { rid: 'zone-1', rtype: 'zone' } }
-        ]
+          { id: 'scene-3', metadata: { name: 'Mango' }, group: { rid: 'zone-1', rtype: 'zone' } },
+        ],
       };
 
       const scenes = zoneService.getScenesForZone(scenesData, 'zone-1');

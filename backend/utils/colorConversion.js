@@ -3,14 +3,14 @@ const COLOR_CONFIG = {
   DEFAULT_WHITE: { r: 255, g: 245, b: 235 },
   DIM_THRESHOLD: {
     START: 15,
-    BRIGHT_START: 50
+    BRIGHT_START: 50,
   },
   SHADOW_THRESHOLD: 50,
   XYZ_TO_RGB_MATRIX: {
     r: [1.656492, -0.354851, -0.255038],
     g: [-0.707196, 1.655397, 0.036152],
-    b: [0.051713, -0.121364, 1.01153]
-  }
+    b: [0.051713, -0.121364, 1.01153],
+  },
 };
 
 /**
@@ -35,7 +35,7 @@ export const xyToRgb = (x, y, brightness = 100) => {
   let b = X * matrix.b[0] + Y * matrix.b[1] + Z * matrix.b[2];
 
   // Apply gamma correction
-  const gammaCorrect = val => {
+  const gammaCorrect = (val) => {
     if (val <= 0.0031308) return 12.92 * val;
     return 1.055 * Math.pow(val, 1.0 / 2.4) - 0.055;
   };
@@ -117,7 +117,7 @@ export const mirekToRgb = (mirek, brightness = 100) => {
  * @param {Object} light - Hue light object
  * @returns {string|null} CSS rgb() color string or null
  */
-export const getLightColor = light => {
+export const getLightColor = (light) => {
   if (!light.on?.on) return null;
 
   const brightness = light.dimming?.brightness ?? 100;
@@ -210,7 +210,7 @@ export const getLightShadow = (light, lightColor) => {
  * @param {Object} light - Raw Hue light object
  * @returns {Object} Enriched light object with color, shadow, and colorSource properties
  */
-export const enrichLight = light => {
+export const enrichLight = (light) => {
   // Determine color source
   let colorSource = null;
   if (light.color?.xy) {
@@ -242,7 +242,7 @@ export const enrichLight = light => {
     shadow,
     colorSource,
     // Keep original data for advanced use cases
-    _original: light
+    _original: light,
   };
 };
 
@@ -251,6 +251,6 @@ export const enrichLight = light => {
  * @param {Array} lights - Array of raw Hue light objects
  * @returns {Array} Array of enriched light objects
  */
-export const enrichLights = lights => {
-  return lights.map(light => enrichLight(light));
+export const enrichLights = (lights) => {
+  return lights.map((light) => enrichLight(light));
 };

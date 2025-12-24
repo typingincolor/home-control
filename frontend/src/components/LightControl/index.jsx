@@ -21,7 +21,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
   const {
     isConnected: wsConnected,
     dashboard: wsDashboard,
-    error: wsError
+    error: wsError,
   } = useWebSocket(sessionToken, null, !isDemoMode);
 
   // Local dashboard state (for demo mode or manual updates)
@@ -98,12 +98,12 @@ export const LightControl = ({ sessionToken, onLogout }) => {
   useEffect(() => {
     if (!isDemoMode || !api.subscribeToMotion) return;
 
-    const unsubscribe = api.subscribeToMotion(updatedMotionZones => {
-      setLocalDashboard(prev => {
+    const unsubscribe = api.subscribeToMotion((updatedMotionZones) => {
+      setLocalDashboard((prev) => {
         if (!prev) return prev;
         return {
           ...prev,
-          motionZones: updatedMotionZones
+          motionZones: updatedMotionZones,
         };
       });
     });
@@ -112,17 +112,17 @@ export const LightControl = ({ sessionToken, onLogout }) => {
   }, [isDemoMode, api]);
 
   // Helper: Get light by UUID from dashboard
-  const getLightByUuid = uuid => {
+  const getLightByUuid = (uuid) => {
     if (!dashboard?.rooms) return null;
     for (const room of dashboard.rooms) {
-      const light = room.lights.find(l => l.id === uuid);
+      const light = room.lights.find((l) => l.id === uuid);
       if (light) return light;
     }
     return null;
   };
 
-  const toggleLight = async lightUuid => {
-    setTogglingLights(prev => new Set(prev).add(lightUuid));
+  const toggleLight = async (lightUuid) => {
+    setTogglingLights((prev) => new Set(prev).add(lightUuid));
 
     try {
       const light = getLightByUuid(lightUuid);
@@ -134,22 +134,24 @@ export const LightControl = ({ sessionToken, onLogout }) => {
       const response = await api.updateLight(sessionToken, lightUuid, newState);
 
       // Optimistic update - apply immediately for responsive UI
-      setLocalDashboard(prev => ({
+      setLocalDashboard((prev) => ({
         ...prev,
         summary: {
           ...prev.summary,
-          lightsOn: newState.on ? prev.summary.lightsOn + 1 : Math.max(0, prev.summary.lightsOn - 1)
+          lightsOn: newState.on
+            ? prev.summary.lightsOn + 1
+            : Math.max(0, prev.summary.lightsOn - 1),
         },
-        rooms: prev.rooms.map(room => ({
+        rooms: prev.rooms.map((room) => ({
           ...room,
-          lights: room.lights.map(l => (l.id === lightUuid ? response.light : l))
-        }))
+          lights: room.lights.map((l) => (l.id === lightUuid ? response.light : l)),
+        })),
       }));
     } catch (err) {
       logger.error('Failed to toggle light:', err);
       alert(`${ERROR_MESSAGES.LIGHT_TOGGLE}: ${err.message}`);
     } finally {
-      setTogglingLights(prev => {
+      setTogglingLights((prev) => {
         const newSet = new Set(prev);
         newSet.delete(lightUuid);
         return newSet;
@@ -158,14 +160,14 @@ export const LightControl = ({ sessionToken, onLogout }) => {
   };
 
   const toggleRoom = async (roomId, turnOn) => {
-    const room = dashboard?.rooms?.find(r => r.id === roomId);
+    const room = dashboard?.rooms?.find((r) => r.id === roomId);
     if (!room) return;
 
-    const lightUuids = room.lights.map(l => l.id);
+    const lightUuids = room.lights.map((l) => l.id);
 
-    setTogglingLights(prev => {
+    setTogglingLights((prev) => {
       const newSet = new Set(prev);
-      lightUuids.forEach(id => newSet.add(id));
+      lightUuids.forEach((id) => newSet.add(id));
       return newSet;
     });
 
@@ -174,41 +176,41 @@ export const LightControl = ({ sessionToken, onLogout }) => {
       const response = await api.updateRoomLights(sessionToken, roomId, newState);
 
       // Optimistic update - apply immediately for responsive UI
-      setLocalDashboard(prev => ({
+      setLocalDashboard((prev) => ({
         ...prev,
-        rooms: prev.rooms.map(r => {
+        rooms: prev.rooms.map((r) => {
           if (r.id === roomId) {
-            const updatedLightMap = new Map(response.updatedLights.map(l => [l.id, l]));
+            const updatedLightMap = new Map(response.updatedLights.map((l) => [l.id, l]));
             return {
               ...r,
-              lights: r.lights.map(l => updatedLightMap.get(l.id) || l)
+              lights: r.lights.map((l) => updatedLightMap.get(l.id) || l),
             };
           }
           return r;
-        })
+        }),
       }));
     } catch (err) {
       logger.error('Failed to toggle room:', err);
       alert(`${ERROR_MESSAGES.ROOM_TOGGLE}: ${err.message}`);
     } finally {
-      setTogglingLights(prev => {
+      setTogglingLights((prev) => {
         const newSet = new Set(prev);
-        lightUuids.forEach(id => newSet.delete(id));
+        lightUuids.forEach((id) => newSet.delete(id));
         return newSet;
       });
     }
   };
 
   const toggleZone = async (zoneId, turnOn) => {
-    const zone = dashboard?.zones?.find(z => z.id === zoneId);
+    const zone = dashboard?.zones?.find((z) => z.id === zoneId);
     if (!zone) return;
 
-    const lightUuids = zone.lights?.map(l => l.id) || [];
+    const lightUuids = zone.lights?.map((l) => l.id) || [];
 
-    setTogglingZones(prev => new Set(prev).add(zoneId));
-    setTogglingLights(prev => {
+    setTogglingZones((prev) => new Set(prev).add(zoneId));
+    setTogglingLights((prev) => {
       const newSet = new Set(prev);
-      lightUuids.forEach(id => newSet.add(id));
+      lightUuids.forEach((id) => newSet.add(id));
       return newSet;
     });
 
@@ -217,31 +219,31 @@ export const LightControl = ({ sessionToken, onLogout }) => {
       const response = await api.updateZoneLights(sessionToken, zoneId, newState);
 
       // Optimistic update - apply immediately for responsive UI
-      setLocalDashboard(prev => ({
+      setLocalDashboard((prev) => ({
         ...prev,
-        zones: prev.zones.map(z => {
+        zones: prev.zones.map((z) => {
           if (z.id === zoneId) {
-            const updatedLightMap = new Map(response.updatedLights.map(l => [l.id, l]));
+            const updatedLightMap = new Map(response.updatedLights.map((l) => [l.id, l]));
             return {
               ...z,
-              lights: z.lights.map(l => updatedLightMap.get(l.id) || l)
+              lights: z.lights.map((l) => updatedLightMap.get(l.id) || l),
             };
           }
           return z;
-        })
+        }),
       }));
     } catch (err) {
       logger.error('Failed to toggle zone:', err);
       alert(`${ERROR_MESSAGES.ZONE_TOGGLE}: ${err.message}`);
     } finally {
-      setTogglingZones(prev => {
+      setTogglingZones((prev) => {
         const newSet = new Set(prev);
         newSet.delete(zoneId);
         return newSet;
       });
-      setTogglingLights(prev => {
+      setTogglingLights((prev) => {
         const newSet = new Set(prev);
-        lightUuids.forEach(id => newSet.delete(id));
+        lightUuids.forEach((id) => newSet.delete(id));
         return newSet;
       });
     }
@@ -261,17 +263,17 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
       // Optimistic update - apply immediately for responsive UI
       if (response.affectedLights && response.affectedLights.length > 0) {
-        const updatedLightMap = new Map(response.affectedLights.map(l => [l.id, l]));
+        const updatedLightMap = new Map(response.affectedLights.map((l) => [l.id, l]));
 
-        setLocalDashboard(prev => {
+        setLocalDashboard((prev) => {
           if (!prev) return prev;
 
           return {
             ...prev,
-            rooms: prev.rooms.map(room => ({
+            rooms: prev.rooms.map((room) => ({
               ...room,
-              lights: room.lights.map(light => updatedLightMap.get(light.id) || light)
-            }))
+              lights: room.lights.map((light) => updatedLightMap.get(light.id) || light),
+            })),
           };
         });
       }
@@ -285,7 +287,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
   // Get the selected room from dashboard
   const selectedRoom =
-    selectedId !== 'zones' ? dashboard?.rooms?.find(r => r.id === selectedId) : null;
+    selectedId !== 'zones' ? dashboard?.rooms?.find((r) => r.id === selectedId) : null;
 
   // Loading state
   if (loading && !dashboard) {
@@ -357,5 +359,5 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
 LightControl.propTypes = {
   sessionToken: PropTypes.string.isRequired,
-  onLogout: PropTypes.func
+  onLogout: PropTypes.func,
 };

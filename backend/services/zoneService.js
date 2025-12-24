@@ -2,7 +2,7 @@ import {
   buildDeviceToLightsMap,
   getLightsFromChildren,
   calculateLightStats,
-  getScenesForGroup
+  getScenesForGroup,
 } from '../utils/hierarchyUtils.js';
 
 /**
@@ -22,7 +22,7 @@ class ZoneService {
 
     // Create light lookup map
     const lightMap = new Map();
-    lightsData.data.forEach(light => {
+    lightsData.data.forEach((light) => {
       lightMap.set(light.id, light);
     });
 
@@ -32,7 +32,7 @@ class ZoneService {
     const zoneMap = {};
 
     // Process each zone
-    zonesData.data.forEach(zone => {
+    zonesData.data.forEach((zone) => {
       const zoneName = zone.metadata?.name || 'Unknown Zone';
 
       // Get lights from zone's children using shared utility
@@ -40,13 +40,13 @@ class ZoneService {
 
       // Deduplicate and filter existing lights
       const uniqueLightUuids = [...new Set(lightUuids)];
-      const lights = uniqueLightUuids.map(uuid => lightMap.get(uuid)).filter(Boolean);
+      const lights = uniqueLightUuids.map((uuid) => lightMap.get(uuid)).filter(Boolean);
 
       if (uniqueLightUuids.length > 0) {
         zoneMap[zoneName] = {
           zoneUuid: zone.id,
           lightUuids: uniqueLightUuids,
-          lights
+          lights,
         };
       }
     });
@@ -64,7 +64,7 @@ class ZoneService {
     // Zone stats round the average brightness
     return {
       ...stats,
-      averageBrightness: Math.round(stats.averageBrightness)
+      averageBrightness: Math.round(stats.averageBrightness),
     };
   }
 

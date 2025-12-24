@@ -29,7 +29,7 @@ router.get('/', extractCredentials, async (req, res, next) => {
 
     logger.debug('Fetched data', {
       lights: lightsData.data?.length || 0,
-      rooms: roomsData.data?.length || 0
+      rooms: roomsData.data?.length || 0,
     });
 
     // Step 2: Build room hierarchy
@@ -37,7 +37,7 @@ router.get('/', extractCredentials, async (req, res, next) => {
 
     if (!roomMap) {
       return res.status(500).json({
-        error: 'Failed to build room hierarchy'
+        error: 'Failed to build room hierarchy',
       });
     }
 
@@ -46,7 +46,7 @@ router.get('/', extractCredentials, async (req, res, next) => {
     // Step 3: Process each room
     const rooms = Object.entries(roomMap).map(([roomName, roomData]) => {
       // Enrich lights with pre-computed colors and shadows
-      const enrichedLights = roomData.lights.map(light => enrichLight(light));
+      const enrichedLights = roomData.lights.map((light) => enrichLight(light));
 
       // Calculate room statistics
       const stats = roomService.calculateRoomStats(roomData.lights);
@@ -61,7 +61,7 @@ router.get('/', extractCredentials, async (req, res, next) => {
         name: roomName,
         stats,
         lights: enrichedLights,
-        scenes
+        scenes,
       };
     });
 
@@ -71,13 +71,13 @@ router.get('/', extractCredentials, async (req, res, next) => {
     logger.debug('Summary', {
       lightsOn: summary.lightsOn,
       totalLights: summary.totalLights,
-      roomCount: summary.roomCount
+      roomCount: summary.roomCount,
     });
 
     // Step 5: Return unified response
     res.json({
       summary,
-      rooms
+      rooms,
     });
   } catch (error) {
     next(error);

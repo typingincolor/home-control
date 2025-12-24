@@ -14,7 +14,7 @@ export const LightTile = ({ light, onToggle, isToggling }) => {
   const shadowStyle =
     light.on && brightness >= 50 && light.shadow
       ? {
-          boxShadow: light.shadow
+          boxShadow: light.shadow,
         }
       : {};
 
@@ -36,7 +36,7 @@ export const LightTile = ({ light, onToggle, isToggling }) => {
         className="light-tile-fill"
         style={{
           height: fillHeight,
-          background: fillGradient
+          background: fillGradient,
         }}
       />
 
@@ -55,7 +55,7 @@ export const LightTile = ({ light, onToggle, isToggling }) => {
             color: contentColor,
             background: pillBackground,
             padding: '2px 8px',
-            borderRadius: '10px'
+            borderRadius: '10px',
           }}
         >
           {light.name || 'Light'}
@@ -100,12 +100,12 @@ function getContrastStyle(color, brightness) {
   if (isBrightFill) {
     return {
       color: 'rgba(0, 0, 0, 0.9)',
-      background: 'rgba(255, 255, 255, 0.7)'
+      background: 'rgba(255, 255, 255, 0.7)',
     };
   } else {
     return {
       color: 'rgba(255, 255, 255, 0.95)',
-      background: 'rgba(0, 0, 0, 0.5)'
+      background: 'rgba(0, 0, 0, 0.5)',
     };
   }
 }
@@ -113,5 +113,5 @@ function getContrastStyle(color, brightness) {
 LightTile.propTypes = {
   light: LightShape.isRequired,
   onToggle: PropTypes.func.isRequired,
-  isToggling: PropTypes.bool
+  isToggling: PropTypes.bool,
 };

@@ -11,7 +11,7 @@ router.get('/websocket', (req, res) => {
   const stats = websocketService.getStats();
   res.json({
     ...stats,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 

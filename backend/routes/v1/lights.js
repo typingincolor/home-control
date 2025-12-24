@@ -31,7 +31,7 @@ router.put('/:id', extractCredentials, async (req, res, next) => {
 
     // Fetch updated light state
     const lightsData = await hueClient.getLights(bridgeIp, username);
-    const updatedLight = lightsData.data.find(light => light.id === id);
+    const updatedLight = lightsData.data.find((light) => light.id === id);
 
     if (!updatedLight) {
       throw new ResourceNotFoundError('light', id);
@@ -44,7 +44,7 @@ router.put('/:id', extractCredentials, async (req, res, next) => {
 
     res.json({
       success: true,
-      light: enrichedLight
+      light: enrichedLight,
     });
   } catch (error) {
     next(error);

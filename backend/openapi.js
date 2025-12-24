@@ -28,17 +28,17 @@ export const openApiSpec = {
       3. Check availability: \`GET /api/v1/auth/bridge-status?bridgeIp=...\`
     `,
     contact: {
-      name: 'API Support'
+      name: 'API Support',
     },
     license: {
-      name: 'MIT'
-    }
+      name: 'MIT',
+    },
   },
   servers: [
     {
       url: 'http://localhost:3001/api/v1',
-      description: 'Development server'
-    }
+      description: 'Development server',
+    },
   ],
   components: {
     securitySchemes: {
@@ -46,20 +46,20 @@ export const openApiSpec = {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'Session Token',
-        description: 'Session token from POST /api/v1/auth/session'
+        description: 'Session token from POST /api/v1/auth/session',
       },
       HeaderAuth: {
         type: 'apiKey',
         in: 'header',
         name: 'X-Bridge-IP',
-        description: 'Bridge IP address (combine with X-Hue-Username header)'
+        description: 'Bridge IP address (combine with X-Hue-Username header)',
       },
       QueryAuth: {
         type: 'apiKey',
         in: 'query',
         name: 'bridgeIp',
-        description: 'Bridge IP address (combine with username query param)'
-      }
+        description: 'Bridge IP address (combine with username query param)',
+      },
     },
     schemas: {
       Error: {
@@ -67,80 +67,80 @@ export const openApiSpec = {
         properties: {
           error: {
             type: 'string',
-            example: 'resource_not_found'
+            example: 'resource_not_found',
           },
           message: {
             type: 'string',
-            example: "The light 'abc123' was not found"
+            example: "The light 'abc123' was not found",
           },
           suggestion: {
             type: 'string',
-            example: 'Check the light ID or refresh the dashboard to get current lights'
-          }
-        }
+            example: 'Check the light ID or refresh the dashboard to get current lights',
+          },
+        },
       },
       Light: {
         type: 'object',
         properties: {
           id: {
             type: 'string',
-            example: 'abc-123-def'
+            example: 'abc-123-def',
           },
           name: {
             type: 'string',
-            example: 'Living Room 1'
+            example: 'Living Room 1',
           },
           on: {
             type: 'boolean',
-            example: true
+            example: true,
           },
           brightness: {
             type: 'number',
             minimum: 0,
             maximum: 100,
-            example: 80
+            example: 80,
           },
           color: {
             type: 'string',
             nullable: true,
             example: 'rgb(255, 180, 120)',
-            description: 'Pre-computed CSS color string (ready to use!)'
+            description: 'Pre-computed CSS color string (ready to use!)',
           },
           shadow: {
             type: 'string',
             nullable: true,
             example: '0 0 20px rgba(255, 180, 120, 0.4)',
-            description: 'Pre-computed CSS box-shadow (ready to use!)'
+            description: 'Pre-computed CSS box-shadow (ready to use!)',
           },
           colorSource: {
             type: 'string',
             enum: ['xy', 'temperature', 'fallback', null],
-            example: 'xy'
-          }
-        }
+            example: 'xy',
+          },
+        },
       },
       Room: {
         type: 'object',
         properties: {
           id: {
             type: 'string',
-            example: 'room-uuid'
+            example: 'room-uuid',
           },
           name: {
             type: 'string',
-            example: 'Living Room'
+            example: 'Living Room',
           },
           stats: {
             type: 'object',
             properties: {
               lightsOnCount: { type: 'integer', example: 2 },
               totalLights: { type: 'integer', example: 4 },
-              averageBrightness: { type: 'number', example: 75.5 }
-            }
+              averageBrightness: { type: 'number', example: 75.5 },
+            },
           },
           lights: {
             type: 'array',
-            items: { $ref: '#/components/schemas/Light' }
+            items: { $ref: '#/components/schemas/Light' },
           },
           scenes: {
             type: 'array',
@@ -148,11 +148,11 @@ export const openApiSpec = {
               type: 'object',
               properties: {
                 id: { type: 'string' },
-                name: { type: 'string' }
-              }
-            }
-          }
-        }
+                name: { type: 'string' },
+              },
+            },
+          },
+        },
       },
       Zone: {
         type: 'object',
@@ -160,23 +160,23 @@ export const openApiSpec = {
         properties: {
           id: {
             type: 'string',
-            example: 'zone-uuid'
+            example: 'zone-uuid',
           },
           name: {
             type: 'string',
-            example: 'Downstairs'
+            example: 'Downstairs',
           },
           stats: {
             type: 'object',
             properties: {
               lightsOnCount: { type: 'integer', example: 2 },
               totalLights: { type: 'integer', example: 4 },
-              averageBrightness: { type: 'number', example: 75.5 }
-            }
+              averageBrightness: { type: 'number', example: 75.5 },
+            },
           },
           lights: {
             type: 'array',
-            items: { $ref: '#/components/schemas/Light' }
+            items: { $ref: '#/components/schemas/Light' },
           },
           scenes: {
             type: 'array',
@@ -184,11 +184,11 @@ export const openApiSpec = {
               type: 'object',
               properties: {
                 id: { type: 'string' },
-                name: { type: 'string' }
-              }
-            }
-          }
-        }
+                name: { type: 'string' },
+              },
+            },
+          },
+        },
       },
       MotionZone: {
         type: 'object',
@@ -199,10 +199,10 @@ export const openApiSpec = {
           motionDetected: { type: 'boolean', example: false },
           enabled: { type: 'boolean', example: true },
           reachable: { type: 'boolean', example: true },
-          lastChanged: { type: 'string', format: 'date-time', example: '2025-12-23T10:30:00Z' }
-        }
-      }
-    }
+          lastChanged: { type: 'string', format: 'date-time', example: '2025-12-23T10:30:00Z' },
+        },
+      },
+    },
   },
   paths: {
     '/auth/pair': {
@@ -222,17 +222,17 @@ export const openApiSpec = {
                   bridgeIp: {
                     type: 'string',
                     example: '192.168.1.100',
-                    description: 'Your Hue Bridge IP address'
+                    description: 'Your Hue Bridge IP address',
                   },
                   appName: {
                     type: 'string',
                     example: 'hue_control_app',
-                    description: 'Application name for the Hue Bridge (optional)'
-                  }
-                }
-              }
-            }
-          }
+                    description: 'Application name for the Hue Bridge (optional)',
+                  },
+                },
+              },
+            },
+          },
         },
         responses: {
           200: {
@@ -245,12 +245,12 @@ export const openApiSpec = {
                     username: {
                       type: 'string',
                       example: 'KZLwQGOGUMwtFMpYMeRqA9gzSuYoRtRgVThntanx',
-                      description: 'Generated Hue API key'
-                    }
-                  }
-                }
-              }
-            }
+                      description: 'Generated Hue API key',
+                    },
+                  },
+                },
+              },
+            },
           },
           400: {
             description: 'Link button not pressed or invalid bridge IP',
@@ -260,18 +260,18 @@ export const openApiSpec = {
                   type: 'object',
                   properties: {
                     error: { type: 'string', example: 'link button not pressed' },
-                    type: { type: 'integer', example: 101 }
-                  }
-                }
-              }
-            }
+                    type: { type: 'integer', example: 101 },
+                  },
+                },
+              },
+            },
           },
           504: {
             description: 'Bridge connection timeout',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
-          }
-        }
-      }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+        },
+      },
     },
     '/auth/connect': {
       post: {
@@ -290,12 +290,12 @@ export const openApiSpec = {
                   bridgeIp: {
                     type: 'string',
                     example: '192.168.1.100',
-                    description: 'Your Hue Bridge IP address'
-                  }
-                }
-              }
-            }
-          }
+                    description: 'Your Hue Bridge IP address',
+                  },
+                },
+              },
+            },
+          },
         },
         responses: {
           200: {
@@ -307,11 +307,11 @@ export const openApiSpec = {
                   properties: {
                     sessionToken: { type: 'string', example: 'hue_sess_abc123...' },
                     expiresIn: { type: 'integer', example: 86400 },
-                    bridgeIp: { type: 'string', example: '192.168.1.100' }
-                  }
-                }
-              }
-            }
+                    bridgeIp: { type: 'string', example: '192.168.1.100' },
+                  },
+                },
+              },
+            },
           },
           401: {
             description: 'Stored credentials are no longer valid',
@@ -322,13 +322,13 @@ export const openApiSpec = {
                   properties: {
                     error: {
                       type: 'string',
-                      example: 'Stored credentials are no longer valid. Pairing required.'
+                      example: 'Stored credentials are no longer valid. Pairing required.',
                     },
-                    requiresPairing: { type: 'boolean', example: true }
-                  }
-                }
-              }
-            }
+                    requiresPairing: { type: 'boolean', example: true },
+                  },
+                },
+              },
+            },
           },
           404: {
             description: 'No stored credentials for this bridge',
@@ -339,16 +339,16 @@ export const openApiSpec = {
                   properties: {
                     error: {
                       type: 'string',
-                      example: 'No stored credentials for this bridge. Pairing required.'
+                      example: 'No stored credentials for this bridge. Pairing required.',
                     },
-                    requiresPairing: { type: 'boolean', example: true }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    requiresPairing: { type: 'boolean', example: true },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     '/auth/bridge-status': {
       get: {
@@ -362,8 +362,8 @@ export const openApiSpec = {
             required: true,
             schema: { type: 'string' },
             description: 'Bridge IP to check',
-            example: '192.168.1.100'
-          }
+            example: '192.168.1.100',
+          },
         ],
         responses: {
           200: {
@@ -374,18 +374,18 @@ export const openApiSpec = {
                   type: 'object',
                   properties: {
                     bridgeIp: { type: 'string', example: '192.168.1.100' },
-                    hasCredentials: { type: 'boolean', example: true }
-                  }
-                }
-              }
-            }
+                    hasCredentials: { type: 'boolean', example: true },
+                  },
+                },
+              },
+            },
           },
           400: {
             description: 'Missing bridgeIp parameter',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
-          }
-        }
-      }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+        },
+      },
     },
     '/auth/session': {
       post: {
@@ -403,17 +403,17 @@ export const openApiSpec = {
                   bridgeIp: {
                     type: 'string',
                     example: '192.168.1.100',
-                    description: 'Your Hue Bridge IP address'
+                    description: 'Your Hue Bridge IP address',
                   },
                   username: {
                     type: 'string',
                     example: 'abc123def456',
-                    description: 'Your Hue API username/key'
-                  }
-                }
-              }
-            }
-          }
+                    description: 'Your Hue API username/key',
+                  },
+                },
+              },
+            },
+          },
         },
         responses: {
           200: {
@@ -425,31 +425,31 @@ export const openApiSpec = {
                   properties: {
                     sessionToken: {
                       type: 'string',
-                      example: 'hue_sess_abc123...'
+                      example: 'hue_sess_abc123...',
                     },
                     expiresIn: {
                       type: 'integer',
                       example: 86400,
-                      description: 'Session expires in seconds (24 hours)'
+                      description: 'Session expires in seconds (24 hours)',
                     },
                     bridgeIp: {
                       type: 'string',
-                      example: '192.168.1.100'
-                    }
-                  }
-                }
-              }
-            }
+                      example: '192.168.1.100',
+                    },
+                  },
+                },
+              },
+            },
           },
           400: {
             description: 'Missing credentials',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
           },
           503: {
             description: 'Cannot connect to bridge',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
-          }
-        }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+        },
       },
       get: {
         summary: 'Get current session info',
@@ -464,17 +464,17 @@ export const openApiSpec = {
                   type: 'object',
                   properties: {
                     bridgeIp: { type: 'string', example: '192.168.1.100' },
-                    active: { type: 'boolean', example: true }
-                  }
-                }
-              }
-            }
+                    active: { type: 'boolean', example: true },
+                  },
+                },
+              },
+            },
           },
           401: {
             description: 'Invalid or expired session',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
-          }
-        }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+        },
       },
       delete: {
         summary: 'Revoke session (logout)',
@@ -489,14 +489,14 @@ export const openApiSpec = {
                   type: 'object',
                   properties: {
                     success: { type: 'boolean', example: true },
-                    message: { type: 'string', example: 'Session revoked' }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    message: { type: 'string', example: 'Session revoked' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     '/auth/refresh': {
       post: {
@@ -514,18 +514,18 @@ export const openApiSpec = {
                   properties: {
                     sessionToken: { type: 'string', example: 'hue_sess_new123...' },
                     expiresIn: { type: 'integer', example: 86400 },
-                    bridgeIp: { type: 'string', example: '192.168.1.100' }
-                  }
-                }
-              }
-            }
+                    bridgeIp: { type: 'string', example: '192.168.1.100' },
+                  },
+                },
+              },
+            },
           },
           401: {
             description: 'Invalid or expired session',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
-          }
-        }
-      }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+        },
+      },
     },
     '/auth/stats': {
       get: {
@@ -544,20 +544,20 @@ export const openApiSpec = {
                     oldestSession: {
                       type: 'integer',
                       example: 3600000,
-                      description: 'Age in milliseconds'
+                      description: 'Age in milliseconds',
                     },
                     newestSession: {
                       type: 'integer',
                       example: 300000,
-                      description: 'Age in milliseconds'
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                      description: 'Age in milliseconds',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     '/dashboard': {
       get: {
@@ -580,34 +580,34 @@ export const openApiSpec = {
                         totalLights: { type: 'integer', example: 12 },
                         lightsOn: { type: 'integer', example: 5 },
                         roomCount: { type: 'integer', example: 4 },
-                        sceneCount: { type: 'integer', example: 8 }
-                      }
+                        sceneCount: { type: 'integer', example: 8 },
+                      },
                     },
                     rooms: {
                       type: 'array',
-                      items: { $ref: '#/components/schemas/Room' }
+                      items: { $ref: '#/components/schemas/Room' },
                     },
                     zones: {
                       type: 'array',
                       description: 'Hue zones (groups of lights that can span multiple rooms)',
-                      items: { $ref: '#/components/schemas/Zone' }
+                      items: { $ref: '#/components/schemas/Zone' },
                     },
                     motionZones: {
                       type: 'array',
                       description: 'MotionAware zones with motion detection status',
-                      items: { $ref: '#/components/schemas/MotionZone' }
-                    }
-                  }
-                }
-              }
-            }
+                      items: { $ref: '#/components/schemas/MotionZone' },
+                    },
+                  },
+                },
+              },
+            },
           },
           401: {
             description: 'Missing or invalid credentials',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
-          }
-        }
-      }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+        },
+      },
     },
     '/lights/{id}': {
       put: {
@@ -620,8 +620,8 @@ export const openApiSpec = {
             in: 'path',
             required: true,
             schema: { type: 'string' },
-            description: 'Light UUID'
-          }
+            description: 'Light UUID',
+          },
         ],
         requestBody: {
           required: true,
@@ -631,11 +631,11 @@ export const openApiSpec = {
                 type: 'object',
                 properties: {
                   on: { type: 'boolean', example: true },
-                  brightness: { type: 'number', minimum: 0, maximum: 100, example: 80 }
-                }
-              }
-            }
-          }
+                  brightness: { type: 'number', minimum: 0, maximum: 100, example: 80 },
+                },
+              },
+            },
+          },
         },
         responses: {
           200: {
@@ -646,18 +646,18 @@ export const openApiSpec = {
                   type: 'object',
                   properties: {
                     success: { type: 'boolean', example: true },
-                    light: { $ref: '#/components/schemas/Light' }
-                  }
-                }
-              }
-            }
+                    light: { $ref: '#/components/schemas/Light' },
+                  },
+                },
+              },
+            },
           },
           404: {
             description: 'Light not found',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
-          }
-        }
-      }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+        },
+      },
     },
     '/rooms/{id}/lights': {
       put: {
@@ -671,8 +671,8 @@ export const openApiSpec = {
             in: 'path',
             required: true,
             schema: { type: 'string' },
-            description: 'Room UUID'
-          }
+            description: 'Room UUID',
+          },
         ],
         requestBody: {
           required: true,
@@ -681,11 +681,11 @@ export const openApiSpec = {
               schema: {
                 type: 'object',
                 properties: {
-                  on: { type: 'boolean', example: true }
-                }
-              }
-            }
-          }
+                  on: { type: 'boolean', example: true },
+                },
+              },
+            },
+          },
         },
         responses: {
           200: {
@@ -698,19 +698,19 @@ export const openApiSpec = {
                     success: { type: 'boolean', example: true },
                     updatedLights: {
                       type: 'array',
-                      items: { $ref: '#/components/schemas/Light' }
-                    }
-                  }
-                }
-              }
-            }
+                      items: { $ref: '#/components/schemas/Light' },
+                    },
+                  },
+                },
+              },
+            },
           },
           404: {
             description: 'Room not found',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
-          }
-        }
-      }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+        },
+      },
     },
     '/zones/{id}/lights': {
       put: {
@@ -724,8 +724,8 @@ export const openApiSpec = {
             in: 'path',
             required: true,
             schema: { type: 'string' },
-            description: 'Zone UUID'
-          }
+            description: 'Zone UUID',
+          },
         ],
         requestBody: {
           required: true,
@@ -734,11 +734,11 @@ export const openApiSpec = {
               schema: {
                 type: 'object',
                 properties: {
-                  on: { type: 'boolean', example: true }
-                }
-              }
-            }
-          }
+                  on: { type: 'boolean', example: true },
+                },
+              },
+            },
+          },
         },
         responses: {
           200: {
@@ -751,19 +751,19 @@ export const openApiSpec = {
                     success: { type: 'boolean', example: true },
                     updatedLights: {
                       type: 'array',
-                      items: { $ref: '#/components/schemas/Light' }
-                    }
-                  }
-                }
-              }
-            }
+                      items: { $ref: '#/components/schemas/Light' },
+                    },
+                  },
+                },
+              },
+            },
           },
           404: {
             description: 'Zone not found',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
-          }
-        }
-      }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+        },
+      },
     },
     '/scenes/{id}/activate': {
       post: {
@@ -777,8 +777,8 @@ export const openApiSpec = {
             in: 'path',
             required: true,
             schema: { type: 'string' },
-            description: 'Scene UUID'
-          }
+            description: 'Scene UUID',
+          },
         ],
         responses: {
           200: {
@@ -791,19 +791,19 @@ export const openApiSpec = {
                     success: { type: 'boolean', example: true },
                     affectedLights: {
                       type: 'array',
-                      items: { $ref: '#/components/schemas/Light' }
-                    }
-                  }
-                }
-              }
-            }
+                      items: { $ref: '#/components/schemas/Light' },
+                    },
+                  },
+                },
+              },
+            },
           },
           404: {
             description: 'Scene not found',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
-          }
-        }
-      }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+        },
+      },
     },
     '/motion-zones': {
       get: {
@@ -821,16 +821,16 @@ export const openApiSpec = {
                   properties: {
                     zones: {
                       type: 'array',
-                      items: { $ref: '#/components/schemas/MotionZone' }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+                      items: { $ref: '#/components/schemas/MotionZone' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
   tags: [
     { name: 'Authentication', description: 'Session management' },
@@ -839,6 +839,6 @@ export const openApiSpec = {
     { name: 'Rooms', description: 'Room-level control' },
     { name: 'Zones', description: 'Zone-level control (groups spanning multiple rooms)' },
     { name: 'Scenes', description: 'Scene activation' },
-    { name: 'Motion', description: 'MotionAware zones' }
-  ]
+    { name: 'Motion', description: 'MotionAware zones' },
+  ],
 };

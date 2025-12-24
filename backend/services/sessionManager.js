@@ -68,7 +68,7 @@ class SessionManager {
       bridgeIp,
       username,
       createdAt: Date.now(),
-      lastUsed: Date.now()
+      lastUsed: Date.now(),
     });
 
     logger.info('Created session', { token: sessionToken.substring(0, 8), bridgeIp });
@@ -76,7 +76,7 @@ class SessionManager {
     return {
       sessionToken,
       expiresIn: this.SESSION_EXPIRY / 1000, // seconds
-      bridgeIp
+      bridgeIp,
     };
   }
 
@@ -105,7 +105,7 @@ class SessionManager {
 
     return {
       bridgeIp: session.bridgeIp,
-      username: session.username
+      username: session.username,
     };
   }
 
@@ -132,7 +132,7 @@ class SessionManager {
     return {
       activeSessions: this.sessions.size,
       oldestSession: this._getOldestSessionAge(),
-      newestSession: this._getNewestSessionAge()
+      newestSession: this._getNewestSessionAge(),
     };
   }
 

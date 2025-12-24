@@ -12,7 +12,7 @@ import {
   Shower,
   Car,
   Tree,
-  Door
+  Door,
 } from './Icons';
 
 // Icon size for nav tabs
@@ -29,7 +29,7 @@ const useDragScroll = () => {
     const el = ref.current;
     if (!el) return;
 
-    const handleMouseDown = e => {
+    const handleMouseDown = (e) => {
       isDragging.current = true;
       startX.current = e.pageX - el.offsetLeft;
       scrollLeft.current = el.scrollLeft;
@@ -46,7 +46,7 @@ const useDragScroll = () => {
       el.style.cursor = 'grab';
     };
 
-    const handleMouseMove = e => {
+    const handleMouseMove = (e) => {
       if (!isDragging.current) return;
       e.preventDefault();
       const x = e.pageX - el.offsetLeft;
@@ -72,7 +72,7 @@ const useDragScroll = () => {
 };
 
 // Get room-specific icon based on room name
-const getRoomIcon = name => {
+const getRoomIcon = (name) => {
   const lower = name?.toLowerCase() || '';
 
   // Check specific room types first (order matters - more specific before generic)
@@ -108,7 +108,7 @@ export const BottomNav = ({ rooms = [], zones = [], selectedId, onSelect }) => {
 
   return (
     <nav className="bottom-nav" ref={navRef}>
-      {rooms.map(room => {
+      {rooms.map((room) => {
         const isActive = selectedId === room.id;
         const lightsOn = room.stats?.lightsOnCount || 0;
 
@@ -145,11 +145,11 @@ BottomNav.propTypes = {
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       stats: PropTypes.shape({
-        lightsOnCount: PropTypes.number
-      })
+        lightsOnCount: PropTypes.number,
+      }),
     })
   ),
   zones: PropTypes.array,
   selectedId: PropTypes.string,
-  onSelect: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
 };

@@ -46,9 +46,9 @@ TopToolbar.propTypes = {
   summary: PropTypes.shape({
     lightsOn: PropTypes.number,
     roomCount: PropTypes.number,
-    sceneCount: PropTypes.number
+    sceneCount: PropTypes.number,
   }),
   isConnected: PropTypes.bool,
   isDemoMode: PropTypes.bool,
-  onLogout: PropTypes.func.isRequired
+  onLogout: PropTypes.func.isRequired,
 };

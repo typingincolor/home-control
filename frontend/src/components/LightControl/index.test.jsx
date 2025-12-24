@@ -14,7 +14,7 @@ const baseDashboard = {
     lightsOn: 2,
     totalLights: 4,
     roomCount: 2,
-    sceneCount: 3
+    sceneCount: 3,
   },
   rooms: [
     {
@@ -29,13 +29,13 @@ const baseDashboard = {
           on: false,
           brightness: 0,
           color: '#ffffff',
-          shadow: 'none'
-        }
+          shadow: 'none',
+        },
       ],
       scenes: [
         { id: 'scene-1', name: 'Bright' },
-        { id: 'scene-2', name: 'Dim' }
-      ]
+        { id: 'scene-2', name: 'Dim' },
+      ],
     },
     {
       id: 'room-2',
@@ -48,7 +48,7 @@ const baseDashboard = {
           on: true,
           brightness: 50,
           color: '#ffaa00',
-          shadow: 'none'
+          shadow: 'none',
         },
         {
           id: 'light-4',
@@ -56,27 +56,27 @@ const baseDashboard = {
           on: false,
           brightness: 0,
           color: '#ffffff',
-          shadow: 'none'
-        }
+          shadow: 'none',
+        },
       ],
-      scenes: [{ id: 'scene-3', name: 'Night' }]
-    }
+      scenes: [{ id: 'scene-3', name: 'Night' }],
+    },
   ],
   zones: [],
-  motionZones: []
+  motionZones: [],
 };
 
 // Mock hooks
 vi.mock('../../hooks/useHueApi', () => ({
-  useHueApi: () => mockApi
+  useHueApi: () => mockApi,
 }));
 
 vi.mock('../../hooks/useDemoMode', () => ({
-  useDemoMode: () => mockIsDemoMode
+  useDemoMode: () => mockIsDemoMode,
 }));
 
 vi.mock('../../hooks/useWebSocket', () => ({
-  useWebSocket: () => mockWebSocketState
+  useWebSocket: () => mockWebSocketState,
 }));
 
 // Mock window.alert
@@ -91,21 +91,21 @@ describe('LightControl', () => {
     mockWebSocketState = {
       isConnected: false,
       dashboard: null,
-      error: null
+      error: null,
     };
     mockApi = {
       getDashboard: vi.fn().mockImplementation(() => Promise.resolve(mockDashboardData)),
       updateLight: vi.fn().mockImplementation((token, lightId, state) =>
         Promise.resolve({
-          light: { id: lightId, on: state.on, brightness: state.on ? 100 : 0 }
+          light: { id: lightId, on: state.on, brightness: state.on ? 100 : 0 },
         })
       ),
       updateRoomLights: vi.fn().mockImplementation((token, roomId, state) =>
         Promise.resolve({
           updatedLights:
             mockDashboardData.rooms
-              .find(r => r.id === roomId)
-              ?.lights.map(l => ({ ...l, on: state.on })) || []
+              .find((r) => r.id === roomId)
+              ?.lights.map((l) => ({ ...l, on: state.on })) || [],
         })
       ),
       updateZoneLights: vi.fn().mockResolvedValue({ updatedLights: [] }),
@@ -113,11 +113,11 @@ describe('LightControl', () => {
         Promise.resolve({
           affectedLights: [
             { id: 'light-1', on: true, brightness: 100, color: '#ffffff' },
-            { id: 'light-2', on: true, brightness: 100, color: '#ffffff' }
-          ]
+            { id: 'light-2', on: true, brightness: 100, color: '#ffffff' },
+          ],
         })
       ),
-      subscribeToMotion: vi.fn().mockReturnValue(() => {})
+      subscribeToMotion: vi.fn().mockReturnValue(() => {}),
     };
   });
 
@@ -201,7 +201,7 @@ describe('LightControl', () => {
       mockWebSocketState = {
         isConnected: true,
         dashboard: mockDashboardData,
-        error: null
+        error: null,
       };
 
       render(<LightControl sessionToken="test-token" />);
@@ -218,7 +218,7 @@ describe('LightControl', () => {
       mockWebSocketState = {
         isConnected: true,
         dashboard: mockDashboardData,
-        error: null
+        error: null,
       };
 
       render(<LightControl sessionToken="test-token" onLogout={() => {}} />);
@@ -290,7 +290,7 @@ describe('LightControl', () => {
 
       // Find and click the light tile button
       const lightTiles = document.querySelectorAll('.light-tile');
-      const lampTile = Array.from(lightTiles).find(tile => tile.textContent.includes('Lamp'));
+      const lampTile = Array.from(lightTiles).find((tile) => tile.textContent.includes('Lamp'));
       expect(lampTile).toBeTruthy();
 
       await user.click(lampTile);
@@ -313,7 +313,7 @@ describe('LightControl', () => {
       });
 
       const lightTiles = document.querySelectorAll('.light-tile');
-      const lampTile = Array.from(lightTiles).find(tile => tile.textContent.includes('Lamp'));
+      const lampTile = Array.from(lightTiles).find((tile) => tile.textContent.includes('Lamp'));
       await user.click(lampTile);
 
       await waitFor(() => {
@@ -375,7 +375,7 @@ describe('LightControl', () => {
       // Find scene button by title attribute
       const sceneButtons = document.querySelectorAll('.scene-icon-button');
       const brightButton = Array.from(sceneButtons).find(
-        btn => btn.getAttribute('title') === 'Bright'
+        (btn) => btn.getAttribute('title') === 'Bright'
       );
       expect(brightButton).toBeTruthy();
 
@@ -394,7 +394,7 @@ describe('LightControl', () => {
 
       const sceneButtons = document.querySelectorAll('.scene-icon-button');
       const brightButton = Array.from(sceneButtons).find(
-        btn => btn.getAttribute('title') === 'Bright'
+        (btn) => btn.getAttribute('title') === 'Bright'
       );
       await user.click(brightButton);
 
@@ -415,7 +415,7 @@ describe('LightControl', () => {
 
       const sceneButtons = document.querySelectorAll('.scene-icon-button');
       const brightButton = Array.from(sceneButtons).find(
-        btn => btn.getAttribute('title') === 'Bright'
+        (btn) => btn.getAttribute('title') === 'Bright'
       );
       await user.click(brightButton);
 
@@ -517,7 +517,7 @@ describe('LightControl', () => {
     it('should handle empty rooms array', async () => {
       mockDashboardData = {
         ...baseDashboard,
-        rooms: []
+        rooms: [],
       };
 
       render(<LightControl sessionToken="test-token" />);

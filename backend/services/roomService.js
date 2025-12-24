@@ -2,7 +2,7 @@ import {
   buildDeviceToLightsMap,
   getLightsFromChildren,
   calculateLightStats,
-  getScenesForGroup
+  getScenesForGroup,
 } from '../utils/hierarchyUtils.js';
 
 /**
@@ -21,8 +21,8 @@ class RoomService {
     if (!lightsData?.data || !roomsData?.data || !devicesData?.data) return null;
 
     // Helper to get light by UUID
-    const getLightByUuid = uuid => {
-      return lightsData.data.find(light => light.id === uuid);
+    const getLightByUuid = (uuid) => {
+      return lightsData.data.find((light) => light.id === uuid);
     };
 
     // Build device → lights map using shared utility
@@ -31,7 +31,7 @@ class RoomService {
     const roomMap = {};
 
     // Build rooms with their lights
-    roomsData.data.forEach(room => {
+    roomsData.data.forEach((room) => {
       // Get lights from room's children using shared utility
       const lightUuids = getLightsFromChildren(room.children, deviceToLights);
 
@@ -39,20 +39,20 @@ class RoomService {
         roomMap[room.metadata?.name || 'Unknown Room'] = {
           roomUuid: room.id,
           lightUuids: [...new Set(lightUuids)], // Deduplicate
-          lights: lightUuids.map(uuid => getLightByUuid(uuid)).filter(Boolean)
+          lights: lightUuids.map((uuid) => getLightByUuid(uuid)).filter(Boolean),
         };
       }
     });
 
     // Add unassigned lights
-    const assignedLightUuids = new Set(Object.values(roomMap).flatMap(r => r.lightUuids));
-    const unassignedLights = lightsData.data.filter(light => !assignedLightUuids.has(light.id));
+    const assignedLightUuids = new Set(Object.values(roomMap).flatMap((r) => r.lightUuids));
+    const unassignedLights = lightsData.data.filter((light) => !assignedLightUuids.has(light.id));
 
     if (unassignedLights.length > 0) {
       roomMap['Unassigned'] = {
         roomUuid: null,
-        lightUuids: unassignedLights.map(l => l.id),
-        lights: unassignedLights
+        lightUuids: unassignedLights.map((l) => l.id),
+        lights: unassignedLights,
       };
     }
 
@@ -89,11 +89,11 @@ class RoomService {
 
     const assignedLightUuids = new Set(
       Object.values(roomMap)
-        .filter(room => room.roomUuid !== null) // Exclude already-created Unassigned room
-        .flatMap(r => r.lightUuids)
+        .filter((room) => room.roomUuid !== null) // Exclude already-created Unassigned room
+        .flatMap((r) => r.lightUuids)
     );
 
-    return lightsData.data.filter(light => !assignedLightUuids.has(light.id));
+    return lightsData.data.filter((light) => !assignedLightUuids.has(light.id));
   }
 }
 

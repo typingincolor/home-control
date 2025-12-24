@@ -6,8 +6,8 @@ vi.mock('../../services/sessionManager.js', () => ({
   default: {
     getSession: vi.fn(),
     hasBridgeCredentials: vi.fn(),
-    storeBridgeCredentials: vi.fn()
-  }
+    storeBridgeCredentials: vi.fn(),
+  },
 }));
 
 import sessionManager from '../../services/sessionManager.js';
@@ -22,11 +22,11 @@ describe('Auth Middleware', () => {
     vi.clearAllMocks();
     req = {
       headers: {},
-      query: {}
+      query: {},
     };
     res = {
       status: vi.fn().mockReturnThis(),
-      json: vi.fn()
+      json: vi.fn(),
     };
     next = vi.fn();
   });
@@ -48,7 +48,7 @@ describe('Auth Middleware', () => {
         expect(req.hue).toEqual({
           bridgeIp,
           username,
-          authMethod: 'session'
+          authMethod: 'session',
         });
         expect(next).toHaveBeenCalledWith();
       });
@@ -95,7 +95,7 @@ describe('Auth Middleware', () => {
         expect(req.hue).toEqual({
           bridgeIp,
           username,
-          authMethod: 'headers'
+          authMethod: 'headers',
         });
         expect(next).toHaveBeenCalledWith();
       });
@@ -122,7 +122,7 @@ describe('Auth Middleware', () => {
         expect(req.hue).toEqual({
           bridgeIp,
           username,
-          authMethod: 'query'
+          authMethod: 'query',
         });
         expect(next).toHaveBeenCalledWith();
       });
@@ -149,7 +149,7 @@ describe('Auth Middleware', () => {
         bridgeIp,
         username,
         authMethod: 'session',
-        sessionToken
+        sessionToken,
       });
       expect(next).toHaveBeenCalledWith();
     });

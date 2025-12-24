@@ -52,7 +52,7 @@ const logger = {
     if (isDevelopment) {
       console.log(message, ...args);
     }
-  }
+  },
 };
 
 /**
@@ -75,7 +75,7 @@ export function createLogger(component) {
     },
     debug(message, ...args) {
       logger.debug(`${prefix} ${message}`, ...args);
-    }
+    },
   };
 }
 

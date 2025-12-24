@@ -8,7 +8,7 @@ export const ZonesView = ({
   onToggleZone,
   onActivateScene,
   togglingZones = new Set(),
-  activatingScene = null
+  activatingScene = null,
 }) => {
   if (zones.length === 0) {
     return (
@@ -29,7 +29,7 @@ export const ZonesView = ({
       </div>
 
       <div className="zones-list-dark">
-        {zones.map(zone => {
+        {zones.map((zone) => {
           const { stats = {} } = zone;
           const anyOn = stats.lightsOnCount > 0;
           const isToggling = togglingZones.has(zone.id);
@@ -48,7 +48,7 @@ export const ZonesView = ({
               <div className="zone-item-controls">
                 <SceneSelector
                   scenes={zone.scenes || []}
-                  onActivate={sceneId => onActivateScene(sceneId, zone.id)}
+                  onActivate={(sceneId) => onActivateScene(sceneId, zone.id)}
                   isActivating={isActivating}
                 />
                 <button
@@ -87,13 +87,13 @@ ZonesView.propTypes = {
       stats: PropTypes.shape({
         lightsOnCount: PropTypes.number,
         totalLights: PropTypes.number,
-        averageBrightness: PropTypes.number
+        averageBrightness: PropTypes.number,
       }),
-      scenes: PropTypes.array
+      scenes: PropTypes.array,
     })
   ),
   onToggleZone: PropTypes.func.isRequired,
   onActivateScene: PropTypes.func.isRequired,
   togglingZones: PropTypes.instanceOf(Set),
-  activatingScene: PropTypes.string
+  activatingScene: PropTypes.string,
 };

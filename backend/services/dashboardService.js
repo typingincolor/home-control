@@ -29,21 +29,21 @@ class DashboardService {
         hueClient.getRooms(bridgeIp, username),
         hueClient.getDevices(bridgeIp, username),
         hueClient.getScenes(bridgeIp, username),
-        hueClient.getZones(bridgeIp, username).catch(err => {
+        hueClient.getZones(bridgeIp, username).catch((err) => {
           logger.warn('Failed to fetch zones', { error: err.message });
           return { data: [] }; // Return empty array on error
         }),
-        motionService.getMotionZones(bridgeIp, username).catch(err => {
+        motionService.getMotionZones(bridgeIp, username).catch((err) => {
           logger.warn('Failed to fetch motion zones', { error: err.message });
           return { zones: [] }; // Return empty array on error
-        })
+        }),
       ]);
 
     logger.debug('Fetched data', {
       lights: lightsData.data?.length || 0,
       rooms: roomsData.data?.length || 0,
       zones: zonesData.data?.length || 0,
-      motionZones: motionZonesResult.zones?.length || 0
+      motionZones: motionZonesResult.zones?.length || 0,
     });
 
     // Step 2: Build room hierarchy
@@ -58,7 +58,7 @@ class DashboardService {
     // Step 3: Process each room
     const rooms = Object.entries(roomMap).map(([roomName, roomData]) => {
       // Enrich lights with pre-computed colors and shadows
-      const enrichedLights = roomData.lights.map(light => enrichLight(light));
+      const enrichedLights = roomData.lights.map((light) => enrichLight(light));
 
       // Calculate room statistics
       const stats = roomService.calculateRoomStats(roomData.lights);
@@ -73,7 +73,7 @@ class DashboardService {
         name: roomName,
         stats,
         lights: enrichedLights,
-        scenes
+        scenes,
       };
     });
 
@@ -82,7 +82,7 @@ class DashboardService {
 
     const zones = Object.entries(zoneMap).map(([zoneName, zoneData]) => {
       // Enrich lights with pre-computed colors and shadows
-      const enrichedLights = zoneData.lights.map(light => enrichLight(light));
+      const enrichedLights = zoneData.lights.map((light) => enrichLight(light));
 
       // Calculate zone statistics
       const stats = zoneService.calculateZoneStats(zoneData.lights);
@@ -97,7 +97,7 @@ class DashboardService {
         name: zoneName,
         stats,
         lights: enrichedLights,
-        scenes
+        scenes,
       };
     });
 
@@ -108,7 +108,7 @@ class DashboardService {
       lightsOn: summary.lightsOn,
       totalLights: summary.totalLights,
       roomCount: summary.roomCount,
-      zoneCount: zones.length
+      zoneCount: zones.length,
     });
 
     // Step 6: Return unified response with zones and motion zones
@@ -116,7 +116,7 @@ class DashboardService {
       summary,
       rooms,
       zones,
-      motionZones: motionZonesResult.zones || []
+      motionZones: motionZonesResult.zones || [],
     };
   }
 }

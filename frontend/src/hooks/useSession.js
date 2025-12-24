@@ -172,6 +172,6 @@ export const useSession = () => {
     isValid: isValid(),
     timeRemaining: getTimeRemaining(),
     createSession,
-    clearSession
+    clearSession,
   };
 };

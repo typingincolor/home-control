@@ -13,7 +13,7 @@ const router = express.Router();
 
 // HTTPS agent for self-signed certificates
 const httpsAgent = new https.Agent({
-  rejectUnauthorized: false
+  rejectUnauthorized: false,
 });
 
 /**
@@ -59,7 +59,7 @@ router.post('/pair', async (req, res, next) => {
         const error = response.data[0].error;
         return res.status(400).json({
           error: error.description,
-          type: error.type
+          type: error.type,
         });
       }
 
@@ -80,14 +80,14 @@ router.post('/pair', async (req, res, next) => {
     if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
       return res.status(504).json({
         error: 'Bridge connection timed out. Check network and try again.',
-        type: 'timeout'
+        type: 'timeout',
       });
     }
     // Handle connection refused
     if (error.code === 'ECONNREFUSED') {
       return res.status(502).json({
         error: 'Cannot connect to bridge. Check IP address.',
-        type: 'connection_refused'
+        type: 'connection_refused',
       });
     }
     next(error);
@@ -129,7 +129,7 @@ router.post('/connect', async (req, res, next) => {
 
     // Debug: Log all stored credentials
     logger.debug('Stored bridges', {
-      bridges: Array.from(sessionManager.bridgeCredentials.keys())
+      bridges: Array.from(sessionManager.bridgeCredentials.keys()),
     });
 
     // Check if we have stored credentials for this bridge
@@ -139,7 +139,7 @@ router.post('/connect', async (req, res, next) => {
       logger.info('No stored credentials, pairing required', { bridgeIp });
       return res.status(404).json({
         error: 'No stored credentials for this bridge. Pairing required.',
-        requiresPairing: true
+        requiresPairing: true,
       });
     }
 
@@ -150,7 +150,7 @@ router.post('/connect', async (req, res, next) => {
       logger.warn('Stored credentials invalid, pairing required', { bridgeIp });
       return res.status(401).json({
         error: 'Stored credentials are no longer valid. Pairing required.',
-        requiresPairing: true
+        requiresPairing: true,
       });
     }
 
@@ -188,7 +188,7 @@ router.get('/bridge-status', (req, res) => {
 
   res.json({
     bridgeIp,
-    hasCredentials
+    hasCredentials,
   });
 });
 
@@ -264,7 +264,7 @@ router.delete('/session', requireSession, (req, res) => {
 
   res.json({
     success: true,
-    message: revoked ? 'Session revoked' : 'Session was already revoked'
+    message: revoked ? 'Session revoked' : 'Session was already revoked',
   });
 });
 
@@ -286,7 +286,7 @@ router.get('/session', requireSession, (req, res) => {
 
   res.json({
     bridgeIp,
-    active: true
+    active: true,
   });
 });
 

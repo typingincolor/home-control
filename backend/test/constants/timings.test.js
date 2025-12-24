@@ -6,7 +6,7 @@ import {
   WEBSOCKET_CLEANUP_INTERVAL_MS,
   SESSION_EXPIRY_MS,
   SESSION_CLEANUP_INTERVAL_MS,
-  SCENE_APPLY_DELAY_MS
+  SCENE_APPLY_DELAY_MS,
 } from '../../constants/timings.js';
 
 describe('Timing Constants', () => {

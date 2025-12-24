@@ -16,22 +16,22 @@ class MotionService {
 
     // Create a map of motion area IDs to their motion status
     const motionStatusMap = {};
-    motionAreasData.data.forEach(area => {
+    motionAreasData.data.forEach((area) => {
       motionStatusMap[area.id] = {
         motionDetected: area.motion?.motion || false,
         motionValid: area.motion?.motion_valid !== false,
         enabled: area.enabled !== false,
-        lastChanged: area.motion?.motion_report?.changed
+        lastChanged: area.motion?.motion_report?.changed,
       };
     });
 
     // Extract MotionAware zones from behaviors and combine with motion status
     const motionZones = behaviorsData.data
       .filter(
-        behavior =>
+        (behavior) =>
           behavior.configuration?.motion?.motion_service?.rtype === 'convenience_area_motion'
       )
-      .map(behavior => {
+      .map((behavior) => {
         const motionServiceId = behavior.configuration.motion.motion_service.rid;
         const status = motionStatusMap[motionServiceId] || {};
 
@@ -41,7 +41,7 @@ class MotionService {
           motionDetected: status.motionDetected || false,
           enabled: behavior.enabled && status.enabled,
           reachable: status.motionValid !== false,
-          lastChanged: status.lastChanged
+          lastChanged: status.lastChanged,
         };
       })
       .sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
@@ -60,7 +60,7 @@ class MotionService {
       // Fetch both endpoints in parallel
       const [behaviorsData, motionAreasData] = await Promise.all([
         hueClient.getResource(bridgeIp, username, 'behavior_instance'),
-        hueClient.getResource(bridgeIp, username, 'convenience_area_motion')
+        hueClient.getResource(bridgeIp, username, 'convenience_area_motion'),
       ]);
 
       // Parse and combine data

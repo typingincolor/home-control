@@ -8,29 +8,29 @@ import { hueApi } from '../services/hueApi';
 const localStorageMock = (() => {
   let store = {};
   return {
-    getItem: key => store[key] || null,
+    getItem: (key) => store[key] || null,
     setItem: (key, value) => {
       store[key] = value ? value.toString() : '';
     },
-    removeItem: key => {
+    removeItem: (key) => {
       delete store[key];
     },
     clear: () => {
       store = {};
-    }
+    },
   };
 })();
 
 Object.defineProperty(global, 'localStorage', {
   value: localStorageMock,
-  writable: true
+  writable: true,
 });
 
 // Mock hueApi
 vi.mock('../services/hueApi', () => ({
   hueApi: {
-    refreshSession: vi.fn()
-  }
+    refreshSession: vi.fn(),
+  },
 }));
 
 describe('useSession', () => {
@@ -300,7 +300,7 @@ describe('useSession', () => {
     it('should schedule auto-refresh 5 minutes before expiration', async () => {
       hueApi.refreshSession.mockResolvedValue({
         sessionToken: 'refreshed-token',
-        expiresIn: 86400
+        expiresIn: 86400,
       });
 
       const { result } = renderHook(() => useSession());
@@ -322,12 +322,12 @@ describe('useSession', () => {
     it('should not refresh if already refreshing', async () => {
       hueApi.refreshSession.mockImplementation(
         () =>
-          new Promise(resolve =>
+          new Promise((resolve) =>
             setTimeout(
               () =>
                 resolve({
                   sessionToken: 'refreshed-token',
-                  expiresIn: 86400
+                  expiresIn: 86400,
                 }),
               1000
             )
@@ -377,7 +377,7 @@ describe('useSession', () => {
     it('should schedule refresh immediately if already past refresh time', async () => {
       hueApi.refreshSession.mockResolvedValue({
         sessionToken: 'refreshed-token',
-        expiresIn: 86400
+        expiresIn: 86400,
       });
 
       const now = Date.now();

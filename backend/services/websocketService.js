@@ -4,7 +4,7 @@ import sessionManager from './sessionManager.js';
 import {
   WEBSOCKET_POLL_INTERVAL_MS,
   WEBSOCKET_HEARTBEAT_INTERVAL_MS,
-  WEBSOCKET_CLEANUP_INTERVAL_MS
+  WEBSOCKET_CLEANUP_INTERVAL_MS,
 } from '../constants/timings.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -31,14 +31,14 @@ class WebSocketService {
       totalClients: this.wss?.clients?.size || 0,
       bridges: {},
       pollingIntervals: this.pollingIntervals.size,
-      stateCaches: this.stateCache.size
+      stateCaches: this.stateCache.size,
     };
 
     for (const [bridgeIp, connections] of this.connections) {
       stats.bridges[bridgeIp] = {
         connections: connections.size,
         hasPolling: this.pollingIntervals.has(bridgeIp),
-        hasCache: this.stateCache.has(bridgeIp)
+        hasCache: this.stateCache.has(bridgeIp),
       };
     }
 
@@ -55,7 +55,7 @@ class WebSocketService {
       totalClients: stats.totalClients,
       bridgeCount: Object.keys(stats.bridges).length,
       pollingIntervals: stats.pollingIntervals,
-      bridges: stats.bridges
+      bridges: stats.bridges,
     });
   }
 
@@ -65,10 +65,10 @@ class WebSocketService {
   initialize(server) {
     this.wss = new WebSocketServer({
       server,
-      path: '/api/v1/ws'
+      path: '/api/v1/ws',
     });
 
-    this.wss.on('connection', ws => {
+    this.wss.on('connection', (ws) => {
       logger.info('New client connected');
 
       ws.isAlive = true;
@@ -76,7 +76,7 @@ class WebSocketService {
         ws.isAlive = true;
       });
 
-      ws.on('message', message => {
+      ws.on('message', (message) => {
         this.handleMessage(ws, message);
       });
 
@@ -84,7 +84,7 @@ class WebSocketService {
         this.handleDisconnect(ws);
       });
 
-      ws.on('error', error => {
+      ws.on('error', (error) => {
         logger.error('Connection error', { error: error.message });
       });
     });
@@ -92,7 +92,7 @@ class WebSocketService {
     // Heartbeat check - terminates dead connections
     this.heartbeatInterval = setInterval(() => {
       let terminated = 0;
-      this.wss.clients.forEach(ws => {
+      this.wss.clients.forEach((ws) => {
         if (ws.isAlive === false) {
           logger.warn('Terminating unresponsive client', { bridgeIp: ws.bridgeIp || 'unknown' });
           this.handleDisconnect(ws); // Clean up before terminating
@@ -138,7 +138,7 @@ class WebSocketService {
     // Check for stale connections (not in OPEN state)
     for (const [bridgeIp, connections] of this.connections) {
       const staleConnections = [];
-      connections.forEach(ws => {
+      connections.forEach((ws) => {
         if (ws.readyState !== 1) {
           // Not OPEN
           staleConnections.push(ws);
@@ -183,7 +183,7 @@ class WebSocketService {
       ws.send(
         JSON.stringify({
           type: 'error',
-          message: error.message
+          message: error.message,
         })
       );
     }
@@ -204,7 +204,7 @@ class WebSocketService {
         ws.send(
           JSON.stringify({
             type: 'error',
-            message: 'Invalid or expired session token'
+            message: 'Invalid or expired session token',
           })
         );
         return;
@@ -227,7 +227,7 @@ class WebSocketService {
       ws.send(
         JSON.stringify({
           type: 'error',
-          message: 'Missing authentication: provide sessionToken OR (bridgeIp + username)'
+          message: 'Missing authentication: provide sessionToken OR (bridgeIp + username)',
         })
       );
       return;
@@ -251,7 +251,7 @@ class WebSocketService {
       ws.send(
         JSON.stringify({
           type: 'initial_state',
-          data: dashboard
+          data: dashboard,
         })
       );
     } catch (error) {
@@ -259,7 +259,7 @@ class WebSocketService {
       ws.send(
         JSON.stringify({
           type: 'error',
-          message: 'Failed to fetch initial state'
+          message: 'Failed to fetch initial state',
         })
       );
     }
@@ -281,7 +281,7 @@ class WebSocketService {
         if (hadConnection) {
           logger.debug('Removed connection', {
             bridgeIp: ws.bridgeIp,
-            remaining: connections.size
+            remaining: connections.size,
           });
         }
 
@@ -314,7 +314,7 @@ class WebSocketService {
           if (changes.length > 0) {
             this.broadcast(bridgeIp, {
               type: 'state_update',
-              changes
+              changes,
             });
           }
         }
@@ -355,13 +355,13 @@ class WebSocketService {
     if (JSON.stringify(previous.summary) !== JSON.stringify(current.summary)) {
       changes.push({
         type: 'summary',
-        data: current.summary
+        data: current.summary,
       });
     }
 
     // Detect room changes
-    const prevRoomMap = new Map(previous.rooms.map(r => [r.id, r]));
-    const currRoomMap = new Map(current.rooms.map(r => [r.id, r]));
+    const prevRoomMap = new Map(previous.rooms.map((r) => [r.id, r]));
+    const currRoomMap = new Map(current.rooms.map((r) => [r.id, r]));
 
     for (const [roomId, currRoom] of currRoomMap) {
       const prevRoom = prevRoomMap.get(roomId);
@@ -369,7 +369,7 @@ class WebSocketService {
       if (!prevRoom || JSON.stringify(prevRoom) !== JSON.stringify(currRoom)) {
         changes.push({
           type: 'room',
-          data: currRoom
+          data: currRoom,
         });
       }
     }
@@ -379,7 +379,7 @@ class WebSocketService {
       const prevRoom = prevRoomMap.get(room.id);
       if (!prevRoom) continue;
 
-      const prevLightMap = new Map(prevRoom.lights.map(l => [l.id, l]));
+      const prevLightMap = new Map(prevRoom.lights.map((l) => [l.id, l]));
 
       for (const light of room.lights) {
         const prevLight = prevLightMap.get(light.id);
@@ -388,7 +388,7 @@ class WebSocketService {
           changes.push({
             type: 'light',
             data: light,
-            roomId: room.id
+            roomId: room.id,
           });
         }
       }
@@ -398,7 +398,7 @@ class WebSocketService {
     const prevMotionZones = previous.motionZones || [];
     const currMotionZones = current.motionZones || [];
 
-    const prevMotionMap = new Map(prevMotionZones.map(z => [z.id, z]));
+    const prevMotionMap = new Map(prevMotionZones.map((z) => [z.id, z]));
 
     for (const zone of currMotionZones) {
       const prevZone = prevMotionMap.get(zone.id);
@@ -406,7 +406,7 @@ class WebSocketService {
       if (!prevZone || JSON.stringify(prevZone) !== JSON.stringify(zone)) {
         changes.push({
           type: 'motion_zone',
-          data: zone
+          data: zone,
         });
       }
     }
@@ -415,7 +415,7 @@ class WebSocketService {
     const prevZones = previous.zones || [];
     const currZones = current.zones || [];
 
-    const prevZoneMap = new Map(prevZones.map(z => [z.id, z]));
+    const prevZoneMap = new Map(prevZones.map((z) => [z.id, z]));
 
     for (const zone of currZones) {
       const prevZone = prevZoneMap.get(zone.id);
@@ -423,7 +423,7 @@ class WebSocketService {
       if (!prevZone || JSON.stringify(prevZone) !== JSON.stringify(zone)) {
         changes.push({
           type: 'zone',
-          data: zone
+          data: zone,
         });
       }
     }
@@ -441,7 +441,7 @@ class WebSocketService {
     const messageStr = JSON.stringify(message);
     let sent = 0;
 
-    connections.forEach(ws => {
+    connections.forEach((ws) => {
       if (ws.readyState === 1) {
         // OPEN state
         ws.send(messageStr);

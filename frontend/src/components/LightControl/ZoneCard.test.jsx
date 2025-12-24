@@ -10,19 +10,19 @@ describe('ZoneCard', () => {
     stats: {
       lightsOnCount: 3,
       totalLights: 5,
-      averageBrightness: 80.5
+      averageBrightness: 80.5,
     },
     lights: [
       { id: 'light-1', name: 'Light 1', on: true, brightness: 80 },
       { id: 'light-2', name: 'Light 2', on: true, brightness: 75 },
       { id: 'light-3', name: 'Light 3', on: true, brightness: 86 },
       { id: 'light-4', name: 'Light 4', on: false, brightness: 0 },
-      { id: 'light-5', name: 'Light 5', on: false, brightness: 0 }
+      { id: 'light-5', name: 'Light 5', on: false, brightness: 0 },
     ],
     scenes: [
       { id: 'scene-1', name: 'Morning' },
-      { id: 'scene-2', name: 'Evening' }
-    ]
+      { id: 'scene-2', name: 'Evening' },
+    ],
   };
 
   const defaultProps = {
@@ -31,7 +31,7 @@ describe('ZoneCard', () => {
     onToggleZone: vi.fn(),
     onActivateScene: vi.fn(),
     togglingLights: new Set(),
-    isActivating: false
+    isActivating: false,
   };
 
   it('should render zone name', () => {
@@ -48,7 +48,7 @@ describe('ZoneCard', () => {
   it('should show placeholder when no lights are on', () => {
     const zoneAllOff = {
       ...mockZone,
-      stats: { lightsOnCount: 0, totalLights: 5, averageBrightness: 0 }
+      stats: { lightsOnCount: 0, totalLights: 5, averageBrightness: 0 },
     };
     render(<ZoneCard {...defaultProps} zone={zoneAllOff} />);
     expect(screen.getByText('—')).toBeInTheDocument();
@@ -69,7 +69,7 @@ describe('ZoneCard', () => {
     const zoneAllOff = {
       ...mockZone,
       stats: { lightsOnCount: 0, totalLights: 5, averageBrightness: 0 },
-      lights: mockZone.lights.map(l => ({ ...l, on: false, brightness: 0 }))
+      lights: mockZone.lights.map((l) => ({ ...l, on: false, brightness: 0 })),
     };
     render(<ZoneCard {...defaultProps} zone={zoneAllOff} />);
     expect(screen.getByText('💡 On')).toBeInTheDocument();
@@ -81,7 +81,7 @@ describe('ZoneCard', () => {
     const zoneAllOff = {
       ...mockZone,
       stats: { lightsOnCount: 0, totalLights: 5, averageBrightness: 0 },
-      lights: mockZone.lights.map(l => ({ ...l, on: false, brightness: 0 }))
+      lights: mockZone.lights.map((l) => ({ ...l, on: false, brightness: 0 })),
     };
     render(<ZoneCard {...defaultProps} zone={zoneAllOff} onToggleZone={onToggleZone} />);
 
@@ -159,8 +159,8 @@ describe('ZoneCard', () => {
       stats: {
         lightsOnCount: 4,
         totalLights: 6,
-        averageBrightness: 92.7
-      }
+        averageBrightness: 92.7,
+      },
     };
     render(<ZoneCard {...defaultProps} zone={zone} />);
 

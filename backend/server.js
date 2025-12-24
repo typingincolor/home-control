@@ -31,7 +31,7 @@ const API_VERSION = '2.0.0';
 // Create an HTTPS agent that accepts self-signed certificates
 // Note: Currently unused as hueClient handles its own agent, kept for potential future use
 const _httpsAgent = new https.Agent({
-  rejectUnauthorized: false
+  rejectUnauthorized: false,
 });
 
 // Enable CORS for all routes
@@ -46,7 +46,7 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(openApiSpec, {
     customSiteTitle: 'Hue Control API Docs',
-    customCss: '.swagger-ui .topbar { display: none }'
+    customCss: '.swagger-ui .topbar { display: none }',
   })
 );
 
@@ -64,7 +64,7 @@ app.get('/api/discovery', async (req, res) => {
     logger.error('Discovery error', { error: error.message });
     res.status(500).json({
       error: 'Discovery failed',
-      message: error.message
+      message: error.message,
     });
   }
 });
@@ -83,8 +83,8 @@ app.get('/health', (req, res) => {
       'scene-activation',
       'auth-pairing',
       'session-auth',
-      'websocket'
-    ]
+      'websocket',
+    ],
   });
 });
 
@@ -96,7 +96,7 @@ app.get('/api/health', (req, res) => {
 // Config endpoint - expose configuration to frontend
 app.get('/api/config', (req, res) => {
   res.json({
-    hue: config.hue
+    hue: config.hue,
     // Only expose safe config values to frontend
   });
 });

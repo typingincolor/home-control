@@ -32,11 +32,11 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
     const roomMap = roomService.buildRoomHierarchy(lightsData, roomsData, devicesData);
 
     // Find the room
-    const room = Object.values(roomMap).find(r => r.roomUuid === roomId);
+    const room = Object.values(roomMap).find((r) => r.roomUuid === roomId);
 
     if (!room) {
       return res.status(404).json({
-        error: 'Room not found'
+        error: 'Room not found',
       });
     }
 
@@ -46,9 +46,9 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
     const hueState = convertToHueState(state);
 
     // Update all lights in parallel
-    const lightUpdates = room.lights.map(light => ({
+    const lightUpdates = room.lights.map((light) => ({
       lightId: light.id,
-      state: hueState
+      state: hueState,
     }));
 
     await hueClient.updateLights(bridgeIp, username, lightUpdates);
@@ -58,15 +58,15 @@ router.put('/:id/lights', extractCredentials, async (req, res, next) => {
     // Fetch updated light states
     const updatedLightsData = await hueClient.getLights(bridgeIp, username);
     const updatedLights = room.lights
-      .map(light => {
-        const updated = updatedLightsData.data.find(l => l.id === light.id);
+      .map((light) => {
+        const updated = updatedLightsData.data.find((l) => l.id === light.id);
         return updated ? enrichLight(updated) : null;
       })
       .filter(Boolean);
 
     res.json({
       success: true,
-      updatedLights
+      updatedLights,
     });
   } catch (error) {
     next(error);

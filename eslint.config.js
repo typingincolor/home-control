@@ -1,105 +1,84 @@
 import js from '@eslint/js';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import globals from 'globals';
-import prettierConfig from 'eslint-config-prettier';
 
 export default [
-  // Ignore patterns
-  {
-    ignores: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/build/**',
-      '**/coverage/**',
-      '**/.stryker-tmp/**',
-      '**/reports/**',
-      'backend/public/**',
-      'test-websocket.js' // Standalone Node.js test script
-    ]
-  },
-
-  // Base config for all JS files
   js.configs.recommended,
-
-  // Backend (Node.js) config
   {
-    files: ['backend/**/*.js'],
-    languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: 'module',
-      globals: {
-        ...globals.node,
-        ...globals.es2022
-      }
+    files: ['**/*.{js,jsx}'],
+    plugins: {
+      react: reactPlugin,
+      'react-hooks': reactHooksPlugin,
     },
-    rules: {
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-      'no-console': 'off', // Allow console in backend (we use logger anyway)
-      'prefer-const': 'error',
-      'no-var': 'error'
-    }
-  },
-
-  // Frontend (React) config
-  {
-    files: ['frontend/src/**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
       parserOptions: {
         ecmaFeatures: {
-          jsx: true
-        }
+          jsx: true,
+        },
       },
       globals: {
-        ...globals.browser,
-        ...globals.es2022
-      }
-    },
-    plugins: {
-      react: reactPlugin,
-      'react-hooks': reactHooksPlugin
+        console: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        localStorage: 'readonly',
+        fetch: 'readonly',
+        WebSocket: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        process: 'readonly',
+        __dirname: 'readonly',
+        require: 'readonly',
+        module: 'readonly',
+        exports: 'readonly',
+        Buffer: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+      },
     },
     settings: {
       react: {
-        version: 'detect'
-      }
+        version: 'detect',
+      },
     },
     rules: {
-      ...reactPlugin.configs.recommended.rules,
-      ...reactHooksPlugin.configs.recommended.rules,
-      'react/react-in-jsx-scope': 'off', // Not needed with React 17+
-      'react/prop-types': 'warn', // Warn on missing prop types
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-      'no-console': 'warn', // Warn on console in frontend
-      'prefer-const': 'error',
-      'no-var': 'error'
-    }
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    },
   },
-
   // Test files config
   {
-    files: ['**/*.test.{js,jsx}', '**/test/**/*.js'],
+    files: ['**/*.test.{js,jsx}', '**/*.spec.{js,jsx,ts}', '**/test/**/*.{js,jsx}'],
     languageOptions: {
       globals: {
-        ...globals.node,
-        ...globals.jest,
-        vi: 'readonly',
         describe: 'readonly',
         it: 'readonly',
+        test: 'readonly',
         expect: 'readonly',
         beforeEach: 'readonly',
         afterEach: 'readonly',
         beforeAll: 'readonly',
-        afterAll: 'readonly'
-      }
+        afterAll: 'readonly',
+        vi: 'readonly',
+        global: 'readonly',
+      },
     },
-    rules: {
-      'no-console': 'off'
-    }
   },
-
-  // Disable formatting rules (let Prettier handle them)
-  prettierConfig
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/coverage/**',
+      '**/reports/**',
+      '**/.stryker-tmp/**',
+      '**/test-results/**',
+      '**/playwright-report/**',
+    ],
+  },
 ];

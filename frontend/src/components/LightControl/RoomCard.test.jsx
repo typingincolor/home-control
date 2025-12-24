@@ -10,7 +10,7 @@ describe('RoomCard', () => {
     stats: {
       lightsOnCount: 2,
       totalLights: 4,
-      averageBrightness: 75.5
+      averageBrightness: 75.5,
     },
     lights: [
       {
@@ -20,7 +20,7 @@ describe('RoomCard', () => {
         brightness: 80,
         color: 'rgb(255, 200, 100)',
         shadow: '0 0 20px rgba(255, 200, 100, 0.4)',
-        colorSource: 'xy'
+        colorSource: 'xy',
       },
       {
         id: 'light-2',
@@ -29,7 +29,7 @@ describe('RoomCard', () => {
         brightness: 71,
         color: 'rgb(255, 180, 120)',
         shadow: '0 0 18px rgba(255, 180, 120, 0.38)',
-        colorSource: 'temperature'
+        colorSource: 'temperature',
       },
       {
         id: 'light-3',
@@ -38,7 +38,7 @@ describe('RoomCard', () => {
         brightness: 0,
         color: null,
         shadow: null,
-        colorSource: null
+        colorSource: null,
       },
       {
         id: 'light-4',
@@ -47,13 +47,13 @@ describe('RoomCard', () => {
         brightness: 0,
         color: null,
         shadow: null,
-        colorSource: null
-      }
+        colorSource: null,
+      },
     ],
     scenes: [
       { id: 'scene-1', name: 'Bright' },
-      { id: 'scene-2', name: 'Relax' }
-    ]
+      { id: 'scene-2', name: 'Relax' },
+    ],
   };
 
   const defaultProps = {
@@ -63,7 +63,7 @@ describe('RoomCard', () => {
     onToggleRoom: vi.fn(),
     onActivateScene: vi.fn(),
     togglingLights: new Set(),
-    isActivating: false
+    isActivating: false,
   };
 
   it('should render room name', () => {
@@ -80,7 +80,7 @@ describe('RoomCard', () => {
   it('should show placeholder when no lights are on', () => {
     const roomAllOff = {
       ...mockRoom,
-      stats: { lightsOnCount: 0, totalLights: 4, averageBrightness: 0 }
+      stats: { lightsOnCount: 0, totalLights: 4, averageBrightness: 0 },
     };
     render(<RoomCard {...defaultProps} room={roomAllOff} />);
     expect(screen.getByText('—')).toBeInTheDocument();
@@ -110,7 +110,7 @@ describe('RoomCard', () => {
     const roomAllOn = {
       ...mockRoom,
       stats: { lightsOnCount: 4, totalLights: 4, averageBrightness: 75 },
-      lights: mockRoom.lights.map(l => ({ ...l, on: true, brightness: 75 }))
+      lights: mockRoom.lights.map((l) => ({ ...l, on: true, brightness: 75 })),
     };
     render(<RoomCard {...defaultProps} room={roomAllOn} />);
     expect(screen.getByText('🌙 All Off')).toBeInTheDocument();
@@ -122,7 +122,7 @@ describe('RoomCard', () => {
     const roomAllOff = {
       ...mockRoom,
       stats: { lightsOnCount: 0, totalLights: 4, averageBrightness: 0 },
-      lights: mockRoom.lights.map(l => ({ ...l, on: false, brightness: 0 }))
+      lights: mockRoom.lights.map((l) => ({ ...l, on: false, brightness: 0 })),
     };
     render(<RoomCard {...defaultProps} room={roomAllOff} onToggleRoom={onToggleRoom} />);
 
@@ -142,7 +142,7 @@ describe('RoomCard', () => {
     const roomAllOn = {
       ...mockRoom,
       stats: { lightsOnCount: 4, totalLights: 4, averageBrightness: 75 },
-      lights: mockRoom.lights.map(l => ({ ...l, on: true, brightness: 75 }))
+      lights: mockRoom.lights.map((l) => ({ ...l, on: true, brightness: 75 })),
     };
     render(<RoomCard {...defaultProps} room={roomAllOn} onToggleRoom={onToggleRoom} />);
 
@@ -178,7 +178,7 @@ describe('RoomCard', () => {
     render(<RoomCard {...defaultProps} onToggleLight={onToggleLight} />);
 
     const lightButtons = screen.getAllByRole('button');
-    const firstLightButton = lightButtons.find(btn => btn.querySelector('.bulb-icon'));
+    const firstLightButton = lightButtons.find((btn) => btn.querySelector('.bulb-icon'));
 
     if (firstLightButton) {
       await user.click(firstLightButton);
@@ -222,8 +222,8 @@ describe('RoomCard', () => {
       stats: {
         lightsOnCount: 3,
         totalLights: 5,
-        averageBrightness: 82.3
-      }
+        averageBrightness: 82.3,
+      },
     };
     render(<RoomCard {...defaultProps} room={room} />);
 

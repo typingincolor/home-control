@@ -6,15 +6,15 @@ import { mockApi } from '../services/mockData';
 
 // Mock the dependencies
 vi.mock('./useDemoMode', () => ({
-  useDemoMode: vi.fn()
+  useDemoMode: vi.fn(),
 }));
 
 vi.mock('../services/hueApi', () => ({
-  hueApi: { name: 'hueApi' }
+  hueApi: { name: 'hueApi' },
 }));
 
 vi.mock('../services/mockData', () => ({
-  mockApi: { name: 'mockApi' }
+  mockApi: { name: 'mockApi' },
 }));
 
 describe('useHueApi', () => {

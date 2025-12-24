@@ -16,7 +16,7 @@ describe('DashboardService', () => {
 
   describe('getDashboard', () => {
     const mockLightsData = {
-      data: [{ id: 'light-1', on: { on: true }, metadata: { name: 'Light 1' } }]
+      data: [{ id: 'light-1', on: { on: true }, metadata: { name: 'Light 1' } }],
     };
 
     const mockRoomsData = {
@@ -24,22 +24,22 @@ describe('DashboardService', () => {
         {
           id: 'room-1',
           metadata: { name: 'Living Room' },
-          children: [{ rid: 'device-1', rtype: 'device' }]
-        }
-      ]
+          children: [{ rid: 'device-1', rtype: 'device' }],
+        },
+      ],
     };
 
     const mockDevicesData = {
       data: [
         {
           id: 'device-1',
-          services: [{ rid: 'light-1', rtype: 'light' }]
-        }
-      ]
+          services: [{ rid: 'light-1', rtype: 'light' }],
+        },
+      ],
     };
 
     const mockScenesData = {
-      data: [{ id: 'scene-1', metadata: { name: 'Bright' }, group: { rid: 'room-1' } }]
+      data: [{ id: 'scene-1', metadata: { name: 'Bright' }, group: { rid: 'room-1' } }],
     };
 
     const mockMotionZones = [
@@ -48,15 +48,15 @@ describe('DashboardService', () => {
         name: 'Hallway MotionAware',
         motionDetected: false,
         enabled: true,
-        reachable: true
+        reachable: true,
       },
       {
         id: 'zone-2',
         name: 'Living Room MotionAware',
         motionDetected: true,
         enabled: true,
-        reachable: true
-      }
+        reachable: true,
+      },
     ];
 
     it('should include motionZones in dashboard response', async () => {
@@ -137,27 +137,27 @@ describe('DashboardService', () => {
         {
           id: 'zone-1',
           metadata: { name: 'Upstairs' },
-          children: [{ rid: 'light-1', rtype: 'light' }]
+          children: [{ rid: 'light-1', rtype: 'light' }],
         },
         {
           id: 'zone-2',
           metadata: { name: 'Downstairs' },
-          children: [{ rid: 'light-1', rtype: 'light' }]
-        }
-      ]
+          children: [{ rid: 'light-1', rtype: 'light' }],
+        },
+      ],
     };
 
     const mockZoneMap = {
       Upstairs: {
         zoneUuid: 'zone-1',
         lightUuids: ['light-1'],
-        lights: [{ id: 'light-1', on: { on: true }, metadata: { name: 'Light 1' } }]
+        lights: [{ id: 'light-1', on: { on: true }, metadata: { name: 'Light 1' } }],
       },
       Downstairs: {
         zoneUuid: 'zone-2',
         lightUuids: ['light-1'],
-        lights: [{ id: 'light-1', on: { on: true }, metadata: { name: 'Light 1' } }]
-      }
+        lights: [{ id: 'light-1', on: { on: true }, metadata: { name: 'Light 1' } }],
+      },
     };
 
     it('should include zones in dashboard response', async () => {
@@ -172,7 +172,7 @@ describe('DashboardService', () => {
       zoneService.calculateZoneStats.mockReturnValue({
         lightsOnCount: 1,
         totalLights: 1,
-        averageBrightness: 100
+        averageBrightness: 100,
       });
       zoneService.getScenesForZone.mockReturnValue([]);
 
@@ -233,13 +233,13 @@ describe('DashboardService', () => {
         Upstairs: {
           zoneUuid: 'zone-1',
           lightUuids: ['light-1'],
-          lights: [{ id: 'light-1', on: { on: true }, dimming: { brightness: 80 } }]
-        }
+          lights: [{ id: 'light-1', on: { on: true }, dimming: { brightness: 80 } }],
+        },
       });
       zoneService.calculateZoneStats.mockReturnValue({
         lightsOnCount: 1,
         totalLights: 1,
-        averageBrightness: 80
+        averageBrightness: 80,
       });
       zoneService.getScenesForZone.mockReturnValue([{ id: 'scene-1', name: 'Bright' }]);
 

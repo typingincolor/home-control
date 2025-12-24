@@ -68,5 +68,5 @@ export const UI_TEXT = {
 
   // Common
   ERROR_OCCURRED: 'An error occurred',
-  RETRY: 'Retry'
+  RETRY: 'Retry',
 };

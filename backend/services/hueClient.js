@@ -14,7 +14,7 @@ class HueClient {
   constructor() {
     // Create HTTPS agent that accepts self-signed certificates
     this.httpsAgent = new https.Agent({
-      rejectUnauthorized: false
+      rejectUnauthorized: false,
     });
 
     // Cache for static resources
@@ -41,7 +41,7 @@ class HueClient {
   _setCache(key, data) {
     this.cache.set(key, {
       data,
-      expiresAt: Date.now() + this.cacheTTL
+      expiresAt: Date.now() + this.cacheTTL,
     });
   }
 
@@ -74,11 +74,11 @@ class HueClient {
       url,
       headers: {
         'Content-Type': 'application/json',
-        'hue-application-key': username
+        'hue-application-key': username,
       },
       httpsAgent: this.httpsAgent,
       timeout: REQUEST_TIMEOUT_MS,
-      validateStatus: () => true // Accept all status codes
+      validateStatus: () => true, // Accept all status codes
     };
 
     if (data && method !== 'GET') {
@@ -209,7 +209,7 @@ class HueClient {
    */
   async activateScene(bridgeIp, username, sceneId) {
     return this._request('PUT', bridgeIp, `/clip/v2/resource/scene/${sceneId}`, username, {
-      recall: { action: 'active' }
+      recall: { action: 'active' },
     });
   }
 
@@ -231,7 +231,7 @@ class HueClient {
     const [lightsData, roomsData, devicesData] = await Promise.all([
       this.getLights(bridgeIp, username),
       this.getRooms(bridgeIp, username),
-      this.getDevices(bridgeIp, username)
+      this.getDevices(bridgeIp, username),
     ]);
 
     return { lightsData, roomsData, devicesData };
@@ -245,7 +245,7 @@ class HueClient {
     const [lightsData, zonesData, devicesData] = await Promise.all([
       this.getLights(bridgeIp, username),
       this.getZones(bridgeIp, username),
-      this.getDevices(bridgeIp, username)
+      this.getDevices(bridgeIp, username),
     ]);
 
     return { lightsData, zonesData, devicesData };
@@ -260,7 +260,7 @@ class HueClient {
       this.getLights(bridgeIp, username),
       this.getRooms(bridgeIp, username),
       this.getDevices(bridgeIp, username),
-      this.getScenes(bridgeIp, username)
+      this.getScenes(bridgeIp, username),
     ]);
 
     return { lightsData, roomsData, devicesData, scenesData };

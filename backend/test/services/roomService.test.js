@@ -18,8 +18,8 @@ describe('RoomService', () => {
         data: [
           { id: 'scene-1', group: { rid: 'room-1' }, metadata: { name: 'Bright' } },
           { id: 'scene-2', group: { rid: 'room-2' }, metadata: { name: 'Dim' } },
-          { id: 'scene-3', group: { rid: 'room-1' }, metadata: { name: 'Relax' } }
-        ]
+          { id: 'scene-3', group: { rid: 'room-1' }, metadata: { name: 'Relax' } },
+        ],
       };
       const result = roomService.getScenesForRoom(scenesData, 'room-1');
       expect(result).toHaveLength(2);
@@ -32,8 +32,8 @@ describe('RoomService', () => {
         data: [
           { id: 'scene-1', group: { rid: 'room-1' }, metadata: { name: 'Zzz Sleep' } },
           { id: 'scene-2', group: { rid: 'room-1' }, metadata: { name: 'Aaa Morning' } },
-          { id: 'scene-3', group: { rid: 'room-1' }, metadata: { name: 'Mmm Relax' } }
-        ]
+          { id: 'scene-3', group: { rid: 'room-1' }, metadata: { name: 'Mmm Relax' } },
+        ],
       };
       const result = roomService.getScenesForRoom(scenesData, 'room-1');
       expect(result[0].name).toBe('Aaa Morning');
@@ -45,8 +45,8 @@ describe('RoomService', () => {
       const scenesData = {
         data: [
           { id: 'scene-1', group: { rid: 'room-1' }, metadata: {} },
-          { id: 'scene-2', group: { rid: 'room-1' } }
-        ]
+          { id: 'scene-2', group: { rid: 'room-1' } },
+        ],
       };
       const result = roomService.getScenesForRoom(scenesData, 'room-1');
       expect(result).toHaveLength(2);
@@ -56,7 +56,7 @@ describe('RoomService', () => {
 
     it('should return empty array when no scenes match room', () => {
       const scenesData = {
-        data: [{ id: 'scene-1', group: { rid: 'room-2' }, metadata: { name: 'Scene 1' } }]
+        data: [{ id: 'scene-1', group: { rid: 'room-2' }, metadata: { name: 'Scene 1' } }],
       };
       const result = roomService.getScenesForRoom(scenesData, 'room-1');
       expect(result).toEqual([]);
@@ -74,17 +74,17 @@ describe('RoomService', () => {
       const lights = {
         data: [
           { id: 'light-1', metadata: { name: 'Light 1' }, on: { on: true } },
-          { id: 'light-2', metadata: { name: 'Light 2' }, on: { on: false } }
-        ]
+          { id: 'light-2', metadata: { name: 'Light 2' }, on: { on: false } },
+        ],
       };
       const rooms = {
         data: [
           {
             id: 'room-1',
             metadata: { name: 'Living Room' },
-            children: [{ rid: 'device-1', rtype: 'device' }]
-          }
-        ]
+            children: [{ rid: 'device-1', rtype: 'device' }],
+          },
+        ],
       };
       const devices = {
         data: [
@@ -92,10 +92,10 @@ describe('RoomService', () => {
             id: 'device-1',
             services: [
               { rid: 'light-1', rtype: 'light' },
-              { rid: 'light-2', rtype: 'light' }
-            ]
-          }
-        ]
+              { rid: 'light-2', rtype: 'light' },
+            ],
+          },
+        ],
       };
 
       const result = roomService.buildRoomHierarchy(lights, rooms, devices);
@@ -107,16 +107,16 @@ describe('RoomService', () => {
 
     it('should handle direct light references in rooms', () => {
       const lights = {
-        data: [{ id: 'light-1', metadata: { name: 'Light 1' } }]
+        data: [{ id: 'light-1', metadata: { name: 'Light 1' } }],
       };
       const rooms = {
         data: [
           {
             id: 'room-1',
             metadata: { name: 'Bedroom' },
-            children: [{ rid: 'light-1', rtype: 'light' }]
-          }
-        ]
+            children: [{ rid: 'light-1', rtype: 'light' }],
+          },
+        ],
       };
       const devices = { data: [] };
 
@@ -127,7 +127,7 @@ describe('RoomService', () => {
 
     it('should deduplicate light UUIDs', () => {
       const lights = {
-        data: [{ id: 'light-1', metadata: { name: 'Light 1' } }]
+        data: [{ id: 'light-1', metadata: { name: 'Light 1' } }],
       };
       const rooms = {
         data: [
@@ -136,10 +136,10 @@ describe('RoomService', () => {
             metadata: { name: 'Kitchen' },
             children: [
               { rid: 'light-1', rtype: 'light' },
-              { rid: 'light-1', rtype: 'light' } // Duplicate
-            ]
-          }
-        ]
+              { rid: 'light-1', rtype: 'light' }, // Duplicate
+            ],
+          },
+        ],
       };
       const devices = { data: [] };
 
@@ -152,17 +152,17 @@ describe('RoomService', () => {
       const lights = {
         data: [
           { id: 'light-1', metadata: { name: 'Assigned' } },
-          { id: 'light-2', metadata: { name: 'Unassigned' } }
-        ]
+          { id: 'light-2', metadata: { name: 'Unassigned' } },
+        ],
       };
       const rooms = {
         data: [
           {
             id: 'room-1',
             metadata: { name: 'Bedroom' },
-            children: [{ rid: 'light-1', rtype: 'light' }]
-          }
-        ]
+            children: [{ rid: 'light-1', rtype: 'light' }],
+          },
+        ],
       };
       const devices = { data: [] };
 
@@ -180,9 +180,9 @@ describe('RoomService', () => {
           {
             id: 'room-1',
             metadata: { name: 'Empty Room' },
-            children: []
-          }
-        ]
+            children: [],
+          },
+        ],
       };
       const devices = { data: [] };
 
@@ -192,16 +192,16 @@ describe('RoomService', () => {
 
     it('should handle missing room metadata name', () => {
       const lights = {
-        data: [{ id: 'light-1', metadata: { name: 'Light 1' } }]
+        data: [{ id: 'light-1', metadata: { name: 'Light 1' } }],
       };
       const rooms = {
         data: [
           {
             id: 'room-1',
             metadata: {},
-            children: [{ rid: 'light-1', rtype: 'light' }]
-          }
-        ]
+            children: [{ rid: 'light-1', rtype: 'light' }],
+          },
+        ],
       };
       const devices = { data: [] };
 
@@ -211,7 +211,7 @@ describe('RoomService', () => {
 
     it('should filter out null lights', () => {
       const lights = {
-        data: [{ id: 'light-1', metadata: { name: 'Light 1' } }]
+        data: [{ id: 'light-1', metadata: { name: 'Light 1' } }],
       };
       const rooms = {
         data: [
@@ -220,10 +220,10 @@ describe('RoomService', () => {
             metadata: { name: 'Office' },
             children: [
               { rid: 'light-1', rtype: 'light' },
-              { rid: 'light-999', rtype: 'light' } // Doesn't exist
-            ]
-          }
-        ]
+              { rid: 'light-999', rtype: 'light' }, // Doesn't exist
+            ],
+          },
+        ],
       };
       const devices = { data: [] };
 
@@ -239,7 +239,7 @@ describe('RoomService', () => {
       expect(result).toEqual({
         lightsOnCount: 0,
         totalLights: 0,
-        averageBrightness: 0
+        averageBrightness: 0,
       });
     });
 
@@ -248,7 +248,7 @@ describe('RoomService', () => {
       expect(result).toEqual({
         lightsOnCount: 0,
         totalLights: 0,
-        averageBrightness: 0
+        averageBrightness: 0,
       });
     });
 
@@ -256,7 +256,7 @@ describe('RoomService', () => {
       const lights = [
         { on: { on: true }, dimming: { brightness: 100 } },
         { on: { on: false }, dimming: { brightness: 0 } },
-        { on: { on: true }, dimming: { brightness: 50 } }
+        { on: { on: true }, dimming: { brightness: 50 } },
       ];
       const result = roomService.calculateRoomStats(lights);
       expect(result.lightsOnCount).toBe(2);
@@ -267,7 +267,7 @@ describe('RoomService', () => {
       const lights = [
         { on: { on: true }, dimming: { brightness: 100 } },
         { on: { on: true }, dimming: { brightness: 50 } },
-        { on: { on: false }, dimming: { brightness: 75 } } // Off, shouldn't count
+        { on: { on: false }, dimming: { brightness: 75 } }, // Off, shouldn't count
       ];
       const result = roomService.calculateRoomStats(lights);
       expect(result.averageBrightness).toBe(75); // (100 + 50) / 2
@@ -276,7 +276,7 @@ describe('RoomService', () => {
     it('should return 0 average brightness when all lights are off', () => {
       const lights = [
         { on: { on: false }, dimming: { brightness: 100 } },
-        { on: { on: false }, dimming: { brightness: 50 } }
+        { on: { on: false }, dimming: { brightness: 50 } },
       ];
       const result = roomService.calculateRoomStats(lights);
       expect(result.averageBrightness).toBe(0);
@@ -285,7 +285,7 @@ describe('RoomService', () => {
     it('should handle missing dimming data with 50% default', () => {
       const lights = [
         { on: { on: true } }, // Missing dimming
-        { on: { on: true }, dimming: { brightness: 100 } }
+        { on: { on: true }, dimming: { brightness: 100 } },
       ];
       const result = roomService.calculateRoomStats(lights);
       expect(result.averageBrightness).toBe(75); // (50 + 100) / 2
@@ -294,7 +294,7 @@ describe('RoomService', () => {
     it('should handle lights with undefined on state', () => {
       const lights = [
         { on: { on: true }, dimming: { brightness: 100 } },
-        { dimming: { brightness: 50 } } // Missing on state
+        { dimming: { brightness: 50 } }, // Missing on state
       ];
       const result = roomService.calculateRoomStats(lights);
       expect(result.lightsOnCount).toBe(1);
@@ -313,7 +313,7 @@ describe('RoomService', () => {
       const lights = [
         { on: { on: true }, dimming: { brightness: 33 } },
         { on: { on: true }, dimming: { brightness: 33 } },
-        { on: { on: true }, dimming: { brightness: 34 } }
+        { on: { on: true }, dimming: { brightness: 34 } },
       ];
       const result = roomService.calculateRoomStats(lights);
       expect(result.averageBrightness).toBeCloseTo(33.333, 2);
@@ -341,14 +341,14 @@ describe('RoomService', () => {
         data: [
           { id: 'light-1', metadata: { name: 'Assigned Light' } },
           { id: 'light-2', metadata: { name: 'Unassigned Light' } },
-          { id: 'light-3', metadata: { name: 'Another Unassigned' } }
-        ]
+          { id: 'light-3', metadata: { name: 'Another Unassigned' } },
+        ],
       };
       const roomMap = {
         'Living Room': {
           roomUuid: 'room-1',
-          lightUuids: ['light-1']
-        }
+          lightUuids: ['light-1'],
+        },
       };
 
       const result = roomService.findUnassignedLights(lightsData, roomMap);
@@ -362,14 +362,14 @@ describe('RoomService', () => {
       const lightsData = {
         data: [
           { id: 'light-1', metadata: { name: 'Light 1' } },
-          { id: 'light-2', metadata: { name: 'Light 2' } }
-        ]
+          { id: 'light-2', metadata: { name: 'Light 2' } },
+        ],
       };
       const roomMap = {
         'Living Room': {
           roomUuid: 'room-1',
-          lightUuids: ['light-1', 'light-2']
-        }
+          lightUuids: ['light-1', 'light-2'],
+        },
       };
 
       const result = roomService.findUnassignedLights(lightsData, roomMap);
@@ -382,18 +382,18 @@ describe('RoomService', () => {
         data: [
           { id: 'light-1', metadata: { name: 'Light 1' } },
           { id: 'light-2', metadata: { name: 'Light 2' } },
-          { id: 'light-3', metadata: { name: 'Light 3' } }
-        ]
+          { id: 'light-3', metadata: { name: 'Light 3' } },
+        ],
       };
       const roomMap = {
         'Living Room': {
           roomUuid: 'room-1',
-          lightUuids: ['light-1']
+          lightUuids: ['light-1'],
         },
         Unassigned: {
           roomUuid: null, // Special Unassigned room
-          lightUuids: ['light-2']
-        }
+          lightUuids: ['light-2'],
+        },
       };
 
       const result = roomService.findUnassignedLights(lightsData, roomMap);
@@ -401,8 +401,8 @@ describe('RoomService', () => {
       // Should find light-2 and light-3 as unassigned
       // (Unassigned room's lights are not counted as "assigned")
       expect(result).toHaveLength(2);
-      expect(result.map(l => l.id)).toContain('light-2');
-      expect(result.map(l => l.id)).toContain('light-3');
+      expect(result.map((l) => l.id)).toContain('light-2');
+      expect(result.map((l) => l.id)).toContain('light-3');
     });
 
     it('should handle multiple rooms correctly', () => {
@@ -411,18 +411,18 @@ describe('RoomService', () => {
           { id: 'light-1', metadata: { name: 'Light 1' } },
           { id: 'light-2', metadata: { name: 'Light 2' } },
           { id: 'light-3', metadata: { name: 'Light 3' } },
-          { id: 'light-4', metadata: { name: 'Unassigned' } }
-        ]
+          { id: 'light-4', metadata: { name: 'Unassigned' } },
+        ],
       };
       const roomMap = {
         'Living Room': {
           roomUuid: 'room-1',
-          lightUuids: ['light-1']
+          lightUuids: ['light-1'],
         },
         Bedroom: {
           roomUuid: 'room-2',
-          lightUuids: ['light-2', 'light-3']
-        }
+          lightUuids: ['light-2', 'light-3'],
+        },
       };
 
       const result = roomService.findUnassignedLights(lightsData, roomMap);

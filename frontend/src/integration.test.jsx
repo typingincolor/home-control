@@ -16,26 +16,26 @@ import { setupServer } from 'msw/node';
 const localStorageMock = (() => {
   let store = {};
   return {
-    getItem: key => store[key] || null,
+    getItem: (key) => store[key] || null,
     setItem: (key, value) => {
       store[key] = value ? value.toString() : '';
     },
-    removeItem: key => {
+    removeItem: (key) => {
       delete store[key];
     },
     clear: () => {
       store = {};
     },
-    key: index => Object.keys(store)[index] || null,
+    key: (index) => Object.keys(store)[index] || null,
     get length() {
       return Object.keys(store).length;
-    }
+    },
   };
 })();
 
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
-  writable: true
+  writable: true,
 });
 
 import App from './App';
@@ -77,8 +77,8 @@ class MockWebSocket {
           this.onmessage({
             data: JSON.stringify({
               type: 'initial_state',
-              data: mockDashboard
-            })
+              data: mockDashboard,
+            }),
           });
         }
       }, 10);
@@ -89,7 +89,7 @@ class MockWebSocket {
       setTimeout(() => {
         if (this.onmessage) {
           this.onmessage({
-            data: JSON.stringify({ type: 'pong' })
+            data: JSON.stringify({ type: 'pong' }),
           });
         }
       }, 10);
@@ -129,7 +129,7 @@ const mockDashboard = {
     totalLights: 3,
     lightsOn: 2,
     roomCount: 1,
-    sceneCount: 2
+    sceneCount: 2,
   },
   rooms: [
     {
@@ -138,7 +138,7 @@ const mockDashboard = {
       stats: {
         lightsOnCount: 2,
         totalLights: 3,
-        averageBrightness: 75
+        averageBrightness: 75,
       },
       lights: [
         {
@@ -147,7 +147,7 @@ const mockDashboard = {
           on: true,
           brightness: 80,
           color: 'rgb(255, 180, 120)',
-          shadow: '0 0 20px rgba(255, 180, 120, 0.4)'
+          shadow: '0 0 20px rgba(255, 180, 120, 0.4)',
         },
         {
           id: 'light-2',
@@ -155,7 +155,7 @@ const mockDashboard = {
           on: true,
           brightness: 70,
           color: 'rgb(100, 150, 255)',
-          shadow: '0 0 18px rgba(100, 150, 255, 0.38)'
+          shadow: '0 0 18px rgba(100, 150, 255, 0.38)',
         },
         {
           id: 'light-3',
@@ -163,15 +163,15 @@ const mockDashboard = {
           on: false,
           brightness: 0,
           color: null,
-          shadow: null
-        }
+          shadow: null,
+        },
       ],
       scenes: [
         { id: 'scene-1', name: 'Bright' },
-        { id: 'scene-2', name: 'Relax' }
-      ]
-    }
-  ]
+        { id: 'scene-2', name: 'Relax' },
+      ],
+    },
+  ],
 };
 
 // Setup MSW server
@@ -209,7 +209,7 @@ const server = setupServer(
     return HttpResponse.json({
       sessionToken: mockSessionToken,
       expiresIn: 86400,
-      bridgeIp: body.bridgeIp
+      bridgeIp: body.bridgeIp,
     });
   }),
 
@@ -253,7 +253,7 @@ const server = setupServer(
           on: true,
           brightness: 100,
           color: 'rgb(255, 245, 235)',
-          shadow: '0 0 25px rgba(255, 245, 235, 0.5)'
+          shadow: '0 0 25px rgba(255, 245, 235, 0.5)',
         },
         {
           id: 'light-2',
@@ -261,9 +261,9 @@ const server = setupServer(
           on: true,
           brightness: 100,
           color: 'rgb(255, 245, 235)',
-          shadow: '0 0 25px rgba(255, 245, 235, 0.5)'
-        }
-      ]
+          shadow: '0 0 25px rgba(255, 245, 235, 0.5)',
+        },
+      ],
     });
   }),
 
@@ -283,8 +283,8 @@ const server = setupServer(
         on: body.on,
         brightness: body.brightness ?? 100,
         color: body.on ? 'rgb(255, 200, 150)' : null,
-        shadow: body.on ? '0 0 20px rgba(255, 200, 150, 0.4)' : null
-      }
+        shadow: body.on ? '0 0 20px rgba(255, 200, 150, 0.4)' : null,
+      },
     });
   }),
 
@@ -299,21 +299,21 @@ const server = setupServer(
     return HttpResponse.json({
       sessionToken: 'hue_sess_refreshed_abc',
       expiresIn: 86400,
-      bridgeIp: mockBridgeIp
+      bridgeIp: mockBridgeIp,
     });
   })
 );
 
 beforeAll(() =>
   server.listen({
-    onUnhandledRequest: req => {
+    onUnhandledRequest: (req) => {
       // Bypass WebSocket connections - they're handled by MockWebSocket
       if (req.url.includes('/ws')) {
         return;
       }
       // Error on other unhandled requests
       console.error('Unhandled %s %s', req.method, req.url);
-    }
+    },
   })
 );
 afterEach(() => {
@@ -648,7 +648,7 @@ describe('Integration Tests', () => {
       await waitFor(() => screen.getByText('Living Room'));
 
       // Wait a bit to ensure no infinite loop
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Should only have called pairing once
       expect(pairCallCount).toBe(1);

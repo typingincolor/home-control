@@ -16,13 +16,13 @@ export function errorHandler(err, req, res, _next) {
     message: apiError.message,
     statusCode: apiError.statusCode,
     originalError: err.message !== apiError.message ? err.message : undefined,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
   });
 
   // Build response
   const response = {
     error: apiError.code,
-    message: apiError.message
+    message: apiError.message,
   };
 
   // Add suggestion if available
@@ -52,7 +52,7 @@ export function notFoundHandler(req, res) {
   res.status(404).json({
     error: 'route_not_found',
     message: `Route ${req.method} ${req.path} not found`,
-    suggestion: 'Check the API documentation at /api/v1/docs'
+    suggestion: 'Check the API documentation at /api/v1/docs',
   });
 }
 

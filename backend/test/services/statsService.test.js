@@ -9,19 +9,19 @@ describe('StatsService', () => {
           { id: 'light-1', on: { on: true } },
           { id: 'light-2', on: { on: false } },
           { id: 'light-3', on: { on: true } },
-          { id: 'light-4', on: { on: true } }
-        ]
+          { id: 'light-4', on: { on: true } },
+        ],
       };
       const roomMap = {
         'Living Room': { lightUuids: ['light-1', 'light-2'] },
-        Bedroom: { lightUuids: ['light-3'] }
+        Bedroom: { lightUuids: ['light-3'] },
       };
       const scenesData = {
         data: [
           { id: 'scene-1', name: 'Bright' },
           { id: 'scene-2', name: 'Relax' },
-          { id: 'scene-3', name: 'Concentrate' }
-        ]
+          { id: 'scene-3', name: 'Concentrate' },
+        ],
       };
 
       const result = statsService.calculateDashboardStats(lightsData, roomMap, scenesData);
@@ -59,8 +59,8 @@ describe('StatsService', () => {
         data: [
           { id: 'light-1', on: { on: false } },
           { id: 'light-2', on: { on: false } },
-          { id: 'light-3', on: { on: false } }
-        ]
+          { id: 'light-3', on: { on: false } },
+        ],
       };
 
       const result = statsService.calculateDashboardStats(lightsData, null, null);
@@ -74,8 +74,8 @@ describe('StatsService', () => {
         data: [
           { id: 'light-1', on: { on: true } },
           { id: 'light-2' }, // Missing on state
-          { id: 'light-3', on: {} } // Missing on.on
-        ]
+          { id: 'light-3', on: {} }, // Missing on.on
+        ],
       };
 
       const result = statsService.calculateDashboardStats(lightsData, null, null);
@@ -88,7 +88,7 @@ describe('StatsService', () => {
       const roomMap = {
         'Living Room': { lightUuids: ['light-1'] },
         Bedroom: { lightUuids: ['light-2'] },
-        Unassigned: { lightUuids: ['light-3'] }
+        Unassigned: { lightUuids: ['light-3'] },
       };
 
       const result = statsService.calculateDashboardStats(null, roomMap, null);
@@ -108,13 +108,13 @@ describe('StatsService', () => {
 
     it('should handle single light, single room, single scene', () => {
       const lightsData = {
-        data: [{ id: 'light-1', on: { on: true } }]
+        data: [{ id: 'light-1', on: { on: true } }],
       };
       const roomMap = {
-        'Living Room': { lightUuids: ['light-1'] }
+        'Living Room': { lightUuids: ['light-1'] },
       };
       const scenesData = {
-        data: [{ id: 'scene-1', name: 'Bright' }]
+        data: [{ id: 'scene-1', name: 'Bright' }],
       };
 
       const result = statsService.calculateDashboardStats(lightsData, roomMap, scenesData);
@@ -130,8 +130,8 @@ describe('StatsService', () => {
         data: [
           { id: 'light-1', on: { on: true } },
           { id: 'light-2', on: { on: true } },
-          { id: 'light-3', on: { on: true } }
-        ]
+          { id: 'light-3', on: { on: true } },
+        ],
       };
 
       const result = statsService.calculateDashboardStats(lightsData, null, null);
@@ -146,7 +146,7 @@ describe('StatsService', () => {
       for (let i = 0; i < 100; i++) {
         lights.push({
           id: `light-${i}`,
-          on: { on: i % 2 === 0 }
+          on: { on: i % 2 === 0 },
         });
       }
 

@@ -22,7 +22,7 @@ describe('stateConversion', () => {
       const result = convertToHueState({ on: true, brightness: 50 });
       expect(result).toEqual({
         on: { on: true },
-        dimming: { brightness: 50 }
+        dimming: { brightness: 50 },
       });
     });
 

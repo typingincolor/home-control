@@ -1,0 +1,13 @@
+* Our target devices are ipad, iphone 14+ and raspberry pi with 7in touch screen.
+* Changes should be built using tdd
+* On an ipad, the main panel should show 2 rows of 4 buttons
+* On an iphone, the main panel should show 4 rows of 2 buttons
+* On the raspberry pi, the main panel shoul show 2 rows of 4 buttons
+* Buttons should be at least 44px, but should be no bigger than 200px
+* Buttons must not overlap with either the top or bottom toolbars
+* Buttons should always be square
+* There must be specific e2e tests for each target device
+* Refactor the code
+* Run the linter and code prettyfier 
+* All the documentation should be updated, I want the screen shot in the README to be what it looks like on the Raspberry Pi
+

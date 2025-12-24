@@ -23,5 +23,5 @@ export const DashboardSummary = ({ totalLightsOn, roomCount, sceneCount }) => {
 DashboardSummary.propTypes = {
   totalLightsOn: PropTypes.number.isRequired,
   roomCount: PropTypes.number.isRequired,
-  sceneCount: PropTypes.number.isRequired
+  sceneCount: PropTypes.number.isRequired,
 };

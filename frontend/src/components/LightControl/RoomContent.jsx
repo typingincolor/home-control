@@ -10,7 +10,7 @@ export const RoomContent = ({
   onToggleRoom,
   onActivateScene,
   togglingLights = new Set(),
-  isActivatingScene = false
+  isActivatingScene = false,
 }) => {
   if (!room) {
     return (
@@ -23,7 +23,7 @@ export const RoomContent = ({
 
   const { lights = [], scenes = [] } = room;
   // Calculate from actual light states (not pre-computed stats) so toggle updates immediately
-  const lightsOn = lights.filter(l => l.on).length;
+  const lightsOn = lights.filter((l) => l.on).length;
   const anyOn = lightsOn > 0;
 
   return (
@@ -54,7 +54,7 @@ export const RoomContent = ({
         </div>
       ) : (
         <div className="light-tiles-grid">
-          {lights.map(light => (
+          {lights.map((light) => (
             <LightTile
               key={light.id}
               light={light}
@@ -77,12 +77,12 @@ RoomContent.propTypes = {
     stats: PropTypes.shape({
       lightsOnCount: PropTypes.number,
       totalLights: PropTypes.number,
-      averageBrightness: PropTypes.number
-    })
+      averageBrightness: PropTypes.number,
+    }),
   }),
   onToggleLight: PropTypes.func.isRequired,
   onToggleRoom: PropTypes.func.isRequired,
   onActivateScene: PropTypes.func.isRequired,
   togglingLights: PropTypes.instanceOf(Set),
-  isActivatingScene: PropTypes.bool
+  isActivatingScene: PropTypes.bool,
 };

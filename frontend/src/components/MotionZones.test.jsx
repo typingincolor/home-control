@@ -4,7 +4,7 @@ import { MotionZones } from './MotionZones';
 
 // Mock the hooks
 vi.mock('../hooks/useHueApi', () => ({
-  useHueApi: vi.fn()
+  useHueApi: vi.fn(),
 }));
 
 import { useHueApi } from '../hooks/useHueApi';
@@ -12,7 +12,7 @@ import { useHueApi } from '../hooks/useHueApi';
 describe('MotionZones', () => {
   const mockGetMotionZones = vi.fn();
   const mockApi = {
-    getMotionZones: mockGetMotionZones
+    getMotionZones: mockGetMotionZones,
   };
 
   beforeEach(() => {
@@ -54,7 +54,7 @@ describe('MotionZones', () => {
   it('should show multiple alerts for multiple motion zones', () => {
     const zones = [
       { id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true },
-      { id: 'zone-2', name: 'Living Room', motionDetected: true, reachable: true }
+      { id: 'zone-2', name: 'Living Room', motionDetected: true, reachable: true },
     ];
 
     render(<MotionZones sessionToken="test-session-token" motionZones={zones} />);
@@ -94,7 +94,7 @@ describe('MotionZones', () => {
 
   it('should fetch from API when no motionZones prop provided', async () => {
     mockGetMotionZones.mockResolvedValue({
-      zones: [{ id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }]
+      zones: [{ id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }],
     });
 
     render(<MotionZones sessionToken="test-session-token" />);

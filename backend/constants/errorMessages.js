@@ -22,7 +22,7 @@ export const ERROR_CODES = {
   DATA_PROCESSING_ERROR: 'data_processing_error',
   RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
   INTERNAL_ERROR: 'internal_error',
-  ROUTE_NOT_FOUND: 'route_not_found'
+  ROUTE_NOT_FOUND: 'route_not_found',
 };
 
 /**
@@ -30,7 +30,7 @@ export const ERROR_CODES = {
  */
 export const ERROR_MESSAGES = {
   // Bridge
-  BRIDGE_CONNECTION: bridgeIp => `Cannot connect to Philips Hue Bridge at ${bridgeIp}`,
+  BRIDGE_CONNECTION: (bridgeIp) => `Cannot connect to Philips Hue Bridge at ${bridgeIp}`,
 
   // Session
   SESSION_EXPIRED: 'Your session has expired or is invalid',
@@ -39,7 +39,7 @@ export const ERROR_MESSAGES = {
   // Generic
   INTERNAL_ERROR: 'An unexpected error occurred',
   RATE_LIMIT: 'Too many requests',
-  UNABLE_TO_COMMUNICATE: 'Unable to communicate with the bridge'
+  UNABLE_TO_COMMUNICATE: 'Unable to communicate with the bridge',
 };
 
 /**
@@ -61,14 +61,14 @@ export const ERROR_SUGGESTIONS = {
   // Retry
   TRY_AGAIN: 'This might be a temporary issue. Try again in a moment',
   CONTACT_SUPPORT: 'Try again or contact support if the problem persists',
-  RATE_LIMIT: seconds => `Wait ${seconds} seconds before trying again`,
+  RATE_LIMIT: (seconds) => `Wait ${seconds} seconds before trying again`,
 
   // Resources
-  CHECK_RESOURCE: resourceType =>
+  CHECK_RESOURCE: (resourceType) =>
     `Check the ${resourceType} ID or refresh the dashboard to get current ${resourceType}s`,
-  CHECK_RESOURCE_FORMAT: resourceType => `Check the ${resourceType} data format`,
-  MISSING_PARAM: param => `Provide ${param} in the request headers or query parameters`,
+  CHECK_RESOURCE_FORMAT: (resourceType) => `Check the ${resourceType} data format`,
+  MISSING_PARAM: (param) => `Provide ${param} in the request headers or query parameters`,
 
   // API
-  CHECK_API_DOCS: 'Check the API documentation at /api/v1/docs'
+  CHECK_API_DOCS: 'Check the API documentation at /api/v1/docs',
 };

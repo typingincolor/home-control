@@ -6,8 +6,8 @@ vi.mock('../../utils/logger.js', () => ({
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
-    debug: vi.fn()
-  })
+    debug: vi.fn(),
+  }),
 }));
 
 // Mock hueClient for bridge validation
@@ -15,8 +15,8 @@ vi.mock('../../services/hueClient.js', () => ({
   default: {
     getLights: vi.fn(() => Promise.resolve({ data: [] })),
     getRooms: vi.fn(() => Promise.resolve({ data: [] })),
-    getDevices: vi.fn(() => Promise.resolve({ data: [] }))
-  }
+    getDevices: vi.fn(() => Promise.resolve({ data: [] })),
+  },
 }));
 
 describe('Multi-Client Integration', () => {
@@ -103,7 +103,7 @@ describe('Multi-Client Integration', () => {
       // The auth middleware should store credentials
       const req = {
         headers: { authorization: `Bearer ${client1Session.sessionToken}` },
-        query: {}
+        query: {},
       };
       const res = { status: vi.fn().mockReturnThis(), json: vi.fn() };
       const next = vi.fn();
@@ -137,7 +137,7 @@ describe('Multi-Client Integration', () => {
       // Make authenticated request
       const req = {
         headers: { authorization: `Bearer ${session.sessionToken}` },
-        query: {}
+        query: {},
       };
       const res = { status: vi.fn().mockReturnThis(), json: vi.fn() };
       const next = vi.fn();
@@ -210,7 +210,7 @@ describe('Multi-Client Integration', () => {
       }
 
       // All sessions should be valid and unique
-      const tokens = sessions.map(s => s.sessionToken);
+      const tokens = sessions.map((s) => s.sessionToken);
       const uniqueTokens = new Set(tokens);
       expect(uniqueTokens.size).toBe(10);
 
@@ -288,7 +288,7 @@ describe('Multi-Client Integration', () => {
       // Middleware validates session and stores credentials (if not already)
       const req1 = {
         headers: { authorization: `Bearer ${client1Session.sessionToken}` },
-        query: {}
+        query: {},
       };
       const res1 = { status: vi.fn().mockReturnThis(), json: vi.fn() };
       const next1 = vi.fn();
@@ -313,7 +313,7 @@ describe('Multi-Client Integration', () => {
       // === STEP 4: Client 2 loads dashboard ===
       const req2 = {
         headers: { authorization: `Bearer ${client2Session.sessionToken}` },
-        query: {}
+        query: {},
       };
       const res2 = { status: vi.fn().mockReturnThis(), json: vi.fn() };
       const next2 = vi.fn();

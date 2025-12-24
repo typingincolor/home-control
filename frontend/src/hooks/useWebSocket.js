@@ -22,10 +22,10 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
   // Detect legacy mode (bridgeIp looks like an IP address)
   const isLegacyMode = sessionToken && sessionToken.includes('.');
 
-  const applyChanges = useCallback(changes => {
+  const applyChanges = useCallback((changes) => {
     if (!changes || changes.length === 0) return;
 
-    setDashboard(prev => {
+    setDashboard((prev) => {
       if (!prev) return prev;
 
       const updated = { ...prev };
@@ -37,20 +37,20 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
             break;
 
           case 'room':
-            updated.rooms = updated.rooms.map(room =>
+            updated.rooms = updated.rooms.map((room) =>
               room.id === change.data.id ? change.data : room
             );
             break;
 
           case 'light':
-            updated.rooms = updated.rooms.map(room => {
+            updated.rooms = updated.rooms.map((room) => {
               if (room.id !== change.roomId) return room;
 
               return {
                 ...room,
-                lights: room.lights.map(light =>
+                lights: room.lights.map((light) =>
                   light.id === change.data.id ? change.data : light
-                )
+                ),
               };
             });
             break;
@@ -58,7 +58,7 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
           case 'motion_zone':
             // Update motion zones array
             if (updated.motionZones) {
-              updated.motionZones = updated.motionZones.map(zone =>
+              updated.motionZones = updated.motionZones.map((zone) =>
                 zone.id === change.data.id ? change.data : zone
               );
             }
@@ -67,7 +67,7 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
           case 'zone':
             // Update zones array (light groupings)
             if (updated.zones) {
-              updated.zones = updated.zones.map(zone =>
+              updated.zones = updated.zones.map((zone) =>
                 zone.id === change.data.id ? change.data : zone
               );
             }
@@ -83,7 +83,7 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
   }, []);
 
   const handleMessage = useCallback(
-    message => {
+    (message) => {
       switch (message.type) {
         case 'initial_state':
           logger.info('Received initial state');
@@ -138,7 +138,7 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
           JSON.stringify({
             type: 'auth',
             bridgeIp: sessionToken,
-            username
+            username,
           })
         );
       } else {
@@ -146,13 +146,13 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
         ws.send(
           JSON.stringify({
             type: 'auth',
-            sessionToken
+            sessionToken,
           })
         );
       }
     };
 
-    ws.onmessage = event => {
+    ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
         handleMessage(message);
@@ -161,7 +161,7 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
       }
     };
 
-    ws.onerror = event => {
+    ws.onerror = (event) => {
       logger.error('Error:', event);
       setError('WebSocket connection error');
     };
@@ -225,6 +225,6 @@ export const useWebSocket = (sessionToken, username = null, enabled = true) => {
   return {
     isConnected,
     dashboard,
-    error
+    error,
   };
 };

@@ -163,7 +163,7 @@ describe('useWebSocket', () => {
 
       expect(ws.sentMessages).toContainEqual({
         type: 'auth',
-        sessionToken: 'test-session-token'
+        sessionToken: 'test-session-token',
       });
 
       global.WebSocket = originalWebSocket;
@@ -188,7 +188,7 @@ describe('useWebSocket', () => {
       expect(ws.sentMessages).toContainEqual({
         type: 'auth',
         bridgeIp: '192.168.1.100',
-        username: 'test-username'
+        username: 'test-username',
       });
 
       global.WebSocket = originalWebSocket;
@@ -214,13 +214,13 @@ describe('useWebSocket', () => {
 
       const dashboardData = {
         summary: { totalLights: 10 },
-        rooms: []
+        rooms: [],
       };
 
       act(() => {
         ws.simulateMessage({
           type: 'initial_state',
-          data: dashboardData
+          data: dashboardData,
         });
       });
 
@@ -251,8 +251,8 @@ describe('useWebSocket', () => {
           type: 'initial_state',
           data: {
             summary: { totalLights: 10, lightsOn: 5 },
-            rooms: [{ id: 'room-1', lights: [{ id: 'light-1', on: false }] }]
-          }
+            rooms: [{ id: 'room-1', lights: [{ id: 'light-1', on: false }] }],
+          },
         });
       });
 
@@ -264,9 +264,9 @@ describe('useWebSocket', () => {
             {
               type: 'light',
               roomId: 'room-1',
-              data: { id: 'light-1', on: true }
-            }
-          ]
+              data: { id: 'light-1', on: true },
+            },
+          ],
         });
       });
 
@@ -294,7 +294,7 @@ describe('useWebSocket', () => {
       act(() => {
         ws.simulateMessage({
           type: 'initial_state',
-          data: { summary: { totalLights: 10 }, rooms: [] }
+          data: { summary: { totalLights: 10 }, rooms: [] },
         });
       });
 
@@ -304,9 +304,9 @@ describe('useWebSocket', () => {
           changes: [
             {
               type: 'summary',
-              data: { totalLights: 12, lightsOn: 6 }
-            }
-          ]
+              data: { totalLights: 12, lightsOn: 6 },
+            },
+          ],
         });
       });
 
@@ -337,8 +337,8 @@ describe('useWebSocket', () => {
           type: 'initial_state',
           data: {
             summary: {},
-            rooms: [{ id: 'room-1', name: 'Living Room' }]
-          }
+            rooms: [{ id: 'room-1', name: 'Living Room' }],
+          },
         });
       });
 
@@ -348,9 +348,9 @@ describe('useWebSocket', () => {
           changes: [
             {
               type: 'room',
-              data: { id: 'room-1', name: 'Updated Room' }
-            }
-          ]
+              data: { id: 'room-1', name: 'Updated Room' },
+            },
+          ],
         });
       });
 
@@ -378,7 +378,7 @@ describe('useWebSocket', () => {
       act(() => {
         ws.simulateMessage({
           type: 'error',
-          message: 'Test error'
+          message: 'Test error',
         });
       });
 
@@ -492,8 +492,8 @@ describe('useWebSocket', () => {
           data: {
             summary: {},
             rooms: [],
-            motionZones: [{ id: 'zone-1', name: 'Hallway', motionDetected: false, enabled: true }]
-          }
+            motionZones: [{ id: 'zone-1', name: 'Hallway', motionDetected: false, enabled: true }],
+          },
         });
       });
 
@@ -507,9 +507,9 @@ describe('useWebSocket', () => {
           changes: [
             {
               type: 'motion_zone',
-              data: { id: 'zone-1', name: 'Hallway', motionDetected: true, enabled: true }
-            }
-          ]
+              data: { id: 'zone-1', name: 'Hallway', motionDetected: true, enabled: true },
+            },
+          ],
         });
       });
 
@@ -542,9 +542,9 @@ describe('useWebSocket', () => {
             rooms: [],
             motionZones: [
               { id: 'zone-1', name: 'Hallway', motionDetected: false },
-              { id: 'zone-2', name: 'Kitchen', motionDetected: false }
-            ]
-          }
+              { id: 'zone-2', name: 'Kitchen', motionDetected: false },
+            ],
+          },
         });
       });
 
@@ -555,13 +555,13 @@ describe('useWebSocket', () => {
           changes: [
             {
               type: 'motion_zone',
-              data: { id: 'zone-1', name: 'Hallway', motionDetected: true }
+              data: { id: 'zone-1', name: 'Hallway', motionDetected: true },
             },
             {
               type: 'motion_zone',
-              data: { id: 'zone-2', name: 'Kitchen', motionDetected: true }
-            }
-          ]
+              data: { id: 'zone-2', name: 'Kitchen', motionDetected: true },
+            },
+          ],
         });
       });
 
@@ -595,8 +595,10 @@ describe('useWebSocket', () => {
           data: {
             summary: {},
             rooms: [],
-            zones: [{ id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 0, totalLights: 3 } }]
-          }
+            zones: [
+              { id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 0, totalLights: 3 } },
+            ],
+          },
         });
       });
 
@@ -610,9 +612,9 @@ describe('useWebSocket', () => {
           changes: [
             {
               type: 'zone',
-              data: { id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 2, totalLights: 3 } }
-            }
-          ]
+              data: { id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 2, totalLights: 3 } },
+            },
+          ],
         });
       });
 
@@ -645,9 +647,9 @@ describe('useWebSocket', () => {
             rooms: [],
             zones: [
               { id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 0 } },
-              { id: 'zone-2', name: 'Downstairs', stats: { lightsOnCount: 0 } }
-            ]
-          }
+              { id: 'zone-2', name: 'Downstairs', stats: { lightsOnCount: 0 } },
+            ],
+          },
         });
       });
 
@@ -658,13 +660,13 @@ describe('useWebSocket', () => {
           changes: [
             {
               type: 'zone',
-              data: { id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 3 } }
+              data: { id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 3 } },
             },
             {
               type: 'zone',
-              data: { id: 'zone-2', name: 'Downstairs', stats: { lightsOnCount: 5 } }
-            }
-          ]
+              data: { id: 'zone-2', name: 'Downstairs', stats: { lightsOnCount: 5 } },
+            },
+          ],
         });
       });
 
@@ -696,8 +698,8 @@ describe('useWebSocket', () => {
           data: {
             summary: { lightsOn: 5 },
             rooms: [],
-            zones: [{ id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 2 } }]
-          }
+            zones: [{ id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 2 } }],
+          },
         });
       });
 
@@ -708,9 +710,9 @@ describe('useWebSocket', () => {
           changes: [
             {
               type: 'summary',
-              data: { lightsOn: 7 }
-            }
-          ]
+              data: { lightsOn: 7 },
+            },
+          ],
         });
       });
 
@@ -810,7 +812,7 @@ describe('useWebSocket', () => {
         vi.advanceTimersByTime(30000);
       });
 
-      expect(ws.sentMessages.filter(m => m.type === 'ping').length).toBe(2);
+      expect(ws.sentMessages.filter((m) => m.type === 'ping').length).toBe(2);
 
       global.WebSocket = originalWebSocket;
     });
@@ -949,7 +951,7 @@ describe('useWebSocket', () => {
       act(() => {
         ws.simulateMessage({
           type: 'state_update',
-          changes: [{ type: 'summary', data: { totalLights: 10 } }]
+          changes: [{ type: 'summary', data: { totalLights: 10 } }],
         });
       });
 
@@ -977,7 +979,7 @@ describe('useWebSocket', () => {
       act(() => {
         ws.simulateMessage({
           type: 'initial_state',
-          data: { summary: {}, rooms: [] }
+          data: { summary: {}, rooms: [] },
         });
       });
 
@@ -986,7 +988,7 @@ describe('useWebSocket', () => {
       act(() => {
         ws.simulateMessage({
           type: 'state_update',
-          changes: []
+          changes: [],
         });
       });
 

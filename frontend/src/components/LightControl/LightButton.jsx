@@ -6,7 +6,7 @@ export const LightButton = ({ light, onToggle, isToggling }) => {
   const buttonStyle = light.color
     ? {
         background: `linear-gradient(135deg, ${light.color} 0%, ${light.color} 100%)`,
-        boxShadow: light.shadow
+        boxShadow: light.shadow,
       }
     : {};
 
@@ -42,5 +42,5 @@ export const LightButton = ({ light, onToggle, isToggling }) => {
 LightButton.propTypes = {
   light: LightShape.isRequired,
   onToggle: PropTypes.func.isRequired,
-  isToggling: PropTypes.bool
+  isToggling: PropTypes.bool,
 };

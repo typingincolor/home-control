@@ -10,15 +10,15 @@ export const RoomCard = ({
   onToggleRoom,
   onActivateScene,
   togglingLights,
-  isActivating
+  isActivating,
 }) => {
   // Use pre-computed stats from backend
   const { lightsOnCount, totalLights, averageBrightness } = room.stats;
   const anyLightsOn = lightsOnCount > 0;
 
   // Get light UUIDs for toggling
-  const lightUuids = room.lights.map(l => l.id);
-  const allLightsToggling = lightUuids.every(uuid => togglingLights.has(uuid));
+  const lightUuids = room.lights.map((l) => l.id);
+  const allLightsToggling = lightUuids.every((uuid) => togglingLights.has(uuid));
 
   return (
     <div className="room-group">
@@ -52,7 +52,7 @@ export const RoomCard = ({
       </div>
 
       <div className="room-lights-grid">
-        {room.lights.map(light => (
+        {room.lights.map((light) => (
           <LightButton
             key={light.id}
             light={light}
@@ -72,5 +72,5 @@ RoomCard.propTypes = {
   onToggleRoom: PropTypes.func.isRequired,
   onActivateScene: PropTypes.func.isRequired,
   togglingLights: PropTypes.instanceOf(Set).isRequired,
-  isActivating: PropTypes.bool
+  isActivating: PropTypes.bool,
 };

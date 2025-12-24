@@ -24,7 +24,7 @@ A modern React web application for controlling Philips Hue lights locally using 
 - **Session-Based Authentication**: Secure token-based sessions with automatic refresh
 - **Backend Business Logic**: Colors, shadows, and statistics pre-computed on server
 - **Simplified API**: Frontend makes 1-2 calls instead of 4-6 (67-83% reduction)
-- **Responsive Design**: Optimized for iPhone 14+, iPad, and desktop browsers
+- **Responsive Design**: Device-specific layouts (iPad: 4×2, iPhone: 2×4, Raspberry Pi 7": 4×2)
 - **Centralized UI Text**: UI_TEXT constants for consistency and easy maintenance
 
 ### Authentication & Discovery

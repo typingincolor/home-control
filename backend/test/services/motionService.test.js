@@ -5,8 +5,8 @@ import hueClient from '../../services/hueClient.js';
 // Mock hueClient
 vi.mock('../../services/hueClient.js', () => ({
   default: {
-    getResource: vi.fn()
-  }
+    getResource: vi.fn(),
+  },
 }));
 
 describe('MotionService', () => {
@@ -46,12 +46,12 @@ describe('MotionService', () => {
               motion: {
                 motion_service: {
                   rtype: 'convenience_area_motion',
-                  rid: 'motion-area-1'
-                }
-              }
-            }
-          }
-        ]
+                  rid: 'motion-area-1',
+                },
+              },
+            },
+          },
+        ],
       };
 
       const motionAreasData = {
@@ -62,10 +62,10 @@ describe('MotionService', () => {
             motion: {
               motion: true,
               motion_valid: true,
-              motion_report: { changed: '2024-01-15T10:30:00Z' }
-            }
-          }
-        ]
+              motion_report: { changed: '2024-01-15T10:30:00Z' },
+            },
+          },
+        ],
       };
 
       const result = motionService.parseMotionSensors(behaviorsData, motionAreasData);
@@ -77,7 +77,7 @@ describe('MotionService', () => {
         motionDetected: true,
         enabled: true,
         reachable: true,
-        lastChanged: '2024-01-15T10:30:00Z'
+        lastChanged: '2024-01-15T10:30:00Z',
       });
     });
 
@@ -91,17 +91,17 @@ describe('MotionService', () => {
               motion: {
                 motion_service: {
                   rtype: 'some_other_type',
-                  rid: 'some-id'
-                }
-              }
-            }
+                  rid: 'some-id',
+                },
+              },
+            },
           },
           {
             id: 'behavior-2',
             metadata: { name: 'Regular Behavior' },
-            configuration: {}
-          }
-        ]
+            configuration: {},
+          },
+        ],
       };
 
       const result = motionService.parseMotionSensors(behaviorsData, { data: [] });
@@ -120,12 +120,12 @@ describe('MotionService', () => {
               motion: {
                 motion_service: {
                   rtype: 'convenience_area_motion',
-                  rid: 'non-existent-motion-area'
-                }
-              }
-            }
-          }
-        ]
+                  rid: 'non-existent-motion-area',
+                },
+              },
+            },
+          },
+        ],
       };
 
       const motionAreasData = { data: [] };
@@ -149,12 +149,12 @@ describe('MotionService', () => {
               motion: {
                 motion_service: {
                   rtype: 'convenience_area_motion',
-                  rid: 'motion-area-1'
-                }
-              }
-            }
-          }
-        ]
+                  rid: 'motion-area-1',
+                },
+              },
+            },
+          },
+        ],
       };
 
       const motionAreasData = {
@@ -162,9 +162,9 @@ describe('MotionService', () => {
           {
             id: 'motion-area-1',
             enabled: true,
-            motion: { motion: false, motion_valid: true }
-          }
-        ]
+            motion: { motion: false, motion_valid: true },
+          },
+        ],
       };
 
       const result = motionService.parseMotionSensors(behaviorsData, motionAreasData);
@@ -183,12 +183,12 @@ describe('MotionService', () => {
               motion: {
                 motion_service: {
                   rtype: 'convenience_area_motion',
-                  rid: 'motion-area-1'
-                }
-              }
-            }
-          }
-        ]
+                  rid: 'motion-area-1',
+                },
+              },
+            },
+          },
+        ],
       };
 
       const motionAreasData = {
@@ -196,9 +196,9 @@ describe('MotionService', () => {
           {
             id: 'motion-area-1',
             enabled: true,
-            motion: { motion: false, motion_valid: false }
-          }
-        ]
+            motion: { motion: false, motion_valid: false },
+          },
+        ],
       };
 
       const result = motionService.parseMotionSensors(behaviorsData, motionAreasData);
@@ -217,12 +217,12 @@ describe('MotionService', () => {
               motion: {
                 motion_service: {
                   rtype: 'convenience_area_motion',
-                  rid: 'motion-area-1'
-                }
-              }
-            }
-          }
-        ]
+                  rid: 'motion-area-1',
+                },
+              },
+            },
+          },
+        ],
       };
 
       const motionAreasData = {
@@ -230,9 +230,9 @@ describe('MotionService', () => {
           {
             id: 'motion-area-1',
             enabled: false,
-            motion: { motion: true, motion_valid: true }
-          }
-        ]
+            motion: { motion: true, motion_valid: true },
+          },
+        ],
       };
 
       const result = motionService.parseMotionSensors(behaviorsData, motionAreasData);
@@ -251,12 +251,12 @@ describe('MotionService', () => {
               motion: {
                 motion_service: {
                   rtype: 'convenience_area_motion',
-                  rid: 'motion-area-1'
-                }
-              }
-            }
-          }
-        ]
+                  rid: 'motion-area-1',
+                },
+              },
+            },
+          },
+        ],
       };
 
       const motionAreasData = {
@@ -264,9 +264,9 @@ describe('MotionService', () => {
           {
             id: 'motion-area-1',
             enabled: true,
-            motion: { motion: false, motion_valid: true }
-          }
-        ]
+            motion: { motion: false, motion_valid: true },
+          },
+        ],
       };
 
       const result = motionService.parseMotionSensors(behaviorsData, motionAreasData);
@@ -283,9 +283,9 @@ describe('MotionService', () => {
             enabled: true,
             configuration: {
               motion: {
-                motion_service: { rtype: 'convenience_area_motion', rid: 'area-1' }
-              }
-            }
+                motion_service: { rtype: 'convenience_area_motion', rid: 'area-1' },
+              },
+            },
           },
           {
             id: 'behavior-2',
@@ -293,9 +293,9 @@ describe('MotionService', () => {
             enabled: true,
             configuration: {
               motion: {
-                motion_service: { rtype: 'convenience_area_motion', rid: 'area-2' }
-              }
-            }
+                motion_service: { rtype: 'convenience_area_motion', rid: 'area-2' },
+              },
+            },
           },
           {
             id: 'behavior-3',
@@ -303,19 +303,19 @@ describe('MotionService', () => {
             enabled: true,
             configuration: {
               motion: {
-                motion_service: { rtype: 'convenience_area_motion', rid: 'area-3' }
-              }
-            }
-          }
-        ]
+                motion_service: { rtype: 'convenience_area_motion', rid: 'area-3' },
+              },
+            },
+          },
+        ],
       };
 
       const motionAreasData = {
         data: [
           { id: 'area-1', enabled: true, motion: { motion: false } },
           { id: 'area-2', enabled: true, motion: { motion: false } },
-          { id: 'area-3', enabled: true, motion: { motion: false } }
-        ]
+          { id: 'area-3', enabled: true, motion: { motion: false } },
+        ],
       };
 
       const result = motionService.parseMotionSensors(behaviorsData, motionAreasData);
@@ -339,11 +339,11 @@ describe('MotionService', () => {
             enabled: true,
             configuration: {
               motion: {
-                motion_service: { rtype: 'convenience_area_motion', rid: 'area-1' }
-              }
-            }
-          }
-        ]
+                motion_service: { rtype: 'convenience_area_motion', rid: 'area-1' },
+              },
+            },
+          },
+        ],
       };
 
       const motionAreasData = {
@@ -351,9 +351,9 @@ describe('MotionService', () => {
           {
             id: 'area-1',
             enabled: true,
-            motion: { motion: true, motion_valid: true }
-          }
-        ]
+            motion: { motion: true, motion_valid: true },
+          },
+        ],
       };
 
       hueClient.getResource

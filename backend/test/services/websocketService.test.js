@@ -7,20 +7,20 @@ vi.mock('../../utils/logger.js', () => ({
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
-    debug: vi.fn()
-  })
+    debug: vi.fn(),
+  }),
 }));
 
 vi.mock('../../services/dashboardService.js', () => ({
   default: {
-    getDashboard: vi.fn()
-  }
+    getDashboard: vi.fn(),
+  },
 }));
 
 vi.mock('../../services/sessionManager.js', () => ({
   default: {
-    getSession: vi.fn()
-  }
+    getSession: vi.fn(),
+  },
 }));
 
 import dashboardService from '../../services/dashboardService.js';
@@ -290,9 +290,9 @@ describe('WebSocketService', () => {
             name: 'Hallway MotionAware',
             motionDetected: false,
             enabled: true,
-            reachable: true
-          }
-        ]
+            reachable: true,
+          },
+        ],
       };
 
       const current = {
@@ -304,16 +304,16 @@ describe('WebSocketService', () => {
             name: 'Hallway MotionAware',
             motionDetected: true, // Changed to true
             enabled: true,
-            reachable: true
-          }
-        ]
+            reachable: true,
+          },
+        ],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
       expect(changes).toContainEqual({
         type: 'motion_zone',
-        data: current.motionZones[0]
+        data: current.motionZones[0],
       });
     });
 
@@ -327,9 +327,9 @@ describe('WebSocketService', () => {
             name: 'Hallway MotionAware',
             motionDetected: true,
             enabled: true,
-            reachable: true
-          }
-        ]
+            reachable: true,
+          },
+        ],
       };
 
       const current = {
@@ -341,16 +341,16 @@ describe('WebSocketService', () => {
             name: 'Hallway MotionAware',
             motionDetected: false, // Changed to false
             enabled: true,
-            reachable: true
-          }
-        ]
+            reachable: true,
+          },
+        ],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
       expect(changes).toContainEqual({
         type: 'motion_zone',
-        data: current.motionZones[0]
+        data: current.motionZones[0],
       });
     });
 
@@ -364,9 +364,9 @@ describe('WebSocketService', () => {
             name: 'Hallway MotionAware',
             motionDetected: false,
             enabled: true,
-            reachable: true
-          }
-        ]
+            reachable: true,
+          },
+        ],
       };
 
       const current = {
@@ -378,16 +378,16 @@ describe('WebSocketService', () => {
             name: 'Hallway MotionAware',
             motionDetected: false,
             enabled: true,
-            reachable: false // Changed to false
-          }
-        ]
+            reachable: false, // Changed to false
+          },
+        ],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
       expect(changes).toContainEqual({
         type: 'motion_zone',
-        data: current.motionZones[0]
+        data: current.motionZones[0],
       });
     });
 
@@ -401,9 +401,9 @@ describe('WebSocketService', () => {
             name: 'Hallway MotionAware',
             motionDetected: false,
             enabled: true,
-            reachable: true
-          }
-        ]
+            reachable: true,
+          },
+        ],
       };
 
       const current = {
@@ -415,15 +415,15 @@ describe('WebSocketService', () => {
             name: 'Hallway MotionAware',
             motionDetected: false,
             enabled: true,
-            reachable: true
-          }
-        ]
+            reachable: true,
+          },
+        ],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
       // Should not include any motion_zone changes
-      const motionZoneChanges = changes.filter(c => c.type === 'motion_zone');
+      const motionZoneChanges = changes.filter((c) => c.type === 'motion_zone');
       expect(motionZoneChanges).toHaveLength(0);
     });
 
@@ -437,16 +437,16 @@ describe('WebSocketService', () => {
             name: 'Hallway MotionAware',
             motionDetected: false,
             enabled: true,
-            reachable: true
+            reachable: true,
           },
           {
             id: 'zone-2',
             name: 'Living Room MotionAware',
             motionDetected: false,
             enabled: true,
-            reachable: true
-          }
-        ]
+            reachable: true,
+          },
+        ],
       };
 
       const current = {
@@ -458,21 +458,21 @@ describe('WebSocketService', () => {
             name: 'Hallway MotionAware',
             motionDetected: true, // Changed
             enabled: true,
-            reachable: true
+            reachable: true,
           },
           {
             id: 'zone-2',
             name: 'Living Room MotionAware',
             motionDetected: true, // Changed
             enabled: true,
-            reachable: true
-          }
-        ]
+            reachable: true,
+          },
+        ],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
-      const motionZoneChanges = changes.filter(c => c.type === 'motion_zone');
+      const motionZoneChanges = changes.filter((c) => c.type === 'motion_zone');
       expect(motionZoneChanges).toHaveLength(2);
       expect(motionZoneChanges[0].data.id).toBe('zone-1');
       expect(motionZoneChanges[1].data.id).toBe('zone-2');
@@ -481,7 +481,7 @@ describe('WebSocketService', () => {
     it('should handle missing motionZones array gracefully', () => {
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: []
+        rooms: [],
         // No motionZones property
       };
 
@@ -494,9 +494,9 @@ describe('WebSocketService', () => {
             name: 'Hallway MotionAware',
             motionDetected: true,
             enabled: true,
-            reachable: true
-          }
-        ]
+            reachable: true,
+          },
+        ],
       };
 
       const changes = websocketService.detectChanges(previous, current);
@@ -504,7 +504,7 @@ describe('WebSocketService', () => {
       // Should detect the new motion zone as a change
       expect(changes).toContainEqual({
         type: 'motion_zone',
-        data: current.motionZones[0]
+        data: current.motionZones[0],
       });
     });
 
@@ -512,18 +512,18 @@ describe('WebSocketService', () => {
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
         rooms: [],
-        motionZones: []
+        motionZones: [],
       };
 
       const current = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
         rooms: [],
-        motionZones: []
+        motionZones: [],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
-      const motionZoneChanges = changes.filter(c => c.type === 'motion_zone');
+      const motionZoneChanges = changes.filter((c) => c.type === 'motion_zone');
       expect(motionZoneChanges).toHaveLength(0);
     });
 
@@ -539,10 +539,10 @@ describe('WebSocketService', () => {
             stats: { lightsOnCount: 1, totalLights: 2, averageBrightness: 80 },
             lights: [
               { id: 'light-1', on: { on: true } },
-              { id: 'light-2', on: { on: false } }
-            ]
-          }
-        ]
+              { id: 'light-2', on: { on: false } },
+            ],
+          },
+        ],
       };
 
       const current = {
@@ -555,17 +555,17 @@ describe('WebSocketService', () => {
             stats: { lightsOnCount: 2, totalLights: 2, averageBrightness: 90 },
             lights: [
               { id: 'light-1', on: { on: true } },
-              { id: 'light-2', on: { on: true } } // Changed to on
-            ]
-          }
-        ]
+              { id: 'light-2', on: { on: true } }, // Changed to on
+            ],
+          },
+        ],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
       expect(changes).toContainEqual({
         type: 'zone',
-        data: current.zones[0]
+        data: current.zones[0],
       });
     });
 
@@ -578,9 +578,9 @@ describe('WebSocketService', () => {
             id: 'zone-1',
             name: 'Downstairs',
             stats: { lightsOnCount: 1, totalLights: 1, averageBrightness: 50 },
-            lights: []
-          }
-        ]
+            lights: [],
+          },
+        ],
       };
 
       const current = {
@@ -591,16 +591,16 @@ describe('WebSocketService', () => {
             id: 'zone-1',
             name: 'Downstairs',
             stats: { lightsOnCount: 1, totalLights: 1, averageBrightness: 100 }, // Changed
-            lights: []
-          }
-        ]
+            lights: [],
+          },
+        ],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
       expect(changes).toContainEqual({
         type: 'zone',
-        data: current.zones[0]
+        data: current.zones[0],
       });
     });
 
@@ -609,24 +609,24 @@ describe('WebSocketService', () => {
         id: 'zone-1',
         name: 'Upstairs',
         stats: { lightsOnCount: 1, totalLights: 1, averageBrightness: 80 },
-        lights: [{ id: 'light-1', on: { on: true } }]
+        lights: [{ id: 'light-1', on: { on: true } }],
       };
 
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
         rooms: [],
-        zones: [zoneData]
+        zones: [zoneData],
       };
 
       const current = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
         rooms: [],
-        zones: [{ ...zoneData }]
+        zones: [{ ...zoneData }],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
-      const zoneChanges = changes.filter(c => c.type === 'zone');
+      const zoneChanges = changes.filter((c) => c.type === 'zone');
       expect(zoneChanges).toHaveLength(0);
     });
 
@@ -636,8 +636,8 @@ describe('WebSocketService', () => {
         rooms: [],
         zones: [
           { id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 1 } },
-          { id: 'zone-2', name: 'Downstairs', stats: { lightsOnCount: 1 } }
-        ]
+          { id: 'zone-2', name: 'Downstairs', stats: { lightsOnCount: 1 } },
+        ],
       };
 
       const current = {
@@ -645,13 +645,13 @@ describe('WebSocketService', () => {
         rooms: [],
         zones: [
           { id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 0 } }, // Changed
-          { id: 'zone-2', name: 'Downstairs', stats: { lightsOnCount: 0 } } // Changed
-        ]
+          { id: 'zone-2', name: 'Downstairs', stats: { lightsOnCount: 0 } }, // Changed
+        ],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
-      const zoneChanges = changes.filter(c => c.type === 'zone');
+      const zoneChanges = changes.filter((c) => c.type === 'zone');
       expect(zoneChanges).toHaveLength(2);
       expect(zoneChanges[0].data.id).toBe('zone-1');
       expect(zoneChanges[1].data.id).toBe('zone-2');
@@ -660,21 +660,21 @@ describe('WebSocketService', () => {
     it('should handle missing zones array gracefully', () => {
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: []
+        rooms: [],
         // No zones property
       };
 
       const current = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
         rooms: [],
-        zones: [{ id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 1 } }]
+        zones: [{ id: 'zone-1', name: 'Upstairs', stats: { lightsOnCount: 1 } }],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
       expect(changes).toContainEqual({
         type: 'zone',
-        data: current.zones[0]
+        data: current.zones[0],
       });
     });
 
@@ -682,37 +682,37 @@ describe('WebSocketService', () => {
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
         rooms: [],
-        zones: []
+        zones: [],
       };
 
       const current = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
         rooms: [],
-        zones: []
+        zones: [],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
-      const zoneChanges = changes.filter(c => c.type === 'zone');
+      const zoneChanges = changes.filter((c) => c.type === 'zone');
       expect(zoneChanges).toHaveLength(0);
     });
 
     it('should detect summary changes', () => {
       const previous = {
         summary: { lightsOn: 1, totalLights: 3, roomCount: 2, sceneCount: 5 },
-        rooms: []
+        rooms: [],
       };
 
       const current = {
         summary: { lightsOn: 2, totalLights: 3, roomCount: 2, sceneCount: 5 },
-        rooms: []
+        rooms: [],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
       expect(changes).toContainEqual({
         type: 'summary',
-        data: current.summary
+        data: current.summary,
       });
     });
 
@@ -723,45 +723,45 @@ describe('WebSocketService', () => {
 
       const changes = websocketService.detectChanges(previous, current);
 
-      const summaryChanges = changes.filter(c => c.type === 'summary');
+      const summaryChanges = changes.filter((c) => c.type === 'summary');
       expect(summaryChanges).toHaveLength(0);
     });
 
     it('should detect room changes', () => {
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: [{ id: 'room-1', name: 'Living Room', stats: { lightsOnCount: 0 }, lights: [] }]
+        rooms: [{ id: 'room-1', name: 'Living Room', stats: { lightsOnCount: 0 }, lights: [] }],
       };
 
       const current = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: [{ id: 'room-1', name: 'Living Room', stats: { lightsOnCount: 1 }, lights: [] }]
+        rooms: [{ id: 'room-1', name: 'Living Room', stats: { lightsOnCount: 1 }, lights: [] }],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
       expect(changes).toContainEqual({
         type: 'room',
-        data: current.rooms[0]
+        data: current.rooms[0],
       });
     });
 
     it('should detect new room', () => {
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: []
+        rooms: [],
       };
 
       const current = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: [{ id: 'room-1', name: 'New Room', stats: { lightsOnCount: 1 }, lights: [] }]
+        rooms: [{ id: 'room-1', name: 'New Room', stats: { lightsOnCount: 1 }, lights: [] }],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
       expect(changes).toContainEqual({
         type: 'room',
-        data: current.rooms[0]
+        data: current.rooms[0],
       });
     });
 
@@ -774,10 +774,10 @@ describe('WebSocketService', () => {
             name: 'Living Room',
             stats: { lightsOnCount: 0 },
             lights: [
-              { id: 'light-1', name: 'Lamp', on: { on: false }, dimming: { brightness: 50 } }
-            ]
-          }
-        ]
+              { id: 'light-1', name: 'Lamp', on: { on: false }, dimming: { brightness: 50 } },
+            ],
+          },
+        ],
       };
 
       const current = {
@@ -788,10 +788,10 @@ describe('WebSocketService', () => {
             name: 'Living Room',
             stats: { lightsOnCount: 1 },
             lights: [
-              { id: 'light-1', name: 'Lamp', on: { on: true }, dimming: { brightness: 100 } }
-            ]
-          }
-        ]
+              { id: 'light-1', name: 'Lamp', on: { on: true }, dimming: { brightness: 100 } },
+            ],
+          },
+        ],
       };
 
       const changes = websocketService.detectChanges(previous, current);
@@ -799,7 +799,7 @@ describe('WebSocketService', () => {
       expect(changes).toContainEqual({
         type: 'light',
         data: current.rooms[0].lights[0],
-        roomId: 'room-1'
+        roomId: 'room-1',
       });
     });
 
@@ -809,43 +809,43 @@ describe('WebSocketService', () => {
         id: 'room-1',
         name: 'Living Room',
         stats: { lightsOnCount: 1 },
-        lights: [light]
+        lights: [light],
       };
 
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: [room]
+        rooms: [room],
       };
 
       const current = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: [{ ...room, lights: [{ ...light }] }]
+        rooms: [{ ...room, lights: [{ ...light }] }],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
-      const lightChanges = changes.filter(c => c.type === 'light');
+      const lightChanges = changes.filter((c) => c.type === 'light');
       expect(lightChanges).toHaveLength(0);
     });
 
     it('should skip light comparison for new rooms', () => {
       const previous = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 1, sceneCount: 1 },
-        rooms: [{ id: 'room-1', name: 'Old Room', stats: {}, lights: [] }]
+        rooms: [{ id: 'room-1', name: 'Old Room', stats: {}, lights: [] }],
       };
 
       const current = {
         summary: { lightsOn: 1, totalLights: 1, roomCount: 2, sceneCount: 1 },
         rooms: [
           { id: 'room-1', name: 'Old Room', stats: {}, lights: [] },
-          { id: 'room-2', name: 'New Room', stats: {}, lights: [{ id: 'light-1' }] }
-        ]
+          { id: 'room-2', name: 'New Room', stats: {}, lights: [{ id: 'light-1' }] },
+        ],
       };
 
       const changes = websocketService.detectChanges(previous, current);
 
       // Should not have light changes for new room (room wasn't in previous)
-      const lightChanges = changes.filter(c => c.type === 'light' && c.roomId === 'room-2');
+      const lightChanges = changes.filter((c) => c.type === 'light' && c.roomId === 'room-2');
       expect(lightChanges).toHaveLength(0);
     });
   });
@@ -894,7 +894,7 @@ describe('WebSocketService', () => {
   describe('handleAuth', () => {
     const mockDashboard = {
       summary: { lightsOn: 1, totalLights: 2, roomCount: 1, sceneCount: 3 },
-      rooms: []
+      rooms: [],
     };
 
     beforeEach(() => {
@@ -905,7 +905,7 @@ describe('WebSocketService', () => {
       const mockWs = { send: vi.fn() };
       sessionManager.getSession.mockReturnValue({
         bridgeIp: '192.168.1.100',
-        username: 'test-user'
+        username: 'test-user',
       });
 
       await websocketService.handleAuth(mockWs, { sessionToken: 'valid-token' });
@@ -916,7 +916,7 @@ describe('WebSocketService', () => {
       expect(mockWs.send).toHaveBeenCalledWith(
         JSON.stringify({
           type: 'initial_state',
-          data: mockDashboard
+          data: mockDashboard,
         })
       );
     });
@@ -930,7 +930,7 @@ describe('WebSocketService', () => {
       expect(mockWs.send).toHaveBeenCalledWith(
         JSON.stringify({
           type: 'error',
-          message: 'Invalid or expired session token'
+          message: 'Invalid or expired session token',
         })
       );
     });
@@ -940,7 +940,7 @@ describe('WebSocketService', () => {
 
       await websocketService.handleAuth(mockWs, {
         bridgeIp: '192.168.1.100',
-        username: 'legacy-user'
+        username: 'legacy-user',
       });
 
       expect(mockWs.bridgeIp).toBe('192.168.1.100');
@@ -956,7 +956,7 @@ describe('WebSocketService', () => {
       expect(mockWs.send).toHaveBeenCalledWith(
         JSON.stringify({
           type: 'error',
-          message: 'Missing authentication: provide sessionToken OR (bridgeIp + username)'
+          message: 'Missing authentication: provide sessionToken OR (bridgeIp + username)',
         })
       );
     });
@@ -967,7 +967,7 @@ describe('WebSocketService', () => {
 
       await websocketService.handleAuth(mockWs, {
         bridgeIp,
-        username: 'test-user'
+        username: 'test-user',
       });
 
       expect(websocketService.connections.has(bridgeIp)).toBe(true);
@@ -982,7 +982,7 @@ describe('WebSocketService', () => {
       const newWs = { send: vi.fn() };
       await websocketService.handleAuth(newWs, {
         bridgeIp,
-        username: 'test-user'
+        username: 'test-user',
       });
 
       const connections = websocketService.connections.get(bridgeIp);
@@ -998,7 +998,7 @@ describe('WebSocketService', () => {
 
       await websocketService.handleAuth(mockWs, {
         bridgeIp,
-        username: 'test-user'
+        username: 'test-user',
       });
 
       expect(startPollingSpy).toHaveBeenCalledWith(bridgeIp, 'test-user');
@@ -1010,13 +1010,13 @@ describe('WebSocketService', () => {
 
       await websocketService.handleAuth(mockWs, {
         bridgeIp: '192.168.1.100',
-        username: 'test-user'
+        username: 'test-user',
       });
 
       expect(mockWs.send).toHaveBeenCalledWith(
         JSON.stringify({
           type: 'error',
-          message: 'Failed to fetch initial state'
+          message: 'Failed to fetch initial state',
         })
       );
     });
@@ -1040,7 +1040,7 @@ describe('WebSocketService', () => {
       const username = 'test-user';
       dashboardService.getDashboard.mockResolvedValue({
         summary: {},
-        rooms: []
+        rooms: [],
       });
 
       await websocketService.startPolling(bridgeIp, username);
@@ -1086,7 +1086,7 @@ describe('WebSocketService', () => {
 
       expect(broadcastSpy).toHaveBeenCalledWith(bridgeIp, {
         type: 'state_update',
-        changes: expect.arrayContaining([{ type: 'summary', data: updatedState.summary }])
+        changes: expect.arrayContaining([{ type: 'summary', data: updatedState.summary }]),
       });
     });
 

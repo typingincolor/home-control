@@ -11,7 +11,7 @@ export const LightShape = PropTypes.shape({
   brightness: PropTypes.number.isRequired,
   color: PropTypes.string, // Pre-computed CSS color (e.g., "rgb(255, 180, 120)")
   shadow: PropTypes.string, // Pre-computed CSS shadow
-  colorSource: PropTypes.oneOf(['xy', 'temperature', 'fallback', null])
+  colorSource: PropTypes.oneOf(['xy', 'temperature', 'fallback', null]),
 });
 
 /**
@@ -19,7 +19,7 @@ export const LightShape = PropTypes.shape({
  */
 export const SceneShape = PropTypes.shape({
   id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired
+  name: PropTypes.string.isRequired,
 });
 
 /**
@@ -28,7 +28,7 @@ export const SceneShape = PropTypes.shape({
 export const RoomStatsShape = PropTypes.shape({
   lightsOnCount: PropTypes.number.isRequired,
   totalLights: PropTypes.number.isRequired,
-  averageBrightness: PropTypes.number.isRequired
+  averageBrightness: PropTypes.number.isRequired,
 });
 
 /**
@@ -39,7 +39,7 @@ export const RoomShape = PropTypes.shape({
   name: PropTypes.string.isRequired,
   stats: RoomStatsShape.isRequired,
   lights: PropTypes.arrayOf(LightShape).isRequired,
-  scenes: PropTypes.arrayOf(SceneShape).isRequired
+  scenes: PropTypes.arrayOf(SceneShape).isRequired,
 });
 
 /**
@@ -50,7 +50,7 @@ export const MotionZoneShape = PropTypes.shape({
   name: PropTypes.string.isRequired,
   motionDetected: PropTypes.bool.isRequired,
   enabled: PropTypes.bool,
-  reachable: PropTypes.bool
+  reachable: PropTypes.bool,
 });
 
 /**
@@ -61,7 +61,7 @@ export const ZoneShape = PropTypes.shape({
   name: PropTypes.string.isRequired,
   stats: RoomStatsShape.isRequired,
   lights: PropTypes.arrayOf(LightShape).isRequired,
-  scenes: PropTypes.arrayOf(SceneShape).isRequired
+  scenes: PropTypes.arrayOf(SceneShape).isRequired,
 });
 
 /**
@@ -71,5 +71,5 @@ export const DashboardSummaryShape = PropTypes.shape({
   lightsOn: PropTypes.number.isRequired,
   totalLights: PropTypes.number.isRequired,
   roomCount: PropTypes.number.isRequired,
-  sceneCount: PropTypes.number.isRequired
+  sceneCount: PropTypes.number.isRequired,
 });

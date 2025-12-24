@@ -3,7 +3,7 @@ import {
   buildDeviceToLightsMap,
   getLightsFromChildren,
   calculateLightStats,
-  getScenesForGroup
+  getScenesForGroup,
 } from '../../utils/hierarchyUtils.js';
 
 describe('hierarchyUtils', () => {
@@ -15,11 +15,11 @@ describe('hierarchyUtils', () => {
             id: 'device-1',
             services: [
               { rid: 'light-1', rtype: 'light' },
-              { rid: 'light-2', rtype: 'light' }
-            ]
+              { rid: 'light-2', rtype: 'light' },
+            ],
           },
-          { id: 'device-2', services: [{ rid: 'light-3', rtype: 'light' }] }
-        ]
+          { id: 'device-2', services: [{ rid: 'light-3', rtype: 'light' }] },
+        ],
       };
 
       const result = buildDeviceToLightsMap(devicesData);
@@ -36,10 +36,10 @@ describe('hierarchyUtils', () => {
             services: [
               { rid: 'light-1', rtype: 'light' },
               { rid: 'button-1', rtype: 'button' },
-              { rid: 'sensor-1', rtype: 'motion' }
-            ]
-          }
-        ]
+              { rid: 'sensor-1', rtype: 'motion' },
+            ],
+          },
+        ],
       };
 
       const result = buildDeviceToLightsMap(devicesData);
@@ -57,7 +57,7 @@ describe('hierarchyUtils', () => {
 
     it('should handle devices without services', () => {
       const devicesData = {
-        data: [{ id: 'device-1' }]
+        data: [{ id: 'device-1' }],
       };
 
       const result = buildDeviceToLightsMap(devicesData);
@@ -69,7 +69,7 @@ describe('hierarchyUtils', () => {
   describe('getLightsFromChildren', () => {
     const deviceToLights = {
       'device-1': ['light-1', 'light-2'],
-      'device-2': ['light-3']
+      'device-2': ['light-3'],
     };
 
     it('should get lights from device children', () => {
@@ -83,7 +83,7 @@ describe('hierarchyUtils', () => {
     it('should get lights from multiple devices', () => {
       const children = [
         { rid: 'device-1', rtype: 'device' },
-        { rid: 'device-2', rtype: 'device' }
+        { rid: 'device-2', rtype: 'device' },
       ];
 
       const result = getLightsFromChildren(children, deviceToLights);
@@ -102,7 +102,7 @@ describe('hierarchyUtils', () => {
     it('should handle mixed device and light children', () => {
       const children = [
         { rid: 'device-1', rtype: 'device' },
-        { rid: 'light-4', rtype: 'light' }
+        { rid: 'light-4', rtype: 'light' },
       ];
 
       const result = getLightsFromChildren(children, deviceToLights);
@@ -132,7 +132,7 @@ describe('hierarchyUtils', () => {
       const lights = [
         { on: { on: true }, dimming: { brightness: 80 } },
         { on: { on: true }, dimming: { brightness: 60 } },
-        { on: { on: false }, dimming: { brightness: 0 } }
+        { on: { on: false }, dimming: { brightness: 0 } },
       ];
 
       const result = calculateLightStats(lights);
@@ -148,7 +148,7 @@ describe('hierarchyUtils', () => {
       expect(result).toEqual({
         lightsOnCount: 0,
         totalLights: 0,
-        averageBrightness: 0
+        averageBrightness: 0,
       });
     });
 
@@ -158,14 +158,14 @@ describe('hierarchyUtils', () => {
       expect(result).toEqual({
         lightsOnCount: 0,
         totalLights: 0,
-        averageBrightness: 0
+        averageBrightness: 0,
       });
     });
 
     it('should use 50% fallback when brightness is missing', () => {
       const lights = [
         { on: { on: true } }, // missing dimming
-        { on: { on: true }, dimming: { brightness: 100 } }
+        { on: { on: true }, dimming: { brightness: 100 } },
       ];
 
       const result = calculateLightStats(lights);
@@ -176,7 +176,7 @@ describe('hierarchyUtils', () => {
     it('should return 0 average when all lights are off', () => {
       const lights = [
         { on: { on: false }, dimming: { brightness: 50 } },
-        { on: { on: false }, dimming: { brightness: 80 } }
+        { on: { on: false }, dimming: { brightness: 80 } },
       ];
 
       const result = calculateLightStats(lights);
@@ -192,8 +192,8 @@ describe('hierarchyUtils', () => {
         { id: 'scene-1', group: { rid: 'room-1', rtype: 'room' }, metadata: { name: 'Bright' } },
         { id: 'scene-2', group: { rid: 'room-1', rtype: 'room' }, metadata: { name: 'Dim' } },
         { id: 'scene-3', group: { rid: 'room-2', rtype: 'room' }, metadata: { name: 'Relax' } },
-        { id: 'scene-4', group: { rid: 'zone-1', rtype: 'zone' }, metadata: { name: 'Party' } }
-      ]
+        { id: 'scene-4', group: { rid: 'zone-1', rtype: 'zone' }, metadata: { name: 'Party' } },
+      ],
     };
 
     it('should filter scenes by group UUID', () => {
@@ -222,8 +222,8 @@ describe('hierarchyUtils', () => {
         data: [
           { id: 'scene-1', group: { rid: 'room-1' }, metadata: { name: 'Zebra' } },
           { id: 'scene-2', group: { rid: 'room-1' }, metadata: { name: 'Apple' } },
-          { id: 'scene-3', group: { rid: 'room-1' }, metadata: { name: 'Mango' } }
-        ]
+          { id: 'scene-3', group: { rid: 'room-1' }, metadata: { name: 'Mango' } },
+        ],
       };
 
       const result = getScenesForGroup(unsortedScenes, 'room-1');
@@ -243,7 +243,7 @@ describe('hierarchyUtils', () => {
 
     it('should handle scenes without metadata', () => {
       const scenesWithoutMetadata = {
-        data: [{ id: 'scene-1', group: { rid: 'room-1' } }]
+        data: [{ id: 'scene-1', group: { rid: 'room-1' } }],
       };
 
       const result = getScenesForGroup(scenesWithoutMetadata, 'room-1');

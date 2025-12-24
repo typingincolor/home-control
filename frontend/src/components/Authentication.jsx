@@ -105,5 +105,5 @@ Authentication.propTypes = {
   bridgeIp: PropTypes.string.isRequired,
   onAuthenticate: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
-  error: PropTypes.string
+  error: PropTypes.string,
 };

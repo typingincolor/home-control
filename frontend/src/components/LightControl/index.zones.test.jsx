@@ -12,7 +12,7 @@ const baseDashboard = {
     lightsOn: 3,
     totalLights: 6,
     roomCount: 2,
-    sceneCount: 4
+    sceneCount: 4,
   },
   rooms: [
     {
@@ -22,10 +22,10 @@ const baseDashboard = {
       lights: [
         { id: 'light-1', name: 'Light 1', on: true, brightness: 80 },
         { id: 'light-2', name: 'Light 2', on: true, brightness: 70 },
-        { id: 'light-3', name: 'Light 3', on: false, brightness: 0 }
+        { id: 'light-3', name: 'Light 3', on: false, brightness: 0 },
       ],
-      scenes: [{ id: 'scene-1', name: 'Bright' }]
-    }
+      scenes: [{ id: 'scene-1', name: 'Bright' }],
+    },
   ],
   zones: [
     {
@@ -34,9 +34,9 @@ const baseDashboard = {
       stats: { lightsOnCount: 2, totalLights: 4, averageBrightness: 80 },
       lights: [
         { id: 'light-1', name: 'Light 1', on: true, brightness: 80 },
-        { id: 'light-4', name: 'Light 4', on: true, brightness: 80 }
+        { id: 'light-4', name: 'Light 4', on: true, brightness: 80 },
       ],
-      scenes: [{ id: 'scene-2', name: 'Evening' }]
+      scenes: [{ id: 'scene-2', name: 'Evening' }],
     },
     {
       id: 'zone-2',
@@ -44,29 +44,29 @@ const baseDashboard = {
       stats: { lightsOnCount: 1, totalLights: 2, averageBrightness: 70 },
       lights: [
         { id: 'light-2', name: 'Light 2', on: true, brightness: 70 },
-        { id: 'light-5', name: 'Light 5', on: false, brightness: 0 }
+        { id: 'light-5', name: 'Light 5', on: false, brightness: 0 },
       ],
-      scenes: [{ id: 'scene-3', name: 'Morning' }]
-    }
+      scenes: [{ id: 'scene-3', name: 'Morning' }],
+    },
   ],
-  motionZones: []
+  motionZones: [],
 };
 
 // Mock hooks
 vi.mock('../../hooks/useHueApi', () => ({
-  useHueApi: () => mockApi
+  useHueApi: () => mockApi,
 }));
 
 vi.mock('../../hooks/useDemoMode', () => ({
-  useDemoMode: () => true // Always demo mode for tests
+  useDemoMode: () => true, // Always demo mode for tests
 }));
 
 vi.mock('../../hooks/useWebSocket', () => ({
   useWebSocket: () => ({
     isConnected: false,
     dashboard: null,
-    error: null
-  })
+    error: null,
+  }),
 }));
 
 describe('LightControl - Zones (Navigation)', () => {
@@ -78,7 +78,7 @@ describe('LightControl - Zones (Navigation)', () => {
       updateLight: vi.fn().mockResolvedValue({ light: {} }),
       updateRoomLights: vi.fn().mockResolvedValue({ updatedLights: [] }),
       updateZoneLights: vi.fn().mockResolvedValue({ updatedLights: [] }),
-      activateSceneV1: vi.fn().mockResolvedValue({ affectedLights: [] })
+      activateSceneV1: vi.fn().mockResolvedValue({ affectedLights: [] }),
     };
   });
 
@@ -202,7 +202,9 @@ describe('LightControl - Zones (Navigation)', () => {
     const zoneItems = document.querySelectorAll('.zone-item-dark');
     expect(zoneItems.length).toBe(2);
 
-    const upstairsZone = Array.from(zoneItems).find(item => item.textContent.includes('Upstairs'));
+    const upstairsZone = Array.from(zoneItems).find((item) =>
+      item.textContent.includes('Upstairs')
+    );
     expect(upstairsZone).toBeTruthy();
 
     const offButton = upstairsZone.querySelector('.zone-toggle-btn');

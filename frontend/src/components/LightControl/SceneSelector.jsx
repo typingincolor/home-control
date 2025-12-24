@@ -7,7 +7,7 @@ export const SceneSelector = ({ scenes, onActivate, isActivating }) => {
 
   return (
     <div className="scene-icons">
-      {scenes.map(scene => (
+      {scenes.map((scene) => (
         <button
           key={scene.id}
           className="scene-icon-button"
@@ -26,5 +26,5 @@ export const SceneSelector = ({ scenes, onActivate, isActivating }) => {
 SceneSelector.propTypes = {
   scenes: PropTypes.arrayOf(SceneShape).isRequired,
   onActivate: PropTypes.func.isRequired,
-  isActivating: PropTypes.bool
+  isActivating: PropTypes.bool,
 };

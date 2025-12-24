@@ -5,5 +5,5 @@ export const ERROR_MESSAGES = {
   ROOM_TOGGLE: 'Failed to toggle room lights',
   ZONE_TOGGLE: 'Failed to toggle zone lights',
   SCENE_ACTIVATION: 'Failed to activate scene',
-  INVALID_IP: 'Please enter a valid IP address (e.g., 192.168.1.100)'
+  INVALID_IP: 'Please enter a valid IP address (e.g., 192.168.1.100)',
 };

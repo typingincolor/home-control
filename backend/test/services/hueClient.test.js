@@ -10,8 +10,8 @@ vi.mock('../../utils/logger.js', () => ({
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
-    debug: vi.fn()
-  })
+    debug: vi.fn(),
+  }),
 }));
 
 describe('HueClient', () => {
@@ -47,8 +47,8 @@ describe('HueClient', () => {
           method: 'GET',
           url: `https://${bridgeIp}/clip/v2/resource/light`,
           headers: expect.objectContaining({
-            'hue-application-key': username
-          })
+            'hue-application-key': username,
+          }),
         })
       );
       expect(result).toEqual(mockResponse.data);
@@ -64,7 +64,7 @@ describe('HueClient', () => {
       expect(axios).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'PUT',
-          data: bodyData
+          data: bodyData,
         })
       );
     });
@@ -74,12 +74,12 @@ describe('HueClient', () => {
       axios.mockResolvedValue(mockResponse);
 
       await hueClient._request('GET', bridgeIp, '/clip/v2/resource/light', username, {
-        someData: true
+        someData: true,
       });
 
       expect(axios).toHaveBeenCalledWith(
         expect.not.objectContaining({
-          data: expect.anything()
+          data: expect.anything(),
         })
       );
     });
@@ -105,7 +105,7 @@ describe('HueClient', () => {
     it('should throw on Hue API v2 errors', async () => {
       const mockResponse = {
         status: 200,
-        data: { errors: [{ description: 'Resource not found' }], data: [] }
+        data: { errors: [{ description: 'Resource not found' }], data: [] },
       };
       axios.mockResolvedValue(mockResponse);
 
@@ -117,7 +117,7 @@ describe('HueClient', () => {
     it('should handle Hue API v2 errors without description', async () => {
       const mockResponse = {
         status: 200,
-        data: { errors: [{ type: 'unknown_error' }], data: [] }
+        data: { errors: [{ type: 'unknown_error' }], data: [] },
       };
       axios.mockResolvedValue(mockResponse);
 
@@ -335,7 +335,7 @@ describe('HueClient', () => {
         expect.objectContaining({
           method: 'PUT',
           url: `https://${bridgeIp}/clip/v2/resource/light/light-123`,
-          data: state
+          data: state,
         })
       );
     });
@@ -349,7 +349,7 @@ describe('HueClient', () => {
       const updates = [
         { lightId: 'light-1', state: { on: { on: true } } },
         { lightId: 'light-2', state: { on: { on: false } } },
-        { lightId: 'light-3', state: { on: { on: true } } }
+        { lightId: 'light-3', state: { on: { on: true } } },
       ];
 
       await hueClient.updateLights(bridgeIp, username, updates);
@@ -365,7 +365,7 @@ describe('HueClient', () => {
       const updates = [
         { lightId: 'light-1', state: {} },
         { lightId: 'light-2', state: {} },
-        { lightId: 'light-3', state: {} }
+        { lightId: 'light-3', state: {} },
       ];
 
       await expect(hueClient.updateLights(bridgeIp, username, updates)).rejects.toThrow(
@@ -385,7 +385,7 @@ describe('HueClient', () => {
         expect.objectContaining({
           method: 'PUT',
           url: `https://${bridgeIp}/clip/v2/resource/scene/scene-123`,
-          data: { recall: { action: 'active' } }
+          data: { recall: { action: 'active' } },
         })
       );
     });
@@ -400,7 +400,7 @@ describe('HueClient', () => {
 
       expect(axios).toHaveBeenCalledWith(
         expect.objectContaining({
-          url: `https://${bridgeIp}/clip/v2/resource/light`
+          url: `https://${bridgeIp}/clip/v2/resource/light`,
         })
       );
       expect(result).toEqual(mockData);
@@ -426,7 +426,7 @@ describe('HueClient', () => {
       expect(result).toEqual({
         lightsData: mockLights,
         roomsData: mockRooms,
-        devicesData: mockDevices
+        devicesData: mockDevices,
       });
     });
 
@@ -460,7 +460,7 @@ describe('HueClient', () => {
       expect(result).toEqual({
         lightsData: mockLights,
         zonesData: mockZones,
-        devicesData: mockDevices
+        devicesData: mockDevices,
       });
     });
   });
@@ -483,7 +483,7 @@ describe('HueClient', () => {
         lightsData: mockLights,
         roomsData: mockRooms,
         devicesData: mockDevices,
-        scenesData: mockScenes
+        scenesData: mockScenes,
       });
     });
   });

@@ -15,8 +15,8 @@ export function buildDeviceToLightsMap(devicesData) {
 
   const deviceToLights = {};
 
-  devicesData.data.forEach(device => {
-    const lightUuids = device.services?.filter(s => s.rtype === 'light').map(s => s.rid) || [];
+  devicesData.data.forEach((device) => {
+    const lightUuids = device.services?.filter((s) => s.rtype === 'light').map((s) => s.rid) || [];
     deviceToLights[device.id] = lightUuids;
   });
 
@@ -36,7 +36,7 @@ export function getLightsFromChildren(children, deviceToLights) {
 
   const lightUuids = [];
 
-  children.forEach(child => {
+  children.forEach((child) => {
     if (child.rtype === 'device') {
       const deviceLights = deviceToLights[child.rid] || [];
       lightUuids.push(...deviceLights);
@@ -58,7 +58,7 @@ export function calculateLightStats(lights) {
     return { lightsOnCount: 0, totalLights: 0, averageBrightness: 0 };
   }
 
-  const lightsOn = lights.filter(light => light.on?.on);
+  const lightsOn = lights.filter((light) => light.on?.on);
   const lightsOnCount = lightsOn.length;
   const totalLights = lights.length;
 
@@ -88,14 +88,14 @@ export function getScenesForGroup(scenesData, groupUuid, groupType = null) {
   }
 
   return scenesData.data
-    .filter(scene => {
+    .filter((scene) => {
       const matchesId = scene.group?.rid === groupUuid;
       const matchesType = groupType ? scene.group?.rtype === groupType : true;
       return matchesId && matchesType;
     })
-    .map(scene => ({
+    .map((scene) => ({
       id: scene.id,
-      name: scene.metadata?.name || 'Unknown Scene'
+      name: scene.metadata?.name || 'Unknown Scene',
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }

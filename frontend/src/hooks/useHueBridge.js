@@ -39,7 +39,7 @@ export const useHueBridge = () => {
       username: null, // Legacy, kept for compatibility
       lights: null,
       loading: false,
-      error: null
+      error: null,
     };
   });
 
@@ -48,32 +48,32 @@ export const useHueBridge = () => {
     bridgeIp: sessionBridgeIp,
     createSession,
     clearSession,
-    isValid
+    isValid,
   } = useSession();
 
   // Helper to migrate from legacy auth to session auth
   const migrateToSession = async (bridgeIp, username) => {
-    setState(prev => ({ ...prev, loading: true }));
+    setState((prev) => ({ ...prev, loading: true }));
     try {
       const sessionInfo = await hueApi.createSession(bridgeIp, username);
       createSession(sessionInfo.sessionToken, bridgeIp, sessionInfo.expiresIn, username);
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         bridgeIp,
         loading: false,
-        step: 'connected'
+        step: 'connected',
       }));
       logger.info('Successfully auto-recovered session');
     } catch (error) {
       logger.error('Failed to auto-recover session:', error);
       // Clear invalid credentials and require re-authentication
       localStorage.removeItem(STORAGE_KEYS.USERNAME);
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         bridgeIp,
         loading: false,
         step: 'authentication',
-        error: 'Session recovery failed. Please authenticate again.'
+        error: 'Session recovery failed. Please authenticate again.',
       }));
     }
   };
@@ -92,10 +92,10 @@ export const useHueBridge = () => {
         try {
           logger.info('Validating session with server...');
           await hueApi.getDashboard(sessionToken);
-          setState(prev => ({
+          setState((prev) => ({
             ...prev,
             bridgeIp: sessionBridgeIp,
-            step: 'connected'
+            step: 'connected',
           }));
           logger.info('Session restored successfully');
           return;
@@ -111,10 +111,10 @@ export const useHueBridge = () => {
           logger.info('Trying to connect with stored server credentials', { bridgeIp: savedIp });
           const sessionInfo = await hueApi.connect(savedIp);
           createSession(sessionInfo.sessionToken, savedIp, sessionInfo.expiresIn);
-          setState(prev => ({
+          setState((prev) => ({
             ...prev,
             bridgeIp: savedIp,
-            step: 'connected'
+            step: 'connected',
           }));
           logger.info('Connected using stored server credentials');
           return;
@@ -135,16 +135,16 @@ export const useHueBridge = () => {
         }
 
         // No recovery options, go to authentication
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           bridgeIp: savedIp,
-          step: 'authentication'
+          step: 'authentication',
         }));
       } else {
         // No saved bridge IP, go to discovery
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
-          step: 'discovery'
+          step: 'discovery',
         }));
       }
     };
@@ -168,13 +168,13 @@ export const useHueBridge = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Run only on mount
   }, []);
 
-  const setBridgeIp = async ip => {
+  const setBridgeIp = async (ip) => {
     localStorage.setItem(STORAGE_KEYS.BRIDGE_IP, ip);
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       bridgeIp: ip,
       loading: true,
-      error: null
+      error: null,
     }));
 
     // Try to connect using stored server-side credentials first
@@ -184,29 +184,29 @@ export const useHueBridge = () => {
 
       // Success! Create session and go to connected
       createSession(sessionInfo.sessionToken, ip, sessionInfo.expiresIn);
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         loading: false,
-        step: 'connected'
+        step: 'connected',
       }));
       logger.info('Connected using stored credentials');
     } catch (error) {
       if (error.message === 'PAIRING_REQUIRED') {
         // No stored credentials, need to pair
         logger.info('Pairing required for this bridge');
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           loading: false,
-          step: 'authentication'
+          step: 'authentication',
         }));
       } else {
         // Other error
         logger.error('Connection failed', { error: error.message });
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           loading: false,
           step: 'authentication',
-          error: error.message
+          error: error.message,
         }));
       }
     }
@@ -214,7 +214,7 @@ export const useHueBridge = () => {
 
   const authenticate = useCallback(async () => {
     logger.info('Starting authentication', { bridgeIp: state.bridgeIp });
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
       // Step 1: Pair with bridge (get username)
@@ -226,10 +226,10 @@ export const useHueBridge = () => {
       const sessionInfo = await hueApi.createSession(state.bridgeIp, username);
       createSession(sessionInfo.sessionToken, state.bridgeIp, sessionInfo.expiresIn, username);
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         loading: false,
-        step: 'connected'
+        step: 'connected',
       }));
 
       logger.info('Authentication complete with session token');
@@ -241,10 +241,10 @@ export const useHueBridge = () => {
         errorMessage = 'Browser security is blocking the request. See troubleshooting tips below.';
       }
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         loading: false,
-        error: errorMessage
+        error: errorMessage,
       }));
     }
   }, [state.bridgeIp, createSession]);
@@ -252,7 +252,7 @@ export const useHueBridge = () => {
   const testConnection = async () => {
     // Connection testing is now handled by ConnectionTest component
     // This function is kept for compatibility but does nothing
-    setState(prev => ({ ...prev, loading: false, error: null }));
+    setState((prev) => ({ ...prev, loading: false, error: null }));
   };
 
   const reset = () => {
@@ -269,7 +269,7 @@ export const useHueBridge = () => {
       username: null,
       lights: null,
       loading: false,
-      error: null
+      error: null,
     });
 
     logger.info('Reset authentication');
@@ -281,6 +281,6 @@ export const useHueBridge = () => {
     setBridgeIp,
     authenticate,
     testConnection,
-    reset
+    reset,
   };
 };
