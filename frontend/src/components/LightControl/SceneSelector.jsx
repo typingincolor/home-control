@@ -1,12 +1,15 @@
 import PropTypes from 'prop-types';
 import { SceneShape } from '../../propTypes/shapes';
 import { SceneIcon, Spinner } from './Icons';
+import { useDragScroll } from '../../hooks/useDragScroll';
 
 export const SceneSelector = ({ scenes, onActivate, isActivating }) => {
+  const dragScrollRef = useDragScroll();
+
   if (!scenes || scenes.length === 0) return null;
 
   return (
-    <div className="scene-icons">
+    <div className="scene-icons" ref={dragScrollRef}>
       {scenes.map((scene) => (
         <button
           key={scene.id}

@@ -1,6 +1,6 @@
-import { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { UI_TEXT } from '../../constants/uiText';
+import { useDragScroll } from '../../hooks/useDragScroll';
 import {
   Home,
   Grid,
@@ -17,59 +17,6 @@ import {
 
 // Icon size for nav tabs
 const NAV_ICON_SIZE = 36;
-
-// Hook for drag-to-scroll functionality
-const useDragScroll = () => {
-  const ref = useRef(null);
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const handleMouseDown = (e) => {
-      isDragging.current = true;
-      startX.current = e.pageX - el.offsetLeft;
-      scrollLeft.current = el.scrollLeft;
-      el.style.cursor = 'grabbing';
-    };
-
-    const handleMouseUp = () => {
-      isDragging.current = false;
-      el.style.cursor = 'grab';
-    };
-
-    const handleMouseLeave = () => {
-      isDragging.current = false;
-      el.style.cursor = 'grab';
-    };
-
-    const handleMouseMove = (e) => {
-      if (!isDragging.current) return;
-      e.preventDefault();
-      const x = e.pageX - el.offsetLeft;
-      const walk = (x - startX.current) * 1.5; // Scroll speed multiplier
-      el.scrollLeft = scrollLeft.current - walk;
-    };
-
-    el.style.cursor = 'grab';
-    el.addEventListener('mousedown', handleMouseDown);
-    el.addEventListener('mouseup', handleMouseUp);
-    el.addEventListener('mouseleave', handleMouseLeave);
-    el.addEventListener('mousemove', handleMouseMove);
-
-    return () => {
-      el.removeEventListener('mousedown', handleMouseDown);
-      el.removeEventListener('mouseup', handleMouseUp);
-      el.removeEventListener('mouseleave', handleMouseLeave);
-      el.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, []);
-
-  return ref;
-};
 
 // Get room-specific icon based on room name
 const getRoomIcon = (name) => {
