@@ -494,6 +494,30 @@ test.describe('Zones View Layout', () => {
           }
         }
       });
+
+      test('each zone should have 6 scene buttons that can be scrolled to', async ({ page }) => {
+        const zoneItems = page.locator('.zone-item-dark');
+        const zoneCount = await zoneItems.count();
+
+        for (let i = 0; i < zoneCount; i++) {
+          const sceneButtons = zoneItems.nth(i).locator('.scene-icon-button');
+          const sceneCount = await sceneButtons.count();
+
+          // Each zone should have exactly 6 scenes
+          expect(sceneCount).toBe(6);
+
+          // All scene buttons should have proper dimensions (not shrunk)
+          for (let j = 0; j < sceneCount; j++) {
+            const box = await sceneButtons.nth(j).boundingBox();
+            expect(box).not.toBeNull();
+            if (box) {
+              // Each button should be at least 44px (not shrunk)
+              expect(box.width).toBeGreaterThanOrEqual(44);
+              expect(box.height).toBeGreaterThanOrEqual(44);
+            }
+          }
+        }
+      });
     });
   }
 });

@@ -2295,6 +2295,10 @@ body.dark-theme {
     display: none;
   }
 
+  .zone-item-controls .scene-icons .scene-icon-button {
+    flex-shrink: 0;
+  }
+
   .zone-item-controls .zone-toggle-btn {
     flex-shrink: 0;
   }
