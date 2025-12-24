@@ -6,20 +6,20 @@ import { createLogger } from '../utils/logger';
 
 const logger = createLogger('Auth');
 
-// Helper to check for valid session synchronously (before first render)
+// Helper to check if we need to restore a session (before first render)
 const getInitialStep = () => {
   const savedToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
   const savedBridgeIp = localStorage.getItem(STORAGE_KEYS.BRIDGE_IP);
   const savedExpiry = localStorage.getItem(STORAGE_KEYS.SESSION_EXPIRES_AT);
 
-  // Check if we have all required session fields
+  // Check if we have session data that needs restoration
   if (savedToken && savedBridgeIp && savedExpiry) {
     const expiryTime = parseInt(savedExpiry, 10);
     const isExpired = Date.now() >= expiryTime;
 
-    // If session is valid and not expired, start at 'connected'
+    // If session appears valid, start at 'restoring' (will validate with server)
     if (!isExpired) {
-      return 'connected';
+      return 'restoring';
     }
   }
 
@@ -78,27 +78,92 @@ export const useHueBridge = () => {
     }
   };
 
-  // Load saved credentials on mount (supports both session and legacy)
+  // Handle session restoration on mount
   useEffect(() => {
-    // Check for existing session first (preferred)
-    if (sessionToken && isValid) {
-      setState(prev => ({
-        ...prev,
-        bridgeIp: sessionBridgeIp,
-        step: 'connected'
-      }));
-      logger.info('Restored session from storage');
-    }
-    // Check if we have username but no valid session (e.g., after server restart)
-    else {
-      const savedIp = localStorage.getItem(STORAGE_KEYS.BRIDGE_IP);
-      const savedUsername = localStorage.getItem(STORAGE_KEYS.USERNAME);
+    const restoreSession = async () => {
+      // Only run when we're in the 'restoring' state
+      if (state.step !== 'restoring') return;
 
-      if (savedIp && savedUsername) {
-        logger.info('Found saved credentials, auto-recovering session...');
-        // Automatically recreate session (no button press needed!)
-        migrateToSession(savedIp, savedUsername);
+      const savedIp = localStorage.getItem(STORAGE_KEYS.BRIDGE_IP);
+
+      // Wait for useSession to load the token
+      if (sessionToken && isValid) {
+        // Validate session with server by making a test request
+        try {
+          logger.info('Validating session with server...');
+          await hueApi.getDashboard(sessionToken);
+          setState(prev => ({
+            ...prev,
+            bridgeIp: sessionBridgeIp,
+            step: 'connected'
+          }));
+          logger.info('Session restored successfully');
+          return;
+        } catch (error) {
+          logger.warn('Session invalid on server, trying stored credentials...', error.message);
+          // Session expired on server, try to reconnect
+        }
       }
+
+      // Session not valid, try to connect using server-side stored credentials
+      if (savedIp) {
+        try {
+          logger.info('Trying to connect with stored server credentials', { bridgeIp: savedIp });
+          const sessionInfo = await hueApi.connect(savedIp);
+          createSession(sessionInfo.sessionToken, savedIp, sessionInfo.expiresIn);
+          setState(prev => ({
+            ...prev,
+            bridgeIp: savedIp,
+            step: 'connected'
+          }));
+          logger.info('Connected using stored server credentials');
+          return;
+        } catch (error) {
+          if (error.message === 'PAIRING_REQUIRED') {
+            logger.info('No stored server credentials, checking for username...');
+          } else {
+            logger.error('Connect failed', error.message);
+          }
+        }
+
+        // Try legacy username-based recovery
+        const savedUsername = localStorage.getItem(STORAGE_KEYS.USERNAME);
+        if (savedUsername) {
+          logger.info('Found saved username, auto-recovering session...');
+          await migrateToSession(savedIp, savedUsername);
+          return;
+        }
+
+        // No recovery options, go to authentication
+        setState(prev => ({
+          ...prev,
+          bridgeIp: savedIp,
+          step: 'authentication'
+        }));
+      } else {
+        // No saved bridge IP, go to discovery
+        setState(prev => ({
+          ...prev,
+          step: 'discovery'
+        }));
+      }
+    };
+
+    restoreSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Run when step or sessionToken changes
+  }, [state.step, sessionToken, isValid]);
+
+  // Handle legacy recovery on mount (when session is expired but username exists)
+  useEffect(() => {
+    // Only run on mount when starting at 'discovery'
+    if (state.step !== 'discovery') return;
+
+    const savedIp = localStorage.getItem(STORAGE_KEYS.BRIDGE_IP);
+    const savedUsername = localStorage.getItem(STORAGE_KEYS.USERNAME);
+
+    if (savedIp && savedUsername) {
+      logger.info('Found saved credentials (expired session), auto-recovering...');
+      migrateToSession(savedIp, savedUsername);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Run only on mount
   }, []);

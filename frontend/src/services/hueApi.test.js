@@ -411,9 +411,7 @@ describe('hueApi', () => {
 
       const result = await hueApi.checkBridgeStatus('192.168.1.100');
 
-      expect(fetch).toHaveBeenCalledWith(
-        '/api/v1/auth/bridge-status?bridgeIp=192.168.1.100'
-      );
+      expect(fetch).toHaveBeenCalledWith('/api/v1/auth/bridge-status?bridgeIp=192.168.1.100');
 
       expect(result).toBe(true);
     });
@@ -449,9 +447,7 @@ describe('hueApi', () => {
 
       await hueApi.checkBridgeStatus('192.168.1.100');
 
-      expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('bridgeIp=192.168.1.100')
-      );
+      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('bridgeIp=192.168.1.100'));
     });
   });
 });

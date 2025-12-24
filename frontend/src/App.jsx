@@ -19,7 +19,7 @@ function App() {
 
   return (
     <div className="app">
-      {effectiveStep !== 'connected' && (
+      {effectiveStep !== 'connected' && effectiveStep !== 'restoring' && (
         <header className="app-header">
           <h1>{UI_TEXT.APP_TITLE}</h1>
           <p className="subtitle">{UI_TEXT.APP_SUBTITLE}</p>
@@ -48,6 +48,13 @@ function App() {
       )}
 
       <main className="app-main">
+        {effectiveStep === 'restoring' && (
+          <div className="restoring-session">
+            <div className="spinner"></div>
+            <p>Restoring session...</p>
+          </div>
+        )}
+
         {effectiveStep === 'discovery' && <BridgeDiscovery onBridgeSelected={setBridgeIp} />}
 
         {effectiveStep === 'authentication' && (
@@ -64,7 +71,7 @@ function App() {
         )}
       </main>
 
-      {effectiveStep !== 'connected' && (
+      {effectiveStep !== 'connected' && effectiveStep !== 'restoring' && (
         <footer className="app-footer">
           <button onClick={reset} className="secondary">
             Start Over

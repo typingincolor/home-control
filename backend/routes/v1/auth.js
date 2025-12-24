@@ -146,7 +146,7 @@ router.post('/connect', async (req, res, next) => {
     // Validate credentials still work
     try {
       await hueClient.getLights(bridgeIp, username);
-    } catch (error) {
+    } catch {
       logger.warn('Stored credentials invalid, pairing required', { bridgeIp });
       return res.status(401).json({
         error: 'Stored credentials are no longer valid. Pairing required.',

@@ -1,11 +1,20 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import App from './App';
 import { STORAGE_KEYS } from './constants/storage';
 
 // Mock hooks
 vi.mock('./hooks/useDemoMode', () => ({
   useDemoMode: vi.fn(() => false)
+}));
+
+// Mock hueApi for session validation
+vi.mock('./services/hueApi', () => ({
+  hueApi: {
+    getDashboard: vi.fn(() => Promise.resolve({ summary: {}, rooms: [] })),
+    connect: vi.fn(() => Promise.reject(new Error('PAIRING_REQUIRED'))),
+    createSession: vi.fn(() => Promise.resolve({ sessionToken: 'test', expiresIn: 86400 }))
+  }
 }));
 
 // Mock components to simplify testing
@@ -49,7 +58,7 @@ describe('App - Login Page Flicker Fix', () => {
     vi.clearAllMocks();
   });
 
-  it('should NOT flash login page when valid session exists on page load', () => {
+  it('should NOT flash login page when valid session exists on page load', async () => {
     // Setup: Store a valid session in localStorage
     const now = Date.now();
     const expiresAt = now + 86400000; // 24 hours from now
@@ -66,8 +75,15 @@ describe('App - Login Page Flicker Fix', () => {
     expect(screen.queryByTestId('bridge-discovery')).not.toBeInTheDocument();
     expect(screen.queryByTestId('authentication')).not.toBeInTheDocument();
 
-    // The dashboard should be visible immediately
-    expect(screen.getByTestId('light-control')).toBeInTheDocument();
+    // Initially shows restoring state, then transitions to light-control
+    // The key is that login pages (discovery/auth) NEVER appear
+    await waitFor(() => {
+      expect(screen.getByTestId('light-control')).toBeInTheDocument();
+    });
+
+    // Verify login pages still didn't appear
+    expect(screen.queryByTestId('bridge-discovery')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('authentication')).not.toBeInTheDocument();
   });
 
   it('should show login page when NO session exists', () => {

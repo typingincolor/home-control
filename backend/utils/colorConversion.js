@@ -9,7 +9,7 @@ const COLOR_CONFIG = {
   XYZ_TO_RGB_MATRIX: {
     r: [1.656492, -0.354851, -0.255038],
     g: [-0.707196, 1.655397, 0.036152],
-    b: [0.051713, -0.121364, 1.011530]
+    b: [0.051713, -0.121364, 1.01153]
   }
 };
 
@@ -35,7 +35,7 @@ export const xyToRgb = (x, y, brightness = 100) => {
   let b = X * matrix.b[0] + Y * matrix.b[1] + Z * matrix.b[2];
 
   // Apply gamma correction
-  const gammaCorrect = (val) => {
+  const gammaCorrect = val => {
     if (val <= 0.0031308) return 12.92 * val;
     return 1.055 * Math.pow(val, 1.0 / 2.4) - 0.055;
   };
@@ -117,7 +117,7 @@ export const mirekToRgb = (mirek, brightness = 100) => {
  * @param {Object} light - Hue light object
  * @returns {string|null} CSS rgb() color string or null
  */
-export const getLightColor = (light) => {
+export const getLightColor = light => {
   if (!light.on?.on) return null;
 
   const brightness = light.dimming?.brightness ?? 100;
@@ -197,7 +197,9 @@ export const getLightShadow = (light, lightColor) => {
     return '0 2px 6px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1)';
   } else {
     // Bright lights: colored glow + depth shadow
-    const glowIntensity = Math.round(((brightness - SHADOW_THRESHOLD) / (100 - SHADOW_THRESHOLD)) * 40 + 20);
+    const glowIntensity = Math.round(
+      ((brightness - SHADOW_THRESHOLD) / (100 - SHADOW_THRESHOLD)) * 40 + 20
+    );
     const glowOpacity = glowIntensity.toString(16).padStart(2, '0');
     return `0 4px 12px ${lightColor}${glowOpacity}, 0 2px 4px rgba(0, 0, 0, 0.1)`;
   }
@@ -208,7 +210,7 @@ export const getLightShadow = (light, lightColor) => {
  * @param {Object} light - Raw Hue light object
  * @returns {Object} Enriched light object with color, shadow, and colorSource properties
  */
-export const enrichLight = (light) => {
+export const enrichLight = light => {
   // Determine color source
   let colorSource = null;
   if (light.color?.xy) {
@@ -249,6 +251,6 @@ export const enrichLight = (light) => {
  * @param {Array} lights - Array of raw Hue light objects
  * @returns {Array} Array of enriched light objects
  */
-export const enrichLights = (lights) => {
+export const enrichLights = lights => {
   return lights.map(light => enrichLight(light));
 };
