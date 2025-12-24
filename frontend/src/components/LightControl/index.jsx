@@ -80,7 +80,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     }
   }, [wsDashboard, wsError, isDemoMode]);
 
-  // Fallback: If WebSocket doesn't deliver dashboard within 5 seconds, fetch via REST
+  // Fallback: If WebSocket doesn't deliver dashboard within 2 seconds, fetch via REST
   useEffect(() => {
     if (!isDemoMode && sessionToken && loading && !localDashboard) {
       const timeoutId = setTimeout(async () => {
@@ -98,7 +98,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
             setLoading(false);
           }
         }
-      }, 5000);
+      }, 2000);
 
       return () => clearTimeout(timeoutId);
     }

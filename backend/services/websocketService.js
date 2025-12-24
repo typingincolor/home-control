@@ -245,9 +245,10 @@ class WebSocketService {
     this.connections.get(bridgeIp).add(ws);
     this.logStats('after auth');
 
-    // Send initial state
+    // Send initial state (use cached state from polling if available)
     try {
-      const dashboard = await dashboardService.getDashboard(bridgeIp, username);
+      const cachedState = this.stateCache.get(bridgeIp);
+      const dashboard = cachedState || (await dashboardService.getDashboard(bridgeIp, username));
       ws.send(
         JSON.stringify({
           type: 'initial_state',
