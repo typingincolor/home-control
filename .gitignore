@@ -39,3 +39,6 @@ backend/.stryker-tmp
 *.sw?
 test-websocket.js
 test-results/
+
+# Project requirements (local only)
+REQUIREMENTS.md
