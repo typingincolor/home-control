@@ -127,6 +127,11 @@ router.post('/connect', async (req, res, next) => {
 
     logger.info('Connect request', { bridgeIp });
 
+    // Debug: Log all stored credentials
+    logger.debug('Stored bridges', {
+      bridges: Array.from(sessionManager.bridgeCredentials.keys())
+    });
+
     // Check if we have stored credentials for this bridge
     const username = sessionManager.getBridgeCredentials(bridgeIp);
 
@@ -228,6 +233,7 @@ router.post('/session', async (req, res, next) => {
 
     // Store credentials for reuse by other clients
     sessionManager.storeBridgeCredentials(bridgeIp, username);
+    logger.info('Stored credentials for bridge', { bridgeIp });
 
     // Create session
     const sessionInfo = sessionManager.createSession(bridgeIp, username);

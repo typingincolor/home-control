@@ -52,6 +52,13 @@ export function extractCredentials(req, res, next) {
       );
     }
 
+    // Store credentials for reuse by other clients
+    // This ensures credentials are available even if first client
+    // reconnects with an existing session token
+    if (!sessionManager.hasBridgeCredentials(bridgeIp)) {
+      sessionManager.storeBridgeCredentials(bridgeIp, username);
+    }
+
     // Attach credentials to request for route handlers
     req.hue = {
       bridgeIp,
@@ -82,6 +89,11 @@ export function requireSession(req, res, next) {
 
     if (!session) {
       throw new InvalidSessionError();
+    }
+
+    // Store credentials for reuse by other clients
+    if (!sessionManager.hasBridgeCredentials(session.bridgeIp)) {
+      sessionManager.storeBridgeCredentials(session.bridgeIp, session.username);
     }
 
     req.hue = {
