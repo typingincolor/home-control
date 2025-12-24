@@ -25,9 +25,7 @@ describe('MotionZones', () => {
   });
 
   it('should return null when no zones have motion', () => {
-    const zones = [
-      { id: 'zone-1', name: 'Kitchen', motionDetected: false, reachable: true }
-    ];
+    const zones = [{ id: 'zone-1', name: 'Kitchen', motionDetected: false, reachable: true }];
 
     const { container } = render(
       <MotionZones sessionToken="test-session-token" motionZones={zones} />
@@ -45,9 +43,7 @@ describe('MotionZones', () => {
   });
 
   it('should show alert when motion is detected', () => {
-    const zones = [
-      { id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }
-    ];
+    const zones = [{ id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }];
 
     render(<MotionZones sessionToken="test-session-token" motionZones={zones} />);
 
@@ -70,9 +66,7 @@ describe('MotionZones', () => {
   it('should auto-dismiss alert after 3 seconds', async () => {
     vi.useFakeTimers();
 
-    const zones = [
-      { id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }
-    ];
+    const zones = [{ id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }];
 
     render(<MotionZones sessionToken="test-session-token" motionZones={zones} />);
 
@@ -89,9 +83,7 @@ describe('MotionZones', () => {
   });
 
   it('should not show alert for unreachable zones', () => {
-    const zones = [
-      { id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: false }
-    ];
+    const zones = [{ id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: false }];
 
     const { container } = render(
       <MotionZones sessionToken="test-session-token" motionZones={zones} />
@@ -123,9 +115,7 @@ describe('MotionZones', () => {
   });
 
   it('should have correct alert structure', () => {
-    const zones = [
-      { id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }
-    ];
+    const zones = [{ id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }];
 
     const { container } = render(
       <MotionZones sessionToken="test-session-token" motionZones={zones} />

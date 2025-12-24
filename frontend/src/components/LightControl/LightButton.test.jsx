@@ -152,7 +152,7 @@ describe('LightButton', () => {
       { ...mockLight, color: 'rgb(255, 180, 120)', colorSource: 'xy' }
     ];
 
-    temperatures.forEach((light) => {
+    temperatures.forEach(light => {
       const onToggle = vi.fn();
       const { container } = render(
         <LightButton light={light} onToggle={onToggle} isToggling={false} />

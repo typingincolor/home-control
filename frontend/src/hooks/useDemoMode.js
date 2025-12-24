@@ -6,8 +6,8 @@ import { useState } from 'react';
  * @returns {boolean} True if demo mode is active
  */
 export const useDemoMode = () => {
-  const [isDemoMode] = useState(() =>
-    new URLSearchParams(window.location.search).get('demo') === 'true'
+  const [isDemoMode] = useState(
+    () => new URLSearchParams(window.location.search).get('demo') === 'true'
   );
   return isDemoMode;
 };

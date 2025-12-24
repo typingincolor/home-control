@@ -7,6 +7,7 @@ This project uses **Vitest** for unit testing and **Stryker** for mutation testi
 ## Test Setup
 
 ### Testing Stack
+
 - **Test Runner**: Vitest 4.0.16 (Vite-native, faster than Jest)
 - **React Testing**: @testing-library/react 16.3.1
 - **DOM Assertions**: @testing-library/jest-dom 6.9.1
@@ -14,6 +15,7 @@ This project uses **Vitest** for unit testing and **Stryker** for mutation testi
 - **Coverage Provider**: Vitest V8
 
 ### Configuration Files
+
 - `vitest.config.js` - Vitest configuration
 - `stryker.conf.json` - Mutation testing configuration
 - `src/test/setup.js` - Global test setup
@@ -21,6 +23,7 @@ This project uses **Vitest** for unit testing and **Stryker** for mutation testi
 ## Running Tests
 
 ### Unit Tests
+
 ```bash
 # Run tests in watch mode
 npm test
@@ -36,6 +39,7 @@ npm run test:coverage
 ```
 
 ### Mutation Tests
+
 ```bash
 # Run mutation testing
 npm run test:mutation
@@ -48,6 +52,7 @@ View mutation report: `open reports/mutation/html/index.html`
 ### Unit Test Results (193 tests)
 
 #### Utilities - 100% Pass Rate
+
 - **colorConversion.js**: 31 tests
   - xyToRgb conversion (7 tests)
   - mirekToRgb conversion (7 tests)
@@ -72,6 +77,7 @@ View mutation report: `open reports/mutation/html/index.html`
 ## Mutation Testing Results
 
 ### Summary
+
 - **Total Mutants**: 400
 - **Killed**: 293 (73.25%)
 - **Survived**: 107 (26.75%)
@@ -80,19 +86,23 @@ View mutation report: `open reports/mutation/html/index.html`
 ### Mutation Score by File
 
 **colorConversion.js** - ~70% mutation score
+
 - Strong coverage on control flow
 - Mathematical operations well-tested
 - Some survivors in precise floating-point calculations (expected)
 
 **validation.js** - ~85% mutation score
+
 - Excellent coverage on validation logic
 - All edge cases tested
 
 **roomUtils.js** - ~75% mutation score
+
 - Good coverage on data transformations
 - Array operations well-tested
 
 **motionSensors.js** - ~80% mutation score
+
 - Strong coverage on data parsing
 - Filtering logic thoroughly tested
 
@@ -141,6 +151,7 @@ Some mutants survive because they don't produce observable differences in the te
 ## Test Organization
 
 ### Test Files Mirror Source Structure
+
 ```
 src/
 ├── utils/
@@ -159,6 +170,7 @@ src/
 ## Adding New Tests
 
 ### For Utilities (Pure Functions)
+
 ```javascript
 import { describe, it, expect } from 'vitest';
 import { yourFunction } from './yourFile';
@@ -177,6 +189,7 @@ describe('yourFile', () => {
 ```
 
 ### For Components
+
 ```javascript
 import { render, screen } from '@testing-library/react';
 import { YourComponent } from './YourComponent';
@@ -217,11 +230,13 @@ describe('YourComponent', () => {
 ## Continuous Integration
 
 Tests should run on:
+
 - Pre-commit hook (optional)
 - Pull request creation
 - Before deployment
 
 ### Recommended CI Commands
+
 ```bash
 npm run test:run        # Fast unit tests
 npm run test:coverage   # Generate coverage report
@@ -245,6 +260,7 @@ Mutation testing validates test quality by introducing small changes (mutations)
 ### Improving Mutation Score
 
 If mutation score is low:
+
 1. Add tests for uncovered edge cases
 2. Test boundary conditions more thoroughly
 3. Add assertions for error states
@@ -253,6 +269,7 @@ If mutation score is low:
 ### When to Accept Survivors
 
 Some mutations are OK to survive:
+
 - Mathematical precision (floating-point edge cases)
 - Defensive code that can't be triggered
 - Performance optimizations
@@ -267,12 +284,14 @@ Some mutations are OK to survive:
 ## Future Testing Improvements
 
 ### Pending Test Coverage
+
 - [ ] Custom hooks (useDemoMode, useHueApi, usePolling)
 - [ ] React components (with Testing Library)
 - [ ] Integration tests (API → UI flow)
 - [ ] E2E tests (Playwright/Cypress)
 
 ### Potential Enhancements
+
 - Visual regression testing for color rendering
 - Performance benchmarks for color conversion
 - Snapshot tests for component output
@@ -281,16 +300,19 @@ Some mutations are OK to survive:
 ## Troubleshooting
 
 ### Tests Failing After Refactor
+
 1. Check if API/data structures changed
 2. Update test expectations
 3. Run `npm run test:ui` for interactive debugging
 
 ### Mutation Testing Takes Too Long
+
 1. Reduce mutant count with `mutate` config
 2. Run only on changed files
 3. Use `--incremental` flag
 
 ### Coverage Not Updating
+
 1. Clear coverage cache: `rm -rf coverage/`
 2. Re-run: `npm run test:coverage`
 3. Check `vitest.config.js` coverage settings

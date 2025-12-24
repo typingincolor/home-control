@@ -23,17 +23,41 @@ const baseDashboard = {
       stats: { lightsOnCount: 1, totalLights: 2, averageBrightness: 75 },
       lights: [
         { id: 'light-1', name: 'Lamp', on: true, brightness: 80, color: '#ffffff', shadow: 'none' },
-        { id: 'light-2', name: 'Ceiling', on: false, brightness: 0, color: '#ffffff', shadow: 'none' }
+        {
+          id: 'light-2',
+          name: 'Ceiling',
+          on: false,
+          brightness: 0,
+          color: '#ffffff',
+          shadow: 'none'
+        }
       ],
-      scenes: [{ id: 'scene-1', name: 'Bright' }, { id: 'scene-2', name: 'Dim' }]
+      scenes: [
+        { id: 'scene-1', name: 'Bright' },
+        { id: 'scene-2', name: 'Dim' }
+      ]
     },
     {
       id: 'room-2',
       name: 'Bedroom',
       stats: { lightsOnCount: 1, totalLights: 2, averageBrightness: 50 },
       lights: [
-        { id: 'light-3', name: 'Bedside', on: true, brightness: 50, color: '#ffaa00', shadow: 'none' },
-        { id: 'light-4', name: 'Overhead', on: false, brightness: 0, color: '#ffffff', shadow: 'none' }
+        {
+          id: 'light-3',
+          name: 'Bedside',
+          on: true,
+          brightness: 50,
+          color: '#ffaa00',
+          shadow: 'none'
+        },
+        {
+          id: 'light-4',
+          name: 'Overhead',
+          on: false,
+          brightness: 0,
+          color: '#ffffff',
+          shadow: 'none'
+        }
       ],
       scenes: [{ id: 'scene-3', name: 'Night' }]
     }
@@ -78,9 +102,10 @@ describe('LightControl', () => {
       ),
       updateRoomLights: vi.fn().mockImplementation((token, roomId, state) =>
         Promise.resolve({
-          updatedLights: mockDashboardData.rooms
-            .find(r => r.id === roomId)?.lights
-            .map(l => ({ ...l, on: state.on })) || []
+          updatedLights:
+            mockDashboardData.rooms
+              .find(r => r.id === roomId)
+              ?.lights.map(l => ({ ...l, on: state.on })) || []
         })
       ),
       updateZoneLights: vi.fn().mockResolvedValue({ updatedLights: [] }),
@@ -265,9 +290,7 @@ describe('LightControl', () => {
 
       // Find and click the light tile button
       const lightTiles = document.querySelectorAll('.light-tile');
-      const lampTile = Array.from(lightTiles).find(tile =>
-        tile.textContent.includes('Lamp')
-      );
+      const lampTile = Array.from(lightTiles).find(tile => tile.textContent.includes('Lamp'));
       expect(lampTile).toBeTruthy();
 
       await user.click(lampTile);
@@ -290,9 +313,7 @@ describe('LightControl', () => {
       });
 
       const lightTiles = document.querySelectorAll('.light-tile');
-      const lampTile = Array.from(lightTiles).find(tile =>
-        tile.textContent.includes('Lamp')
-      );
+      const lampTile = Array.from(lightTiles).find(tile => tile.textContent.includes('Lamp'));
       await user.click(lampTile);
 
       await waitFor(() => {
@@ -353,8 +374,8 @@ describe('LightControl', () => {
 
       // Find scene button by title attribute
       const sceneButtons = document.querySelectorAll('.scene-icon-button');
-      const brightButton = Array.from(sceneButtons).find(btn =>
-        btn.getAttribute('title') === 'Bright'
+      const brightButton = Array.from(sceneButtons).find(
+        btn => btn.getAttribute('title') === 'Bright'
       );
       expect(brightButton).toBeTruthy();
 
@@ -372,8 +393,8 @@ describe('LightControl', () => {
       });
 
       const sceneButtons = document.querySelectorAll('.scene-icon-button');
-      const brightButton = Array.from(sceneButtons).find(btn =>
-        btn.getAttribute('title') === 'Bright'
+      const brightButton = Array.from(sceneButtons).find(
+        btn => btn.getAttribute('title') === 'Bright'
       );
       await user.click(brightButton);
 
@@ -393,8 +414,8 @@ describe('LightControl', () => {
       });
 
       const sceneButtons = document.querySelectorAll('.scene-icon-button');
-      const brightButton = Array.from(sceneButtons).find(btn =>
-        btn.getAttribute('title') === 'Bright'
+      const brightButton = Array.from(sceneButtons).find(
+        btn => btn.getAttribute('title') === 'Bright'
       );
       await user.click(brightButton);
 
@@ -439,9 +460,7 @@ describe('LightControl', () => {
 
   describe('MotionZones', () => {
     it('should render MotionZones component', async () => {
-      mockDashboardData.motionZones = [
-        { id: 'motion-1', name: 'Hallway', motionDetected: true }
-      ];
+      mockDashboardData.motionZones = [{ id: 'motion-1', name: 'Hallway', motionDetected: true }];
 
       render(<LightControl sessionToken="test-token" />);
 

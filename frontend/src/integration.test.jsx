@@ -16,12 +16,20 @@ import { setupServer } from 'msw/node';
 const localStorageMock = (() => {
   let store = {};
   return {
-    getItem: (key) => store[key] || null,
-    setItem: (key, value) => { store[key] = value ? value.toString() : ''; },
-    removeItem: (key) => { delete store[key]; },
-    clear: () => { store = {}; },
-    key: (index) => Object.keys(store)[index] || null,
-    get length() { return Object.keys(store).length; }
+    getItem: key => store[key] || null,
+    setItem: (key, value) => {
+      store[key] = value ? value.toString() : '';
+    },
+    removeItem: key => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+    key: index => Object.keys(store)[index] || null,
+    get length() {
+      return Object.keys(store).length;
+    }
   };
 })();
 
@@ -170,9 +178,7 @@ const mockDashboard = {
 const server = setupServer(
   // Discovery endpoint
   http.get('/api/discovery', () => {
-    return HttpResponse.json([
-      { id: 'bridge-1', internalipaddress: mockBridgeIp }
-    ]);
+    return HttpResponse.json([{ id: 'bridge-1', internalipaddress: mockBridgeIp }]);
   }),
 
   // Pairing endpoint
@@ -298,16 +304,18 @@ const server = setupServer(
   })
 );
 
-beforeAll(() => server.listen({
-  onUnhandledRequest: (req) => {
-    // Bypass WebSocket connections - they're handled by MockWebSocket
-    if (req.url.includes('/ws')) {
-      return;
+beforeAll(() =>
+  server.listen({
+    onUnhandledRequest: req => {
+      // Bypass WebSocket connections - they're handled by MockWebSocket
+      if (req.url.includes('/ws')) {
+        return;
+      }
+      // Error on other unhandled requests
+      console.error('Unhandled %s %s', req.method, req.url);
     }
-    // Error on other unhandled requests
-    console.error('Unhandled %s %s', req.method, req.url);
-  }
-}));
+  })
+);
 afterEach(() => {
   server.resetHandlers();
   localStorage.clear();
@@ -348,9 +356,12 @@ describe('Integration Tests', () => {
       await user.click(authButton);
 
       // Step 3: Should show dashboard with lights
-      await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
-      }, { timeout: 10000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('Living Room')).toBeInTheDocument();
+        },
+        { timeout: 10000 }
+      );
 
       // Verify dashboard content (wait for lights to render)
       await waitFor(() => {
@@ -420,7 +431,7 @@ describe('Integration Tests', () => {
 
     it('restores session on page reload', async () => {
       // Pre-populate localStorage with session
-      const expiresAt = Date.now() + (24 * 60 * 60 * 1000); // 24 hours from now
+      const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
       localStorage.setItem('hue_session_token', mockSessionToken);
       localStorage.setItem('hue_bridge_ip', mockBridgeIp);
       localStorage.setItem('hue_username', mockUsername);
@@ -429,9 +440,12 @@ describe('Integration Tests', () => {
       render(<App />);
 
       // Should skip straight to dashboard
-      await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
-      }, { timeout: 10000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('Living Room')).toBeInTheDocument();
+        },
+        { timeout: 10000 }
+      );
 
       // Should NOT show authentication screen
       expect(screen.queryByText(/Press the Link Button/i)).not.toBeInTheDocument();
@@ -448,9 +462,12 @@ describe('Integration Tests', () => {
       render(<App />);
 
       // Should automatically create new session using saved username
-      await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
-      }, { timeout: 10000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('Living Room')).toBeInTheDocument();
+        },
+        { timeout: 10000 }
+      );
 
       // Should have new session token
       expect(localStorage.getItem('hue_session_token')).toBe(mockSessionToken);
@@ -474,9 +491,12 @@ describe('Integration Tests', () => {
       await user.click(screen.getByText(new RegExp(UI_TEXT.BUTTON_I_PRESSED_BUTTON, 'i')));
 
       // Wait for WebSocket to connect and receive data
-      await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
-      }, { timeout: 10000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('Living Room')).toBeInTheDocument();
+        },
+        { timeout: 10000 }
+      );
 
       // Verify dashboard loaded via WebSocket
       expect(screen.getByText('Light 1')).toBeInTheDocument();
@@ -499,9 +519,12 @@ describe('Integration Tests', () => {
       expect(screen.getByText(new RegExp(UI_TEXT.LOADING_CONNECTING, 'i'))).toBeInTheDocument();
 
       // Wait for dashboard
-      await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
-      }, { timeout: 10000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('Living Room')).toBeInTheDocument();
+        },
+        { timeout: 10000 }
+      );
 
       // Should never have shown error
       expect(screen.queryByText(/Connection Failed/i)).not.toBeInTheDocument();
@@ -513,7 +536,7 @@ describe('Integration Tests', () => {
       const user = userEvent.setup();
 
       // Start with authenticated session
-      const expiresAt = Date.now() + (24 * 60 * 60 * 1000);
+      const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
       localStorage.setItem('hue_session_token', mockSessionToken);
       localStorage.setItem('hue_bridge_ip', mockBridgeIp);
       localStorage.setItem('hue_username', mockUsername);
@@ -535,18 +558,21 @@ describe('Integration Tests', () => {
 
       // Lights should update immediately (optimistic)
       // We don't need to wait for WebSocket poll (5 seconds)
-      await waitFor(() => {
-        // Check that affected lights have updated
-        // (The exact assertions depend on your UI)
-        expect(screen.getByText('Light 1')).toBeInTheDocument();
-      }, { timeout: 1000 }); // Should be fast, not 5+ seconds
+      await waitFor(
+        () => {
+          // Check that affected lights have updated
+          // (The exact assertions depend on your UI)
+          expect(screen.getByText('Light 1')).toBeInTheDocument();
+        },
+        { timeout: 1000 }
+      ); // Should be fast, not 5+ seconds
     });
   });
 
   describe('Error Handling', () => {
     it('handles 401 errors gracefully', async () => {
       // Start with authenticated session
-      const expiresAt = Date.now() + (24 * 60 * 60 * 1000);
+      const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
       localStorage.setItem('hue_session_token', 'invalid_token');
       localStorage.setItem('hue_bridge_ip', mockBridgeIp);
       localStorage.setItem('hue_username', mockUsername);
@@ -562,12 +588,15 @@ describe('Integration Tests', () => {
       render(<App />);
 
       // Should detect invalid session and auto-recover
-      await waitFor(() => {
-        // Should either auto-recover or show auth screen
-        const hasAuth = screen.queryByText(/Press the Link Button/i);
-        const hasDashboard = screen.queryByText('Living Room');
-        expect(hasAuth || hasDashboard).toBeTruthy();
-      }, { timeout: 10000 });
+      await waitFor(
+        () => {
+          // Should either auto-recover or show auth screen
+          const hasAuth = screen.queryByText(/Press the Link Button/i);
+          const hasDashboard = screen.queryByText('Living Room');
+          expect(hasAuth || hasDashboard).toBeTruthy();
+        },
+        { timeout: 10000 }
+      );
     });
 
     it('handles network errors gracefully', async () => {
@@ -586,7 +615,9 @@ describe('Integration Tests', () => {
 
       // Should show error message
       await waitFor(() => {
-        expect(screen.getByText(new RegExp(ERROR_MESSAGES.BRIDGE_DISCOVERY, 'i'))).toBeInTheDocument();
+        expect(
+          screen.getByText(new RegExp(ERROR_MESSAGES.BRIDGE_DISCOVERY, 'i'))
+        ).toBeInTheDocument();
       });
     });
   });

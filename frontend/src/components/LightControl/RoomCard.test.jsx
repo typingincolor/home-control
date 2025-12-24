@@ -178,9 +178,7 @@ describe('RoomCard', () => {
     render(<RoomCard {...defaultProps} onToggleLight={onToggleLight} />);
 
     const lightButtons = screen.getAllByRole('button');
-    const firstLightButton = lightButtons.find(btn =>
-      btn.querySelector('.bulb-icon')
-    );
+    const firstLightButton = lightButtons.find(btn => btn.querySelector('.bulb-icon'));
 
     if (firstLightButton) {
       await user.click(firstLightButton);

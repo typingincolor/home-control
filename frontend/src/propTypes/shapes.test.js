@@ -10,9 +10,10 @@ import {
 } from './shapes';
 
 // Helper to check if a PropType validator exists
-const isPropTypeValidator = (validator) => {
-  return typeof validator === 'function' ||
-    (validator && typeof validator.isRequired === 'function');
+const isPropTypeValidator = validator => {
+  return (
+    typeof validator === 'function' || (validator && typeof validator.isRequired === 'function')
+  );
 };
 
 describe('PropTypes shapes', () => {

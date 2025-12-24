@@ -202,9 +202,7 @@ describe('LightControl - Zones (Navigation)', () => {
     const zoneItems = document.querySelectorAll('.zone-item-dark');
     expect(zoneItems.length).toBe(2);
 
-    const upstairsZone = Array.from(zoneItems).find(item =>
-      item.textContent.includes('Upstairs')
-    );
+    const upstairsZone = Array.from(zoneItems).find(item => item.textContent.includes('Upstairs'));
     expect(upstairsZone).toBeTruthy();
 
     const offButton = upstairsZone.querySelector('.zone-toggle-btn');
@@ -212,11 +210,7 @@ describe('LightControl - Zones (Navigation)', () => {
 
     await user.click(offButton);
 
-    expect(mockApi.updateZoneLights).toHaveBeenCalledWith(
-      'test-token',
-      'zone-1',
-      { on: false }
-    );
+    expect(mockApi.updateZoneLights).toHaveBeenCalledWith('test-token', 'zone-1', { on: false });
   });
 
   it('should show zone count badge on Zones tab', async () => {

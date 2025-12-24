@@ -7,21 +7,11 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
-    exclude: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/.stryker-tmp/**'
-    ],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.stryker-tmp/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'src/test/',
-        '**/*.config.js',
-        'dist/',
-        '.stryker-tmp/'
-      ]
+      exclude: ['node_modules/', 'src/test/', '**/*.config.js', 'dist/', '.stryker-tmp/']
     }
   }
 });

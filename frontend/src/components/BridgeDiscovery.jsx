@@ -28,7 +28,7 @@ export const BridgeDiscovery = ({ onBridgeSelected }) => {
     }
   };
 
-  const handleManualSubmit = (e) => {
+  const handleManualSubmit = e => {
     e.preventDefault();
     if (validateIp(manualIp)) {
       onBridgeSelected(manualIp);
@@ -50,7 +50,7 @@ export const BridgeDiscovery = ({ onBridgeSelected }) => {
         {discoveredBridges.length > 0 && (
           <div className="discovered-bridges">
             <h4>{UI_TEXT.LABEL_FOUND_BRIDGES}</h4>
-            {discoveredBridges.map((bridge) => (
+            {discoveredBridges.map(bridge => (
               <div key={bridge.id} className="bridge-item">
                 <span className="bridge-ip">{bridge.internalipaddress}</span>
                 <button onClick={() => onBridgeSelected(bridge.internalipaddress)}>
@@ -71,17 +71,22 @@ export const BridgeDiscovery = ({ onBridgeSelected }) => {
             type="text"
             placeholder={UI_TEXT.PLACEHOLDER_MANUAL_IP}
             value={manualIp}
-            onChange={(e) => setManualIp(e.target.value)}
+            onChange={e => setManualIp(e.target.value)}
             className="ip-input"
           />
-          <button type="submit" className="primary">{UI_TEXT.BUTTON_CONNECT}</button>
+          <button type="submit" className="primary">
+            {UI_TEXT.BUTTON_CONNECT}
+          </button>
         </form>
       </div>
 
       {error && <div className="error">{error}</div>}
 
       <div className="help-text">
-        <p><strong>Tip:</strong> Your bridge IP can be found in the Philips Hue app under Settings → My Hue System → Bridge</p>
+        <p>
+          <strong>Tip:</strong> Your bridge IP can be found in the Philips Hue app under Settings →
+          My Hue System → Bridge
+        </p>
       </div>
     </div>
   );

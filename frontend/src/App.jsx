@@ -9,16 +9,8 @@ import './App.css';
 function App() {
   const isDemoMode = useDemoMode();
 
-  const {
-    step,
-    bridgeIp,
-    sessionToken,
-    loading,
-    error,
-    setBridgeIp,
-    authenticate,
-    reset
-  } = useHueBridge();
+  const { step, bridgeIp, sessionToken, loading, error, setBridgeIp, authenticate, reset } =
+    useHueBridge();
 
   // In demo mode, use dummy credentials and skip to connected step
   const effectiveStep = isDemoMode ? 'connected' : step;
@@ -33,12 +25,16 @@ function App() {
           <p className="subtitle">{UI_TEXT.APP_SUBTITLE}</p>
 
           <div className="progress-indicator">
-            <div className={`step ${effectiveStep === 'discovery' ? 'active' : effectiveStep !== 'discovery' ? 'completed' : ''}`}>
+            <div
+              className={`step ${effectiveStep === 'discovery' ? 'active' : effectiveStep !== 'discovery' ? 'completed' : ''}`}
+            >
               <div className="step-number">1</div>
               <div className="step-label">Discovery</div>
             </div>
             <div className="progress-line"></div>
-            <div className={`step ${effectiveStep === 'authentication' ? 'active' : effectiveStep === 'connected' ? 'completed' : ''}`}>
+            <div
+              className={`step ${effectiveStep === 'authentication' ? 'active' : effectiveStep === 'connected' ? 'completed' : ''}`}
+            >
               <div className="step-number">2</div>
               <div className="step-label">Authentication</div>
             </div>
@@ -52,9 +48,7 @@ function App() {
       )}
 
       <main className="app-main">
-        {effectiveStep === 'discovery' && (
-          <BridgeDiscovery onBridgeSelected={setBridgeIp} />
-        )}
+        {effectiveStep === 'discovery' && <BridgeDiscovery onBridgeSelected={setBridgeIp} />}
 
         {effectiveStep === 'authentication' && (
           <Authentication
@@ -66,10 +60,7 @@ function App() {
         )}
 
         {effectiveStep === 'connected' && (
-          <LightControl
-            sessionToken={effectiveSessionToken}
-            onLogout={reset}
-          />
+          <LightControl sessionToken={effectiveSessionToken} onLogout={reset} />
         )}
       </main>
 

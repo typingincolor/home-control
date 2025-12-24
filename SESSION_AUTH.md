@@ -38,14 +38,16 @@ On returning visits:
 All v1 API endpoints support **three authentication methods** (in priority order):
 
 #### Method 1: Session Token (Preferred)
+
 ```javascript
-GET /api/v1/dashboard
+GET / api / v1 / dashboard;
 Headers: {
-  Authorization: "Bearer hue_sess_abc123..."
+  Authorization: 'Bearer hue_sess_abc123...';
 }
 ```
 
 #### Method 2: Custom Headers
+
 ```javascript
 GET /api/v1/dashboard
 Headers: {
@@ -55,6 +57,7 @@ Headers: {
 ```
 
 #### Method 3: Query Parameters (Legacy)
+
 ```javascript
 GET /api/v1/dashboard?bridgeIp=192.168.1.100&username=permanent-api-key
 ```
@@ -64,20 +67,26 @@ GET /api/v1/dashboard?bridgeIp=192.168.1.100&username=permanent-api-key
 WebSocket connections also support dual authentication:
 
 #### Session Token Mode (Preferred)
+
 ```javascript
-ws.send(JSON.stringify({
-  type: 'auth',
-  sessionToken: 'hue_sess_abc123...'
-}));
+ws.send(
+  JSON.stringify({
+    type: 'auth',
+    sessionToken: 'hue_sess_abc123...'
+  })
+);
 ```
 
 #### Legacy Mode (Backward Compatible)
+
 ```javascript
-ws.send(JSON.stringify({
-  type: 'auth',
-  bridgeIp: '192.168.1.100',
-  username: 'permanent-api-key'
-}));
+ws.send(
+  JSON.stringify({
+    type: 'auth',
+    bridgeIp: '192.168.1.100',
+    username: 'permanent-api-key'
+  })
+);
 ```
 
 ## Frontend Architecture
@@ -90,17 +99,18 @@ Manages session lifecycle:
 import { useSession } from './hooks/useSession';
 
 const {
-  sessionToken,        // Current session token
-  bridgeIp,           // Bridge IP from session
-  isExpired,          // Whether token expired
-  isValid,            // Whether session is valid
-  timeRemaining,      // Seconds until expiration
-  createSession,      // Create new session
-  clearSession        // Clear current session
+  sessionToken, // Current session token
+  bridgeIp, // Bridge IP from session
+  isExpired, // Whether token expired
+  isValid, // Whether session is valid
+  timeRemaining, // Seconds until expiration
+  createSession, // Create new session
+  clearSession // Clear current session
 } = useSession();
 ```
 
 **Features:**
+
 - Stores token + expiry in localStorage
 - Automatically checks expiration every minute
 - Removes legacy username from storage
@@ -112,15 +122,16 @@ Updated to create sessions automatically:
 
 ```javascript
 const {
-  step,               // 'discovery' | 'authentication' | 'connected'
+  step, // 'discovery' | 'authentication' | 'connected'
   bridgeIp,
-  sessionToken,       // Session token for API calls
-  authenticate,       // Pair + create session
-  reset               // Logout + clear session
+  sessionToken, // Session token for API calls
+  authenticate, // Pair + create session
+  reset // Logout + clear session
 } = useHueBridge();
 ```
 
 **Authentication Flow:**
+
 1. User pairs with bridge → gets username
 2. Hook automatically creates session → gets token
 3. Token stored in localStorage
@@ -141,6 +152,7 @@ await hueApi.updateLight(bridgeIp, username, lightId, state);
 ```
 
 **Auto-detection:**
+
 - If first param contains "." → treat as IP (legacy mode)
 - Otherwise → treat as session token
 
@@ -174,6 +186,7 @@ sessionManager.revokeSession(sessionToken);
 ```
 
 **Features:**
+
 - Generates cryptographically secure tokens
 - 24-hour expiration (86400 seconds)
 - In-memory storage (cleared on server restart)
@@ -182,6 +195,7 @@ sessionManager.revokeSession(sessionToken);
 ### Auth Middleware
 
 `extractCredentials` middleware extracts auth from:
+
 1. `Authorization: Bearer <token>` header → looks up session
 2. `X-Bridge-IP` + `X-Hue-Username` headers → uses directly
 3. `bridgeIp` + `username` query params → uses directly
@@ -189,13 +203,12 @@ sessionManager.revokeSession(sessionToken);
 ```javascript
 // Attaches to req.hue:
 {
-  bridgeIp,
-  username,
-  authMethod  // 'session' | 'headers' | 'query'
+  (bridgeIp, username, authMethod); // 'session' | 'headers' | 'query'
 }
 ```
 
 All v1 routes use this middleware:
+
 ```javascript
 router.get('/dashboard', extractCredentials, async (req, res) => {
   const { bridgeIp, username } = req.hue;
@@ -238,6 +251,7 @@ if (savedUsername && savedBridgeIp) {
 ### Session Tokens vs Raw Credentials
 
 **Old approach (username in every request):**
+
 - ❌ Permanent API key exposed on every call
 - ❌ No expiration - stolen key works forever
 - ❌ Can't revoke without re-pairing bridge
@@ -245,6 +259,7 @@ if (savedUsername && savedBridgeIp) {
 - ❌ Logged in server logs
 
 **New approach (session tokens):**
+
 - ✅ Temporary tokens (24-hour expiration)
 - ✅ Can revoke specific sessions
 - ✅ Token ≠ bridge credentials
@@ -264,12 +279,14 @@ if (savedUsername && savedBridgeIp) {
 ### Current Behavior
 
 **When token expires:**
+
 1. `useSession` hook detects expiration (checked every minute)
 2. Sets `isExpired = true`
 3. Calls `clearSession()` automatically
 4. User redirected to login screen
 
 **On API calls with expired token:**
+
 1. Backend returns `401 Unauthorized`
 2. `request()` function catches error
 3. Throws "Session expired. Please log in again."
@@ -285,7 +302,7 @@ useEffect(() => {
   if (!expiresAt) return;
 
   // Refresh 5 minutes before expiration
-  const refreshTime = expiresAt - (5 * 60 * 1000);
+  const refreshTime = expiresAt - 5 * 60 * 1000;
   const now = Date.now();
 
   if (refreshTime > now) {
@@ -322,6 +339,7 @@ await hueApi.revokeSession(sessionToken);
 ## Session Storage
 
 **localStorage keys:**
+
 ```javascript
 {
   "hue_session_token": "hue_sess_abc123...",
@@ -331,6 +349,7 @@ await hueApi.revokeSession(sessionToken);
 ```
 
 **Legacy keys (removed on migration):**
+
 ```javascript
 {
   "hue_username": "old-permanent-key"  // Removed after session created
@@ -342,6 +361,7 @@ await hueApi.revokeSession(sessionToken);
 ### Manual Testing
 
 1. **Clear storage:**
+
    ```javascript
    localStorage.clear();
    ```
@@ -352,12 +372,14 @@ await hueApi.revokeSession(sessionToken);
    - Click "Connect"
 
 3. **Verify session created:**
+
    ```javascript
    localStorage.getItem('hue_session_token');
    // Should return: "hue_sess_..."
    ```
 
 4. **Test API calls:**
+
    ```javascript
    // Check network tab - should see Authorization header
    fetch('/api/v1/dashboard', {
@@ -375,6 +397,7 @@ await hueApi.revokeSession(sessionToken);
 ### Backward Compatibility Testing
 
 1. **Simulate legacy user:**
+
    ```javascript
    localStorage.setItem('hue_bridge_ip', '192.168.1.100');
    localStorage.setItem('hue_username', 'old-key-abc123');
@@ -386,15 +409,17 @@ await hueApi.revokeSession(sessionToken);
 3. **Verify:**
    ```javascript
    localStorage.getItem('hue_session_token'); // Should exist
-   localStorage.getItem('hue_username');      // Should be removed
+   localStorage.getItem('hue_username'); // Should be removed
    ```
 
 ## API Reference
 
 ### POST /api/v1/auth/session
+
 Create new session token
 
 **Request:**
+
 ```json
 {
   "bridgeIp": "192.168.1.100",
@@ -403,6 +428,7 @@ Create new session token
 ```
 
 **Response:**
+
 ```json
 {
   "sessionToken": "hue_sess_abc123...",
@@ -412,14 +438,17 @@ Create new session token
 ```
 
 ### DELETE /api/v1/auth/session
+
 Revoke current session
 
 **Headers:**
+
 ```
 Authorization: Bearer hue_sess_abc123...
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -428,14 +457,17 @@ Authorization: Bearer hue_sess_abc123...
 ```
 
 ### GET /api/v1/auth/session
+
 Get current session info
 
 **Headers:**
+
 ```
 Authorization: Bearer hue_sess_abc123...
 ```
 
 **Response:**
+
 ```json
 {
   "bridgeIp": "192.168.1.100",
@@ -446,20 +478,24 @@ Authorization: Bearer hue_sess_abc123...
 ## Troubleshooting
 
 ### "Session expired" errors
+
 - Token has exceeded 24-hour lifetime
 - Solution: Log in again (will get new token)
 
 ### "Invalid session token" errors
+
 - Token doesn't exist in server memory
 - Happens after server restart
 - Solution: Log in again
 
 ### WebSocket won't connect
+
 - Check if using correct auth method
 - Verify token hasn't expired
 - Check browser console for errors
 
 ### API calls returning 401
+
 - Token expired or invalid
 - Check localStorage for valid token
 - Try logging out and back in
@@ -467,6 +503,7 @@ Authorization: Bearer hue_sess_abc123...
 ## Summary
 
 Session-based authentication provides:
+
 - ✅ Better security (temporary tokens)
 - ✅ Server-side control (revocation)
 - ✅ Backward compatibility (legacy mode)

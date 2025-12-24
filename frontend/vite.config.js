@@ -1,15 +1,15 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { readFileSync } from 'fs'
-import { fileURLToPath } from 'url'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Read configuration from root config.json
-const configPath = path.resolve(__dirname, '../config.json')
-const config = JSON.parse(readFileSync(configPath, 'utf-8'))
+const configPath = path.resolve(__dirname, '../config.json');
+const config = JSON.parse(readFileSync(configPath, 'utf-8'));
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -21,7 +21,7 @@ export default defineConfig({
       '/api': {
         target: `http://localhost:${config.development.backendPort}`,
         changeOrigin: true,
-        ws: true, // Enable WebSocket proxying
+        ws: true // Enable WebSocket proxying
       }
     }
   },
@@ -31,4 +31,4 @@ export default defineConfig({
     // Ensure paths work when served from root
     base: '/'
   }
-})
+});

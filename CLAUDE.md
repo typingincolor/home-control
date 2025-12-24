@@ -9,6 +9,7 @@ This is a **Philips Hue Light Control** web application built as a monorepo with
 **Architecture (v3.0.0):** Business logic resides in the backend, exposing a simplified v1 REST API with WebSocket support. The backend pre-computes colors, shadows, and statistics while pushing real-time updates via WebSocket, reducing frontend complexity by ~1,300 lines, API calls by 67-83%, and eliminating polling overhead. The legacy proxy has been completely removed in favor of controlled v1 endpoints. See `ARCHITECTURE_UPDATE.md` for migration details.
 
 **Performance Optimizations:**
+
 - **Backend caching**: Static resources (rooms, devices, zones, scenes, behavior_instance) cached with 5-minute TTL
 - **WebSocket polling**: 15-second interval for dynamic data (lights, motion status)
 - **Optimistic updates**: Frontend updates UI immediately on user actions, syncs with backend asynchronously
@@ -19,24 +20,29 @@ This is a **Philips Hue Light Control** web application built as a monorepo with
 ## Development Commands
 
 ### Start Development (Both Servers)
+
 ```bash
 npm run dev
 ```
+
 - Frontend runs on http://localhost:5173 (Vite dev server with hot reload)
 - Backend runs on http://localhost:3001 (Express API proxy)
 - **Always use port 5173 for development** - this is the Vite dev server with live reloading
 
 ### Run Only Frontend
+
 ```bash
 npm run dev:frontend
 ```
 
 ### Run Only Backend
+
 ```bash
 npm run dev:backend
 ```
 
 ### Testing
+
 ```bash
 npm run test               # Run tests in watch mode
 npm run test:ui            # Open Vitest UI
@@ -46,12 +52,15 @@ npm run test:mutation      # Run mutation testing
 ```
 
 ### Production Build & Deploy
+
 ```bash
 npm run deploy
 ```
+
 This runs: build → build:backend → start
 
 Or step-by-step:
+
 ```bash
 npm run build              # Build frontend to frontend/dist/
 npm run build:backend      # Copy frontend build to backend/public/
@@ -61,6 +70,7 @@ npm run start              # Start production server on port 3001
 ## Architecture
 
 ### Monorepo Structure
+
 - **Root**: Workspace manager with shared config
 - **Frontend workspace**: React 18 + Vite 6
 - **Backend workspace**: Express 5 server
@@ -68,7 +78,9 @@ npm run start              # Start production server on port 3001
 ### Key Architectural Patterns
 
 #### 1. Centralized Configuration
+
 All configuration lives in **`config.json`** at the project root:
+
 - Server ports and host settings
 - Hue API endpoints
 - Development ports
@@ -76,7 +88,9 @@ All configuration lives in **`config.json`** at the project root:
 Both frontend (vite.config.js) and backend (server.js) read from this file. Environment variables can override these values.
 
 #### 2. API Proxy Pattern
+
 The backend acts as a **CORS proxy** for the Hue Bridge:
+
 - Hue Bridge doesn't send CORS headers and uses self-signed HTTPS certificates
 - Backend forwards all `/api/hue/*` requests to the bridge with proper headers
 - Backend accepts self-signed certificates via custom HTTPS agent
@@ -85,12 +99,15 @@ The backend acts as a **CORS proxy** for the Hue Bridge:
 **Important**: The proxy extracts bridge IP from query parameter `?bridgeIp={ip}` on every request, allowing the frontend to control which bridge to connect to without hardcoding.
 
 #### 3. Relative URL Strategy
+
 Frontend uses **empty string `PROXY_URL = ''`** in hueApi.js:
+
 - Development: Vite proxy forwards `/api/*` to backend automatically
 - Production: Same-origin requests (backend serves both API and frontend)
 - **No hardcoded localhost** - works on any machine/network
 
 #### 4. Dual-Mode Serving
+
 **Development**: Separate frontend (Vite) and backend (Express) servers
 **Production**: Backend serves both API and static frontend files from `backend/public/`
 
@@ -99,6 +116,7 @@ Frontend uses **empty string `PROXY_URL = ''`** in hueApi.js:
 This app uses **Philips Hue API v2** (CLIP API) exclusively for all operations. API v1 methods have been removed.
 
 #### API v2 Architecture
+
 - **Base path**: `/clip/v2/resource/{resource_type}`
 - **Authentication**: `hue-application-key` header (not URL-based)
 - **IDs**: UUIDs instead of numeric strings
@@ -106,6 +124,7 @@ This app uses **Philips Hue API v2** (CLIP API) exclusively for all operations. 
 - **Resource types**: light, room, device, scene, behavior_instance, convenience_area_motion
 
 #### Key Endpoints Used
+
 - `/clip/v2/resource/light` - Get/control all lights
 - `/clip/v2/resource/room` - Get rooms with device children
 - `/clip/v2/resource/device` - Get devices with light service references
@@ -116,6 +135,7 @@ This app uses **Philips Hue API v2** (CLIP API) exclusively for all operations. 
 #### V2 Data Structures
 
 **Light**:
+
 ```javascript
 {
   id: "uuid",                          // UUID identifier
@@ -126,6 +146,7 @@ This app uses **Philips Hue API v2** (CLIP API) exclusively for all operations. 
 ```
 
 **Room Hierarchy** (room → device → light):
+
 ```javascript
 {
   id: "room-uuid",
@@ -137,6 +158,7 @@ This app uses **Philips Hue API v2** (CLIP API) exclusively for all operations. 
 ```
 
 **Device** (contains light references):
+
 ```javascript
 {
   id: "device-uuid",
@@ -147,21 +169,24 @@ This app uses **Philips Hue API v2** (CLIP API) exclusively for all operations. 
 ```
 
 **Critical Pattern**: To get lights in a room:
+
 1. Fetch rooms, devices, and lights
 2. Build device→lights map from device.services
 3. Walk room.children to find device references
 4. Map device UUIDs to their light UUIDs
 
 Example v2 request:
+
 ```javascript
 fetch('/api/hue/clip/v2/resource/light?bridgeIp={ip}', {
   headers: { 'hue-application-key': username }
-})
+});
 ```
 
 ### Component Architecture
 
 #### Main Flow Components
+
 1. **App.jsx**: Manages 3-step authentication flow
    - Step 1: BridgeDiscovery (find/enter bridge IP)
    - Step 2: Authentication (link button press)
@@ -225,6 +250,7 @@ fetch('/api/hue/clip/v2/resource/light?bridgeIp={ip}', {
     - Shows green dot (no motion) or red dot (motion detected)
 
 #### Data Flow
+
 - **localStorage**: Persists bridgeIp and username across sessions (keys from `constants/storage.js`)
 - **useHueBridge hook**: Manages bridge connection state
 - **useHueApi hook**: Selects between real and mock API based on demo mode
@@ -245,6 +271,7 @@ All user-facing text is centralized in **`constants/uiText.js`** via the `UI_TEX
 - **Internationalization-ready**: Easy to extend for multi-language support
 
 **Usage Pattern**:
+
 ```javascript
 import { UI_TEXT } from '../constants/uiText';
 
@@ -257,6 +284,7 @@ expect(screen.getByText(UI_TEXT.APP_TITLE)).toBeInTheDocument();
 ```
 
 **Organization**: Constants are grouped by component/feature:
+
 - App Header: `APP_TITLE`, `APP_SUBTITLE`
 - BridgeDiscovery: `BRIDGE_DISCOVERY_TITLE`, `BUTTON_DISCOVER_BRIDGE`, etc.
 - Authentication: `AUTH_MAIN_TITLE`, `AUTH_DESCRIPTION`, `BUTTON_I_PRESSED_BUTTON`, etc.
@@ -268,6 +296,7 @@ expect(screen.getByText(UI_TEXT.APP_TITLE)).toBeInTheDocument();
 **When to add new constants**: Any user-visible text should be added to `UI_TEXT` rather than hardcoded in components. This includes buttons, labels, headings, error messages, status text, and placeholders.
 
 ### CSS Architecture
+
 - **Single CSS file**: `frontend/src/App.css` (no CSS modules)
 - **Dark theme**: Always dark mode with CSS variables
   - `--bg-primary: #1a1a1a` - Main background
@@ -287,9 +316,11 @@ expect(screen.getByText(UI_TEXT.APP_TITLE)).toBeInTheDocument();
 ### UI Features & Patterns
 
 #### Color Display System
+
 Light buttons display actual bulb colors using mathematical color space conversions with **brightness-aware warm dim blending** for realistic visualization:
 
 **Color Conversion Functions** (`utils/colorConversion.js`):
+
 ```javascript
 // Convert Hue xy coordinates (CIE 1931) to RGB with brightness scaling
 xyToRgb(x, y, brightness = 100) {
@@ -331,6 +362,7 @@ getLightShadow(light, lightColor) {
 ```
 
 **Warm Dim Blending Algorithm**:
+
 - **DIM_START = 15%**: Pure warm candlelight color below this threshold
 - **BRIGHT_START = 50%**: Pure actual color above this threshold
 - **Transition zone (15-50%)**: Smoothstep curve `t²(3-2t)` for gradual blending
@@ -338,11 +370,13 @@ getLightShadow(light, lightColor) {
 - **Rationale**: Human eyes perceive very dim colored lights as warm/yellowish regardless of actual color
 
 **Race Condition Handling**:
+
 - During scene transitions, Hue API may return light state before color properties load
 - Fallback system uses neutral white RGB(255, 245, 235) with brightness-based blending
 - Prevents green CSS fallback from appearing during data loads
 
 **Dynamic Button Styling**:
+
 - Inline styles override default CSS when color data available
 - Background gradient uses blended color from `getLightColor()`
 - Box-shadow determined by `getLightShadow()` based on brightness threshold
@@ -352,6 +386,7 @@ getLightShadow(light, lightColor) {
 #### Information Density Features
 
 **Dashboard Summary** (LightControl.jsx):
+
 ```javascript
 // Overall statistics at top of page
 <div className="lights-summary">
@@ -364,6 +399,7 @@ getLightShadow(light, lightColor) {
 ```
 
 **Room Status System**:
+
 ```javascript
 // Helper function calculates room statistics with race condition handling
 getRoomLightStats(roomLights) {
@@ -384,11 +420,13 @@ getRoomLightStats(roomLights) {
 ```
 
 **Race Condition Handling**:
+
 - During scene transitions, `light.dimming?.brightness` may be temporarily undefined
 - Fallback to 50% prevents brightness from dropping to 0 and causing flickering
 - Visibility condition uses `lightsOnCount > 0` instead of `averageBrightness > 0` for stability
 
 **Visual Elements**:
+
 - **Status badges**: "{X} of {Y} on" for each room
 - **Brightness badge**: Compact badge showing average room brightness percentage
   - Always visible for consistent layout alignment
@@ -401,20 +439,24 @@ getRoomLightStats(roomLights) {
 #### Responsive Design Strategy
 
 **Breakpoints**:
+
 - `max-width: 768px` - Mobile devices (reduced padding, smaller fonts)
 - `min-width: 1800px` - Large screens (cap at 4 rooms per row)
 
 **Mobile Optimizations**:
+
 - Container: `calc(100% - 16px)` width, `8px` padding
 - Header/footer: `12px` padding
 - Button size: `clamp(60px, 4vw, 80px)` scales with viewport
 
 **iPad Optimizations**:
+
 - Buttons scale up to 82px on iPad Pro (1024px)
 - Text labels increase to 100px max-width
 - Logo scales with `clamp(60px, 15vw, 120px)`
 
 **Layout Grid**:
+
 - Room cards: `repeat(auto-fill, minmax(440px, 1fr))`
 - Light buttons: `repeat(auto-fit, minmax(var(--button-size), 1fr))`
 - Maximum 4 rooms per row via media query
@@ -427,6 +469,7 @@ getRoomLightStats(roomLights) {
 The project includes comprehensive testing with **332 tests total** (139 backend + 193 frontend):
 
 **Backend Tests** (139 tests):
+
 ```
 backend/test/
 ├── services/
@@ -441,6 +484,7 @@ backend/test/
 ```
 
 **Frontend Tests** (193 tests):
+
 ```
 frontend/src/
 ├── utils/
@@ -479,22 +523,26 @@ frontend/src/
 ### Running Tests
 
 **Watch mode** (auto-runs on changes):
+
 ```bash
 npm run test
 ```
 
 **Interactive UI** (visual test explorer):
+
 ```bash
 npm run test:ui
 ```
 
 **Coverage report**:
+
 ```bash
 npm run test:coverage
 # Opens frontend/coverage/index.html
 ```
 
 **Mutation testing** (validates test quality):
+
 ```bash
 npm run test:mutation
 # Takes ~1 minute, opens frontend/reports/mutation/index.html
@@ -503,6 +551,7 @@ npm run test:mutation
 ### Testing Patterns
 
 #### Testing Utilities (Pure Functions)
+
 ```javascript
 import { describe, it, expect } from 'vitest';
 import { xyToRgb } from './colorConversion';
@@ -517,6 +566,7 @@ describe('colorConversion', () => {
 ```
 
 #### Testing Hooks with Mocks
+
 ```javascript
 import { renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
@@ -533,6 +583,7 @@ it('should return hueApi when not in demo mode', () => {
 ```
 
 #### Testing Components with User Events
+
 ```javascript
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -550,6 +601,7 @@ it('should call onActivate when scene is selected', async () => {
 ```
 
 #### Testing Polling with Fake Timers
+
 ```javascript
 beforeEach(() => {
   vi.useFakeTimers();
@@ -582,6 +634,7 @@ it('should call callback at specified interval', () => {
 - ✅ **Components**: Tests verify rendering, user interactions, conditional logic
 
 **Survived mutants** are primarily in:
+
 - Complex mathematical operations (matrix transformations, gamma correction)
 - Boundary conditions that don't change observable behavior
 - Precise floating-point calculations
@@ -600,6 +653,7 @@ For detailed testing documentation, see `frontend/TESTING.md`.
 ### Common Patterns
 
 #### Building Room→Device→Light Hierarchy
+
 **Critical implementation pattern** for v2 API room organization:
 
 ```javascript
@@ -610,9 +664,7 @@ const getLightsByRoom = () => {
   // Step 1: Build device → lights map from services
   const deviceToLights = {};
   devices.data.forEach(device => {
-    const lightUuids = device.services
-      ?.filter(s => s.rtype === 'light')
-      .map(s => s.rid) || [];
+    const lightUuids = device.services?.filter(s => s.rtype === 'light').map(s => s.rid) || [];
     deviceToLights[device.id] = lightUuids;
   });
 
@@ -649,6 +701,7 @@ const getLightsByRoom = () => {
 **Why this is necessary**: V2 API uses an indirect relationship where rooms contain devices, and devices contain lights. You cannot get lights directly from a room.
 
 #### Adding New Hue API v2 Resource
+
 ```javascript
 // In hueApi.js
 async getResource(bridgeIp, username, resourceType) {
@@ -665,6 +718,7 @@ async getResource(bridgeIp, username, resourceType) {
 ```
 
 #### Component Polling Pattern
+
 ```javascript
 // Initial fetch
 useEffect(() => {
@@ -688,19 +742,23 @@ useEffect(() => {
 ### Debugging
 
 #### Check Backend Server
+
 ```bash
 curl http://localhost:3001/api/health
 # Should return: {"status":"ok","message":"Proxy server is running"}
 ```
 
 #### Check Proxy Logs
+
 Backend logs all proxied requests:
+
 ```
 [PROXY] GET https://{bridge-ip}/api/{username}/lights
 [PROXY] Response status: 200
 ```
 
 #### Common Issues
+
 - **"Nothing showing in console"**: Check you're on port 5173 (Vite dev), not 3001 (backend)
 - **Backend changes not applying**: Restart backend server manually
 - **CORS errors**: Ensure backend proxy is running and forwarding requests
@@ -780,11 +838,13 @@ The MotionAware zones feature is **NOT** available through traditional motion se
 ## Network Architecture
 
 ### Development
+
 - Frontend: localhost:5173 (accessible only on dev machine)
 - Backend: 0.0.0.0:3001 (accessible from network)
 - Vite proxies `/api/*` to backend
 
 ### Production
+
 - Single server: 0.0.0.0:3001 (accessible from entire network)
 - Serves both API and static files
 - Access from any device: `http://{server-ip}:3001`

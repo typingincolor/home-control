@@ -2,12 +2,7 @@ import PropTypes from 'prop-types';
 import { UI_TEXT } from '../../constants/uiText';
 import { Logout, LightbulbOn, Home, Grid } from './Icons';
 
-export const TopToolbar = ({
-  summary = {},
-  isConnected = true,
-  isDemoMode = false,
-  onLogout
-}) => {
+export const TopToolbar = ({ summary = {}, isConnected = true, isDemoMode = false, onLogout }) => {
   const { lightsOn = 0, roomCount = 0, sceneCount = 0 } = summary;
 
   return (
@@ -27,8 +22,7 @@ export const TopToolbar = ({
         </div>
       </div>
 
-      <div className="toolbar-center">
-      </div>
+      <div className="toolbar-center"></div>
 
       <div className="toolbar-right">
         {isDemoMode && (

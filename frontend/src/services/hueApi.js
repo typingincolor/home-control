@@ -1,3 +1,7 @@
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('HueApi');
+
 // Use relative URLs - works with Vite proxy in dev and same-origin in production
 const PROXY_URL = '';
 
@@ -15,7 +19,7 @@ const request = async (url, options = {}, sessionToken = null) => {
     if (sessionToken) {
       options.headers = {
         ...options.headers,
-        'Authorization': `Bearer ${sessionToken}`
+        Authorization: `Bearer ${sessionToken}`
       };
     }
 
@@ -38,8 +42,7 @@ const request = async (url, options = {}, sessionToken = null) => {
 
     return data;
   } catch (error) {
-    // eslint-disable-next-line no-console -- Intentional error logging
-    console.error(`[HueApi] Request failed:`, error);
+    logger.error('Request failed:', error);
 
     // Network error detection
     if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
@@ -61,8 +64,7 @@ export const hueApi = {
       const data = await response.json();
       return data;
     } catch (error) {
-      // eslint-disable-next-line no-console -- Intentional error logging
-      console.error('Bridge discovery error:', error);
+      logger.error('Bridge discovery error:', error);
       throw new Error('Could not discover bridges. Please enter IP manually.');
     }
   },
@@ -140,11 +142,15 @@ export const hueApi = {
   async updateLight(sessionToken, lightId, state) {
     const url = `${PROXY_URL}/api/v1/lights/${lightId}`;
 
-    return request(url, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(state)
-    }, sessionToken);
+    return request(
+      url,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state)
+      },
+      sessionToken
+    );
   },
 
   /**
@@ -157,11 +163,15 @@ export const hueApi = {
   async updateRoomLights(sessionToken, roomId, state) {
     const url = `${PROXY_URL}/api/v1/rooms/${roomId}/lights`;
 
-    return request(url, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(state)
-    }, sessionToken);
+    return request(
+      url,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state)
+      },
+      sessionToken
+    );
   },
 
   /**
@@ -174,11 +184,15 @@ export const hueApi = {
   async updateZoneLights(sessionToken, zoneId, state) {
     const url = `${PROXY_URL}/api/v1/zones/${zoneId}/lights`;
 
-    return request(url, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(state)
-    }, sessionToken);
+    return request(
+      url,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state)
+      },
+      sessionToken
+    );
   },
 
   /**

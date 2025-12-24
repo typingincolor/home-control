@@ -2,6 +2,9 @@ import { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { MotionZoneShape } from '../propTypes/shapes';
 import { useHueApi } from '../hooks/useHueApi';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('MotionZones');
 
 export const MotionZones = ({ sessionToken, motionZones }) => {
   const api = useHueApi();
@@ -21,8 +24,7 @@ export const MotionZones = ({ sessionToken, motionZones }) => {
           const motionData = await api.getMotionZones(sessionToken);
           setFetchedZones(motionData.zones || []);
         } catch (err) {
-          // eslint-disable-next-line no-console -- Intentional error logging
-          console.error('[MotionZones] Failed to fetch MotionAware data:', err);
+          logger.error('Failed to fetch MotionAware data:', err);
         }
       };
       fetchSensors();

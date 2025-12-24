@@ -8,10 +8,16 @@ import { hueApi } from '../services/hueApi';
 const localStorageMock = (() => {
   let store = {};
   return {
-    getItem: (key) => store[key] || null,
-    setItem: (key, value) => { store[key] = value ? value.toString() : ''; },
-    removeItem: (key) => { delete store[key]; },
-    clear: () => { store = {}; }
+    getItem: key => store[key] || null,
+    setItem: (key, value) => {
+      store[key] = value ? value.toString() : '';
+    },
+    removeItem: key => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    }
   };
 })();
 
@@ -314,11 +320,18 @@ describe('useSession', () => {
     });
 
     it('should not refresh if already refreshing', async () => {
-      hueApi.refreshSession.mockImplementation(() =>
-        new Promise(resolve => setTimeout(() => resolve({
-          sessionToken: 'refreshed-token',
-          expiresIn: 86400
-        }), 1000))
+      hueApi.refreshSession.mockImplementation(
+        () =>
+          new Promise(resolve =>
+            setTimeout(
+              () =>
+                resolve({
+                  sessionToken: 'refreshed-token',
+                  expiresIn: 86400
+                }),
+              1000
+            )
+          )
       );
 
       const { result } = renderHook(() => useSession());

@@ -54,7 +54,7 @@ export const RoomContent = ({
         </div>
       ) : (
         <div className="light-tiles-grid">
-          {lights.map((light) => (
+          {lights.map(light => (
             <LightTile
               key={light.id}
               light={light}

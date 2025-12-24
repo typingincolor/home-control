@@ -3,7 +3,7 @@ import { LightShape } from '../../propTypes/shapes';
 import { LightbulbOn, LightbulbOff, Spinner } from './Icons';
 
 export const LightTile = ({ light, onToggle, isToggling }) => {
-  const brightness = light.on ? (light.brightness || 0) : 0;
+  const brightness = light.on ? light.brightness || 0 : 0;
   const fillHeight = `${brightness}%`;
 
   // Fill color from backend, or default warm color
@@ -11,12 +11,18 @@ export const LightTile = ({ light, onToggle, isToggling }) => {
   const fillGradient = `linear-gradient(to top, ${fillColor} 0%, ${adjustColor(fillColor, 20)} 100%)`;
 
   // Shadow only when brightness is high enough
-  const shadowStyle = light.on && brightness >= 50 && light.shadow ? {
-    boxShadow: light.shadow
-  } : {};
+  const shadowStyle =
+    light.on && brightness >= 50 && light.shadow
+      ? {
+          boxShadow: light.shadow
+        }
+      : {};
 
   // Content color and background pill for readability
-  const { color: contentColor, background: pillBackground } = getContrastStyle(fillColor, brightness);
+  const { color: contentColor, background: pillBackground } = getContrastStyle(
+    fillColor,
+    brightness
+  );
 
   return (
     <button

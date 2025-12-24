@@ -13,26 +13,31 @@ During real-world testing with a Hue Bridge, we discovered several bugs that uni
 ## Why Unit Tests Didn't Catch These
 
 ### 1. No API Service Tests
+
 - `hueApi.js` had **zero tests** initially
 - No verification of HTTP headers, request bodies, or methods
 - Added `hueApi.test.js` (15 tests) **after** discovering the bug
 
 ### 2. Component Tests Too Isolated
+
 - No tests for `Authentication` component
 - No tests for `useHueBridge` hook memoization
 - Tests didn't verify callback stability across re-renders
 
 ### 3. No Integration Tests
+
 - All tests were unit tests with heavy mocking
 - Real-world integration scenarios weren't tested
 - Timing issues and race conditions weren't caught
 
 ### 4. Mock-Heavy Tests Hid Real Behavior
+
 - Tests verified **expected behavior**, not **actual behavior**
 - Mocked `fetch`, `WebSocket`, `localStorage` completely
 - Integration bugs slipped through
 
 ### 5. No Edge Case Testing
+
 - Server restart → session recovery
 - WebSocket disconnect → reconnect
 - Optimistic updates → reconciliation
@@ -77,6 +82,7 @@ We've created an integration test suite (`integration.test.jsx`) that uses:
 ## Test Status
 
 **Current Status:**
+
 - ✅ Framework setup complete
 - ✅ localStorage mocking working
 - ✅ MSW server configured
@@ -84,6 +90,7 @@ We've created an integration test suite (`integration.test.jsx`) that uses:
 - ⚠️ UI selectors need adjustment (tests expect specific button text/labels)
 
 **Next Steps:**
+
 1. Adjust test selectors to match actual UI
 2. Add more edge cases
 3. Add E2E tests with Playwright/Cypress
@@ -111,11 +118,13 @@ Going forward, we should have:
 3. **E2E Tests (5%)** - Critical paths with real backend
 
 ### What to Unit Test
+
 - Pure utility functions (`colorConversion.js`, `validation.js`)
 - Isolated component rendering
 - Hook logic in isolation
 
 ### What to Integration Test
+
 - Authentication flows
 - Session management and persistence
 - WebSocket connection lifecycle
@@ -123,6 +132,7 @@ Going forward, we should have:
 - Error handling and recovery
 
 ### What to E2E Test
+
 - Complete user journeys with real backend
 - Cross-browser compatibility
 - Performance under load
@@ -140,14 +150,14 @@ Going forward, we should have:
 
 If these integration tests existed from the start:
 
-| Bug | Test That Would Catch It |
-|-----|-------------------------|
-| Missing Content-Type header | "includes Content-Type header in pairing request" |
-| Infinite auth loop | "does not create infinite authentication loop" |
-| WebSocket error flash | "does not show error flash during initial connection" |
-| Scene activation delay | "updates lights immediately (optimistic update)" |
-| Session not persisting | "persists session to localStorage" |
-| No session recovery | "auto-recovers session after server restart" |
+| Bug                         | Test That Would Catch It                              |
+| --------------------------- | ----------------------------------------------------- |
+| Missing Content-Type header | "includes Content-Type header in pairing request"     |
+| Infinite auth loop          | "does not create infinite authentication loop"        |
+| WebSocket error flash       | "does not show error flash during initial connection" |
+| Scene activation delay      | "updates lights immediately (optimistic update)"      |
+| Session not persisting      | "persists session to localStorage"                    |
+| No session recovery         | "auto-recovers session after server restart"          |
 
 ## Recommendations
 

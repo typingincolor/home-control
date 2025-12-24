@@ -29,7 +29,7 @@ export const ZonesView = ({
       </div>
 
       <div className="zones-list-dark">
-        {zones.map((zone) => {
+        {zones.map(zone => {
           const { stats = {} } = zone;
           const anyOn = stats.lightsOnCount > 0;
           const isToggling = togglingZones.has(zone.id);
@@ -48,7 +48,7 @@ export const ZonesView = ({
               <div className="zone-item-controls">
                 <SceneSelector
                   scenes={zone.scenes || []}
-                  onActivate={(sceneId) => onActivateScene(sceneId, zone.id)}
+                  onActivate={sceneId => onActivateScene(sceneId, zone.id)}
                   isActivating={isActivating}
                 />
                 <button

@@ -7,6 +7,7 @@ All integration tests are now passing successfully! The test suite validates the
 ### Test Results
 
 **Test Suite:** `src/integration.test.jsx`
+
 - **Duration:** ~2.2 seconds
 - **Status:** ✅ All passing
 - **Tests:** 11/11 (100%)
@@ -16,6 +17,7 @@ All integration tests are now passing successfully! The test suite validates the
 ## Test Categories
 
 ### ✅ Full Authentication Flow (2 tests)
+
 1. **completes discovery → pairing → session → dashboard**
    Validates the complete user flow from bridge discovery through authentication to dashboard display.
 
@@ -23,6 +25,7 @@ All integration tests are now passing successfully! The test suite validates the
    Regression test ensuring API requests include proper Content-Type headers (caught bug #1).
 
 ### ✅ Session Management (3 tests)
+
 3. **persists session to localStorage**
    Verifies session tokens, bridge IP, and username are saved to localStorage.
 
@@ -33,6 +36,7 @@ All integration tests are now passing successfully! The test suite validates the
    Tests automatic session recreation using stored username when session expires (caught bug #5).
 
 ### ✅ WebSocket Connection (2 tests)
+
 6. **connects and receives initial dashboard state**
    Verifies WebSocket connects and receives dashboard data from backend.
 
@@ -40,10 +44,12 @@ All integration tests are now passing successfully! The test suite validates the
    Regression test ensuring no error appears during normal connection handshake (caught bug #3).
 
 ### ✅ Scene Activation (1 test)
+
 8. **updates lights immediately (optimistic update)**
    Validates optimistic UI updates when activating scenes (caught bug #4).
 
 ### ✅ Error Handling (2 tests)
+
 9. **handles 401 errors gracefully**
    Tests automatic recovery when authentication fails.
 
@@ -51,6 +57,7 @@ All integration tests are now passing successfully! The test suite validates the
     Verifies friendly error messages on network failures.
 
 ### ✅ Regression Tests (1 test)
+
 11. **does not create infinite authentication loop**
     Prevents infinite re-renders from unmemoized callbacks (caught bug #2).
 
@@ -59,6 +66,7 @@ All integration tests are now passing successfully! The test suite validates the
 ## What Was Fixed
 
 ### Issues Resolved:
+
 1. ✅ **WebSocket MSW Bypass** - Configured MSW to bypass WebSocket connections
 2. ✅ **MockWebSocket addEventListener** - Added event listener methods for MSW compatibility
 3. ✅ **Authentication Flow** - MockWebSocket now waits for auth before sending initial_state
@@ -67,6 +75,7 @@ All integration tests are now passing successfully! The test suite validates the
 6. ✅ **Summary Assertions** - Fixed multi-element text matching issues
 
 ### Key Improvements:
+
 - **Centralized UI Text Constants** (`constants/uiText.js`)
   - All UI text in one place
   - Tests and components use same constants
@@ -88,14 +97,14 @@ All integration tests are now passing successfully! The test suite validates the
 
 If this test suite existed from the start, all 5 real-world bugs would have been caught:
 
-| Bug | Test That Catches It |
-|-----|---------------------|
-| Missing Content-Type header | "includes Content-Type header in pairing request" |
-| Infinite auth loop | "does not create infinite authentication loop" |
-| WebSocket error flash | "does not show error flash during initial connection" |
-| Scene activation delay | "updates lights immediately (optimistic update)" |
-| Session not persisting | "persists session to localStorage" |
-| No session recovery | "auto-recovers session after server restart" |
+| Bug                         | Test That Catches It                                  |
+| --------------------------- | ----------------------------------------------------- |
+| Missing Content-Type header | "includes Content-Type header in pairing request"     |
+| Infinite auth loop          | "does not create infinite authentication loop"        |
+| WebSocket error flash       | "does not show error flash during initial connection" |
+| Scene activation delay      | "updates lights immediately (optimistic update)"      |
+| Session not persisting      | "persists session to localStorage"                    |
+| No session recovery         | "auto-recovers session after server restart"          |
 
 ---
 
@@ -117,6 +126,7 @@ npm run test:ui
 ## Lessons Learned
 
 ### What Worked Well:
+
 1. ✅ **MSW for Network Mocking** - Realistic API mocking at network level
 2. ✅ **Real Components** - No mocking of React components
 3. ✅ **localStorage Mocking** - Proper persistence testing
@@ -124,6 +134,7 @@ npm run test:ui
 5. ✅ **Centralized Constants** - UI text constants prevent test brittleness
 
 ### What Was Challenging:
+
 1. ⚠️ **MSW + WebSocket** - MSW tries to intercept WebSocket connections
    - **Solution:** Configure `onUnhandledRequest` to bypass `/ws` URLs
    - **Solution:** Add `addEventListener`/`removeEventListener` to MockWebSocket
@@ -155,6 +166,7 @@ Even though these tests were created after bugs were found, they provide signifi
 ## Future Enhancements
 
 ### Next Steps (Optional):
+
 1. **Add E2E Tests** with Playwright for critical paths with real backend
 2. **Test Room Toggle** - Verify bulk light operations
 3. **Test Motion Zones** - Validate motion detection display
@@ -169,6 +181,7 @@ Even though these tests were created after bugs were found, they provide signifi
 The integration test suite is now fully operational with 11/11 tests passing in ~2.2 seconds. All real-world bugs discovered during testing would be caught by this suite, providing strong regression protection and a solid foundation for future development.
 
 **Key Achievement:** Went from 2/11 passing → 11/11 passing by:
+
 - Fixing MockWebSocket to wait for authentication
 - Adding event listener methods for MSW compatibility
 - Centralizing UI text constants to prevent test brittleness

@@ -61,8 +61,7 @@ describe('hueApi', () => {
         status: 500
       });
 
-      await expect(hueApi.createUser('192.168.1.100'))
-        .rejects.toThrow('HTTP error! status: 500');
+      await expect(hueApi.createUser('192.168.1.100')).rejects.toThrow('HTTP error! status: 500');
     });
   });
 
@@ -104,8 +103,7 @@ describe('hueApi', () => {
         json: () => Promise.resolve({ message: 'Invalid credentials' })
       });
 
-      await expect(hueApi.createSession('192.168.1.100', 'bad-user'))
-        .rejects.toThrow();
+      await expect(hueApi.createSession('192.168.1.100', 'bad-user')).rejects.toThrow();
     });
   });
 
@@ -127,7 +125,7 @@ describe('hueApi', () => {
         '/api/v1/dashboard',
         expect.objectContaining({
           headers: expect.objectContaining({
-            'Authorization': 'Bearer hue_sess_test123'
+            Authorization: 'Bearer hue_sess_test123'
           })
         })
       );
@@ -141,8 +139,9 @@ describe('hueApi', () => {
         status: 401
       });
 
-      await expect(hueApi.getDashboard('expired-token'))
-        .rejects.toThrow('Session expired. Please log in again.');
+      await expect(hueApi.getDashboard('expired-token')).rejects.toThrow(
+        'Session expired. Please log in again.'
+      );
     });
   });
 
@@ -161,7 +160,7 @@ describe('hueApi', () => {
         '/api/v1/motion-zones',
         expect.objectContaining({
           headers: expect.objectContaining({
-            'Authorization': 'Bearer hue_sess_test123'
+            Authorization: 'Bearer hue_sess_test123'
           })
         })
       );
@@ -181,11 +180,10 @@ describe('hueApi', () => {
         json: () => Promise.resolve(mockResponse)
       });
 
-      const result = await hueApi.updateLight(
-        'hue_sess_test123',
-        'light-1',
-        { on: true, brightness: 80 }
-      );
+      const result = await hueApi.updateLight('hue_sess_test123', 'light-1', {
+        on: true,
+        brightness: 80
+      });
 
       expect(fetch).toHaveBeenCalledWith(
         '/api/v1/lights/light-1',
@@ -193,7 +191,7 @@ describe('hueApi', () => {
           method: 'PUT',
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer hue_sess_test123'
+            Authorization: 'Bearer hue_sess_test123'
           }),
           body: JSON.stringify({ on: true, brightness: 80 })
         })
@@ -217,11 +215,7 @@ describe('hueApi', () => {
         json: () => Promise.resolve(mockResponse)
       });
 
-      const result = await hueApi.updateRoomLights(
-        'hue_sess_test123',
-        'room-1',
-        { on: true }
-      );
+      const result = await hueApi.updateRoomLights('hue_sess_test123', 'room-1', { on: true });
 
       expect(fetch).toHaveBeenCalledWith(
         '/api/v1/rooms/room-1/lights',
@@ -229,7 +223,7 @@ describe('hueApi', () => {
           method: 'PUT',
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer hue_sess_test123'
+            Authorization: 'Bearer hue_sess_test123'
           }),
           body: JSON.stringify({ on: true })
         })
@@ -250,17 +244,14 @@ describe('hueApi', () => {
         json: () => Promise.resolve(mockResponse)
       });
 
-      const result = await hueApi.activateSceneV1(
-        'hue_sess_test123',
-        'scene-1'
-      );
+      const result = await hueApi.activateSceneV1('hue_sess_test123', 'scene-1');
 
       expect(fetch).toHaveBeenCalledWith(
         '/api/v1/scenes/scene-1/activate',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
-            'Authorization': 'Bearer hue_sess_test123'
+            Authorization: 'Bearer hue_sess_test123'
           })
         })
       );
@@ -289,7 +280,7 @@ describe('hueApi', () => {
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
-            'Authorization': 'Bearer hue_sess_old123'
+            Authorization: 'Bearer hue_sess_old123'
           })
         })
       );
@@ -317,7 +308,7 @@ describe('hueApi', () => {
         expect.objectContaining({
           method: 'DELETE',
           headers: expect.objectContaining({
-            'Authorization': 'Bearer hue_sess_test123'
+            Authorization: 'Bearer hue_sess_test123'
           })
         })
       );
@@ -330,21 +321,22 @@ describe('hueApi', () => {
     it('should handle network errors', async () => {
       fetch.mockRejectedValue(new TypeError('Failed to fetch'));
 
-      await expect(hueApi.getDashboard('test-token'))
-        .rejects.toThrow('Could not connect to proxy server');
+      await expect(hueApi.getDashboard('test-token')).rejects.toThrow(
+        'Could not connect to proxy server'
+      );
     });
 
     it('should handle V2 API errors in response', async () => {
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({
-          errors: [{ description: 'Invalid parameter' }],
-          data: []
-        })
+        json: () =>
+          Promise.resolve({
+            errors: [{ description: 'Invalid parameter' }],
+            data: []
+          })
       });
 
-      await expect(hueApi.getDashboard('test-token'))
-        .rejects.toThrow('Invalid parameter');
+      await expect(hueApi.getDashboard('test-token')).rejects.toThrow('Invalid parameter');
     });
   });
 });

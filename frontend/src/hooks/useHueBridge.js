@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { hueApi } from '../services/hueApi';
 import { STORAGE_KEYS } from '../constants/storage';
 import { useSession } from './useSession';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('Auth');
 
 // Helper to check for valid session synchronously (before first render)
 const getInitialStep = () => {
@@ -27,9 +30,8 @@ const getInitialStep = () => {
 export const useHueBridge = () => {
   const [state, setState] = useState(() => {
     const initialStep = getInitialStep();
-    const initialBridgeIp = initialStep === 'connected'
-      ? localStorage.getItem(STORAGE_KEYS.BRIDGE_IP)
-      : null;
+    const initialBridgeIp =
+      initialStep === 'connected' ? localStorage.getItem(STORAGE_KEYS.BRIDGE_IP) : null;
 
     return {
       step: initialStep, // Initialize based on existing session
@@ -41,7 +43,13 @@ export const useHueBridge = () => {
     };
   });
 
-  const { sessionToken, bridgeIp: sessionBridgeIp, createSession, clearSession, isValid } = useSession();
+  const {
+    sessionToken,
+    bridgeIp: sessionBridgeIp,
+    createSession,
+    clearSession,
+    isValid
+  } = useSession();
 
   // Helper to migrate from legacy auth to session auth
   const migrateToSession = async (bridgeIp, username) => {
@@ -55,11 +63,9 @@ export const useHueBridge = () => {
         loading: false,
         step: 'connected'
       }));
-      // eslint-disable-next-line no-console -- Intentional debug logging
-      console.log('[Auth] Successfully auto-recovered session');
+      logger.info('Successfully auto-recovered session');
     } catch (error) {
-      // eslint-disable-next-line no-console -- Intentional error logging
-      console.error('[Auth] Failed to auto-recover session:', error);
+      logger.error('Failed to auto-recover session:', error);
       // Clear invalid credentials and require re-authentication
       localStorage.removeItem(STORAGE_KEYS.USERNAME);
       setState(prev => ({
@@ -81,8 +87,7 @@ export const useHueBridge = () => {
         bridgeIp: sessionBridgeIp,
         step: 'connected'
       }));
-      // eslint-disable-next-line no-console -- Intentional debug logging
-      console.log('[Auth] Restored session from storage');
+      logger.info('Restored session from storage');
     }
     // Check if we have username but no valid session (e.g., after server restart)
     else {
@@ -90,8 +95,7 @@ export const useHueBridge = () => {
       const savedUsername = localStorage.getItem(STORAGE_KEYS.USERNAME);
 
       if (savedIp && savedUsername) {
-        // eslint-disable-next-line no-console -- Intentional debug logging
-        console.log('[Auth] Found saved credentials, auto-recovering session...');
+        logger.info('Found saved credentials, auto-recovering session...');
         // Automatically recreate session (no button press needed!)
         migrateToSession(savedIp, savedUsername);
       }
@@ -99,7 +103,7 @@ export const useHueBridge = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Run only on mount
   }, []);
 
-  const setBridgeIp = (ip) => {
+  const setBridgeIp = ip => {
     localStorage.setItem(STORAGE_KEYS.BRIDGE_IP, ip);
     setState(prev => ({
       ...prev,
@@ -115,8 +119,7 @@ export const useHueBridge = () => {
     try {
       // Step 1: Pair with bridge (get username)
       const username = await hueApi.createUser(state.bridgeIp);
-      // eslint-disable-next-line no-console -- Intentional debug logging
-      console.log('[Auth] Pairing successful, creating session...');
+      logger.info('Pairing successful, creating session...');
 
       // Step 2: Create session token
       const sessionInfo = await hueApi.createSession(state.bridgeIp, username);
@@ -128,8 +131,7 @@ export const useHueBridge = () => {
         step: 'connected'
       }));
 
-      // eslint-disable-next-line no-console -- Intentional debug logging
-      console.log('[Auth] Authentication complete with session token');
+      logger.info('Authentication complete with session token');
     } catch (error) {
       let errorMessage = error.message;
 
@@ -169,8 +171,7 @@ export const useHueBridge = () => {
       error: null
     });
 
-    // eslint-disable-next-line no-console -- Intentional debug logging
-    console.log('[Auth] Reset authentication');
+    logger.info('Reset authentication');
   };
 
   return {

@@ -4,16 +4,16 @@ import { useHueApi } from '../../hooks/useHueApi';
 import { useDemoMode } from '../../hooks/useDemoMode';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import { ERROR_MESSAGES } from '../../constants/messages';
+import { createLogger } from '../../utils/logger';
 import { TopToolbar } from './TopToolbar';
 import { BottomNav } from './BottomNav';
 import { RoomContent } from './RoomContent';
 import { ZonesView } from './ZonesView';
 import { MotionZones } from '../MotionZones';
 
-export const LightControl = ({
-  sessionToken,
-  onLogout
-}) => {
+const logger = createLogger('Dashboard');
+
+export const LightControl = ({ sessionToken, onLogout }) => {
   const isDemoMode = useDemoMode();
   const api = useHueApi();
 
@@ -48,11 +48,9 @@ export const LightControl = ({
     try {
       const dashboardData = await api.getDashboard(sessionToken);
       setLocalDashboard(dashboardData);
-      // eslint-disable-next-line no-console -- Intentional debug logging
-      console.log('[Dashboard] Fetched dashboard successfully');
+      logger.info('Fetched dashboard successfully');
     } catch (err) {
-      // eslint-disable-next-line no-console -- Intentional error logging
-      console.error('[Dashboard] Failed to fetch dashboard:', err);
+      logger.error('Failed to fetch dashboard:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -100,7 +98,7 @@ export const LightControl = ({
   useEffect(() => {
     if (!isDemoMode || !api.subscribeToMotion) return;
 
-    const unsubscribe = api.subscribeToMotion((updatedMotionZones) => {
+    const unsubscribe = api.subscribeToMotion(updatedMotionZones => {
       setLocalDashboard(prev => {
         if (!prev) return prev;
         return {
@@ -114,7 +112,7 @@ export const LightControl = ({
   }, [isDemoMode, api]);
 
   // Helper: Get light by UUID from dashboard
-  const getLightByUuid = (uuid) => {
+  const getLightByUuid = uuid => {
     if (!dashboard?.rooms) return null;
     for (const room of dashboard.rooms) {
       const light = room.lights.find(l => l.id === uuid);
@@ -123,7 +121,7 @@ export const LightControl = ({
     return null;
   };
 
-  const toggleLight = async (lightUuid) => {
+  const toggleLight = async lightUuid => {
     setTogglingLights(prev => new Set(prev).add(lightUuid));
 
     try {
@@ -140,20 +138,15 @@ export const LightControl = ({
         ...prev,
         summary: {
           ...prev.summary,
-          lightsOn: newState.on
-            ? prev.summary.lightsOn + 1
-            : Math.max(0, prev.summary.lightsOn - 1)
+          lightsOn: newState.on ? prev.summary.lightsOn + 1 : Math.max(0, prev.summary.lightsOn - 1)
         },
         rooms: prev.rooms.map(room => ({
           ...room,
-          lights: room.lights.map(l =>
-            l.id === lightUuid ? response.light : l
-          )
+          lights: room.lights.map(l => (l.id === lightUuid ? response.light : l))
         }))
       }));
     } catch (err) {
-      // eslint-disable-next-line no-console -- Intentional error logging
-      console.error('Failed to toggle light:', err);
+      logger.error('Failed to toggle light:', err);
       alert(`${ERROR_MESSAGES.LIGHT_TOGGLE}: ${err.message}`);
     } finally {
       setTogglingLights(prev => {
@@ -195,8 +188,7 @@ export const LightControl = ({
         })
       }));
     } catch (err) {
-      // eslint-disable-next-line no-console -- Intentional error logging
-      console.error('Failed to toggle room:', err);
+      logger.error('Failed to toggle room:', err);
       alert(`${ERROR_MESSAGES.ROOM_TOGGLE}: ${err.message}`);
     } finally {
       setTogglingLights(prev => {
@@ -239,8 +231,7 @@ export const LightControl = ({
         })
       }));
     } catch (err) {
-      // eslint-disable-next-line no-console -- Intentional error logging
-      console.error('Failed to toggle zone:', err);
+      logger.error('Failed to toggle zone:', err);
       alert(`${ERROR_MESSAGES.ZONE_TOGGLE}: ${err.message}`);
     } finally {
       setTogglingZones(prev => {
@@ -262,8 +253,11 @@ export const LightControl = ({
     setActivatingScene(zoneId || sceneUuid);
     try {
       const response = await api.activateSceneV1(sessionToken, sceneUuid);
-      // eslint-disable-next-line no-console -- Intentional debug logging
-      console.log(`Activated scene ${sceneUuid}`, response.affectedLights?.length, 'lights affected');
+      logger.info(
+        `Activated scene ${sceneUuid}`,
+        response.affectedLights?.length,
+        'lights affected'
+      );
 
       // Optimistic update - apply immediately for responsive UI
       if (response.affectedLights && response.affectedLights.length > 0) {
@@ -276,16 +270,13 @@ export const LightControl = ({
             ...prev,
             rooms: prev.rooms.map(room => ({
               ...room,
-              lights: room.lights.map(light =>
-                updatedLightMap.get(light.id) || light
-              )
+              lights: room.lights.map(light => updatedLightMap.get(light.id) || light)
             }))
           };
         });
       }
     } catch (err) {
-      // eslint-disable-next-line no-console -- Intentional error logging
-      console.error('Failed to activate scene:', err);
+      logger.error('Failed to activate scene:', err);
       alert(`${ERROR_MESSAGES.SCENE_ACTIVATION}: ${err.message}`);
     } finally {
       setActivatingScene(null);
@@ -293,9 +284,8 @@ export const LightControl = ({
   };
 
   // Get the selected room from dashboard
-  const selectedRoom = selectedId !== 'zones'
-    ? dashboard?.rooms?.find(r => r.id === selectedId)
-    : null;
+  const selectedRoom =
+    selectedId !== 'zones' ? dashboard?.rooms?.find(r => r.id === selectedId) : null;
 
   // Loading state
   if (loading && !dashboard) {
@@ -312,18 +302,11 @@ export const LightControl = ({
   if (error && !dashboard) {
     return (
       <div className="dark-layout">
-        <TopToolbar
-          summary={{}}
-          isConnected={false}
-          isDemoMode={isDemoMode}
-          onLogout={onLogout}
-        />
+        <TopToolbar summary={{}} isConnected={false} isDemoMode={isDemoMode} onLogout={onLogout} />
         <div className="main-panel">
           <div className="empty-state-dark">
             <div className="empty-state-dark-icon">⚠️</div>
-            <div className="empty-state-dark-text">
-              Connection failed: {error}
-            </div>
+            <div className="empty-state-dark-text">Connection failed: {error}</div>
           </div>
         </div>
       </div>
@@ -360,10 +343,7 @@ export const LightControl = ({
         )}
       </div>
 
-      <MotionZones
-        sessionToken={sessionToken}
-        motionZones={dashboard?.motionZones}
-      />
+      <MotionZones sessionToken={sessionToken} motionZones={dashboard?.motionZones} />
 
       <BottomNav
         rooms={dashboard?.rooms || []}

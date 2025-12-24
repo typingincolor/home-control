@@ -42,9 +42,9 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -356,7 +356,8 @@ button.secondary:hover:not(:disabled) {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -434,7 +435,8 @@ button.secondary:hover:not(:disabled) {
 }
 
 @keyframes demo-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -463,7 +465,8 @@ button.secondary:hover:not(:disabled) {
 }
 
 @keyframes pulse-warning {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -474,7 +477,8 @@ button.secondary:hover:not(:disabled) {
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 8px rgba(39, 174, 96, 0.6);
   }
   50% {
@@ -936,15 +940,17 @@ button.secondary:hover:not(:disabled) {
   background: white;
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
-              0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #e5e7eb;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .room-group:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07),
-              0 8px 20px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.07),
+    0 8px 20px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
   border-color: #d1d5db;
 }
@@ -1295,7 +1301,9 @@ button.secondary:hover:not(:disabled) {
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease, filter 0.2s ease;
+  transition:
+    all 0.3s ease,
+    filter 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1306,8 +1314,9 @@ button.secondary:hover:not(:disabled) {
 .light-bulb-button.on {
   background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 4px 12px rgba(16, 185, 129, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .light-bulb-button.on:hover:not(:disabled) {
@@ -1444,7 +1453,6 @@ button.secondary:hover:not(:disabled) {
     width: 100%;
   }
 
-
   .scene-control {
     flex-direction: column;
     align-items: stretch;
@@ -1495,7 +1503,9 @@ button.secondary:hover:not(:disabled) {
   background: rgba(239, 68, 68, 0.95);
   border-radius: 24px;
   box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
-  animation: motion-alert-slide-in 0.3s ease-out, motion-alert-pulse 1.5s ease-in-out infinite;
+  animation:
+    motion-alert-slide-in 0.3s ease-out,
+    motion-alert-pulse 1.5s ease-in-out infinite;
 }
 
 .motion-alert-dot {
@@ -1523,7 +1533,8 @@ button.secondary:hover:not(:disabled) {
 }
 
 @keyframes motion-alert-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
   }
   50% {
@@ -1532,7 +1543,8 @@ button.secondary:hover:not(:disabled) {
 }
 
 @keyframes pulse-motion {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -1767,7 +1779,9 @@ body.dark-theme {
   color: var(--text-secondary);
   border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
   flex-shrink: 0;
 }
 
@@ -1867,8 +1881,12 @@ body.dark-theme {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .light-tile-name {

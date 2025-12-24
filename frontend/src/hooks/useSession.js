@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { STORAGE_KEYS } from '../constants/storage';
 import { hueApi } from '../services/hueApi';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('Session');
 
 /**
  * Session management hook
@@ -73,24 +76,20 @@ export const useSession = () => {
 
     // Only schedule if we haven't expired yet
     if (now < expiresAt) {
-      // eslint-disable-next-line no-console -- Intentional debug logging
-      console.log(`[Session] Auto-refresh scheduled in ${Math.floor(delay / 1000)} seconds`);
+      logger.info(`Auto-refresh scheduled in ${Math.floor(delay / 1000)} seconds`);
 
       const timeoutId = setTimeout(async () => {
         if (isRefreshing) return; // Prevent duplicate refreshes
 
         setIsRefreshing(true);
-        // eslint-disable-next-line no-console -- Intentional debug logging
-        console.log('[Session] Auto-refreshing token...');
+        logger.info('Auto-refreshing token...');
 
         try {
           const newSession = await hueApi.refreshSession(sessionToken);
           createSession(newSession.sessionToken, bridgeIp, newSession.expiresIn);
-          // eslint-disable-next-line no-console -- Intentional debug logging
-          console.log('[Session] Auto-refresh successful');
+          logger.info('Auto-refresh successful');
         } catch (error) {
-          // eslint-disable-next-line no-console -- Intentional error logging
-          console.error('[Session] Auto-refresh failed:', error);
+          logger.error('Auto-refresh failed:', error);
           // Don't clear session immediately - let it expire naturally
           // User will see "session expired" message on next API call
         } finally {
@@ -111,7 +110,7 @@ export const useSession = () => {
    * @param {string} username - Optional username to store for session recovery
    */
   const createSession = useCallback((token, ip, expiresIn, username = null) => {
-    const expiryTime = Date.now() + (expiresIn * 1000);
+    const expiryTime = Date.now() + expiresIn * 1000;
 
     // Store in state
     setSessionToken(token);
@@ -129,8 +128,7 @@ export const useSession = () => {
       localStorage.setItem(STORAGE_KEYS.USERNAME, username);
     }
 
-    // eslint-disable-next-line no-console -- Intentional debug logging
-    console.log('[Session] Created session, expires in', expiresIn, 'seconds');
+    logger.info('Created session, expires in', expiresIn, 'seconds');
   }, []);
 
   /**
@@ -147,8 +145,7 @@ export const useSession = () => {
     // Keep bridgeIp for re-auth
     // localStorage.removeItem(STORAGE_KEYS.BRIDGE_IP);
 
-    // eslint-disable-next-line no-console -- Intentional debug logging
-    console.log('[Session] Cleared session');
+    logger.info('Cleared session');
   }, []);
 
   /**

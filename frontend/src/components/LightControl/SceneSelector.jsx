@@ -7,7 +7,7 @@ export const SceneSelector = ({ scenes, onActivate, isActivating }) => {
 
   return (
     <div className="scene-icons">
-      {scenes.map((scene) => (
+      {scenes.map(scene => (
         <button
           key={scene.id}
           className="scene-icon-button"
@@ -15,11 +15,7 @@ export const SceneSelector = ({ scenes, onActivate, isActivating }) => {
           disabled={isActivating}
           title={scene.name}
         >
-          {isActivating ? (
-            <Spinner size={20} />
-          ) : (
-            <SceneIcon name={scene.name} size={20} />
-          )}
+          {isActivating ? <Spinner size={20} /> : <SceneIcon name={scene.name} size={20} />}
           <span className="scene-tooltip">{scene.name}</span>
         </button>
       ))}

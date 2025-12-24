@@ -52,7 +52,7 @@ export const RoomCard = ({
       </div>
 
       <div className="room-lights-grid">
-        {room.lights.map((light) => (
+        {room.lights.map(light => (
           <LightButton
             key={light.id}
             light={light}

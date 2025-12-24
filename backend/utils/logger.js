@@ -22,14 +22,9 @@ const winstonLogger = winston.createLogger({
     winston.format.errors({ stack: true }),
     isProduction
       ? winston.format.json()
-      : winston.format.combine(
-          winston.format.colorize(),
-          consoleFormat
-        )
+      : winston.format.combine(winston.format.colorize(), consoleFormat)
   ),
-  transports: [
-    new winston.transports.Console()
-  ]
+  transports: [new winston.transports.Console()]
 });
 
 /**

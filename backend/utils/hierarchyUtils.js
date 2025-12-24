@@ -16,9 +16,7 @@ export function buildDeviceToLightsMap(devicesData) {
   const deviceToLights = {};
 
   devicesData.data.forEach(device => {
-    const lightUuids = device.services
-      ?.filter(s => s.rtype === 'light')
-      .map(s => s.rid) || [];
+    const lightUuids = device.services?.filter(s => s.rtype === 'light').map(s => s.rid) || [];
     deviceToLights[device.id] = lightUuids;
   });
 
@@ -65,13 +63,14 @@ export function calculateLightStats(lights) {
   const totalLights = lights.length;
 
   // Calculate average brightness of lights that are on
-  const averageBrightness = lightsOnCount > 0
-    ? lightsOn.reduce((sum, light) => {
-        // Use 50% as default during scene transitions when brightness data is loading
-        const brightness = light.dimming?.brightness ?? 50;
-        return sum + brightness;
-      }, 0) / lightsOnCount
-    : 0;
+  const averageBrightness =
+    lightsOnCount > 0
+      ? lightsOn.reduce((sum, light) => {
+          // Use 50% as default during scene transitions when brightness data is loading
+          const brightness = light.dimming?.brightness ?? 50;
+          return sum + brightness;
+        }, 0) / lightsOnCount
+      : 0;
 
   return { lightsOnCount, totalLights, averageBrightness };
 }

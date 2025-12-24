@@ -5,7 +5,7 @@ import { VALIDATION } from '../constants/validation';
  * @param {string} ip - IP address to validate
  * @returns {boolean} True if valid IP address
  */
-export const validateIp = (ip) => {
+export const validateIp = ip => {
   if (!VALIDATION.IP_REGEX.test(ip)) return false;
 
   // Check each octet is 0-255

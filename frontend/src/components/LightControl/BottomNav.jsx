@@ -29,7 +29,7 @@ const useDragScroll = () => {
     const el = ref.current;
     if (!el) return;
 
-    const handleMouseDown = (e) => {
+    const handleMouseDown = e => {
       isDragging.current = true;
       startX.current = e.pageX - el.offsetLeft;
       scrollLeft.current = el.scrollLeft;
@@ -46,7 +46,7 @@ const useDragScroll = () => {
       el.style.cursor = 'grab';
     };
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = e => {
       if (!isDragging.current) return;
       e.preventDefault();
       const x = e.pageX - el.offsetLeft;
@@ -72,37 +72,43 @@ const useDragScroll = () => {
 };
 
 // Get room-specific icon based on room name
-const getRoomIcon = (name) => {
+const getRoomIcon = name => {
   const lower = name?.toLowerCase() || '';
 
   // Check specific room types first (order matters - more specific before generic)
   if (lower.includes('living')) return <Sofa size={NAV_ICON_SIZE} className="nav-tab-icon" />;
-  if (lower.includes('dining')) return <DiningTable size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('dining'))
+    return <DiningTable size={NAV_ICON_SIZE} className="nav-tab-icon" />;
   if (lower.includes('kitchen')) return <Saucepan size={NAV_ICON_SIZE} className="nav-tab-icon" />;
-  if (lower.includes('office') || lower.includes('study')) return <DeskLamp size={NAV_ICON_SIZE} className="nav-tab-icon" />;
-  if (lower.includes('bathroom') || lower.includes('bath')) return <Shower size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('office') || lower.includes('study'))
+    return <DeskLamp size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('bathroom') || lower.includes('bath'))
+    return <Shower size={NAV_ICON_SIZE} className="nav-tab-icon" />;
   if (lower.includes('garage')) return <Car size={NAV_ICON_SIZE} className="nav-tab-icon" />;
-  if (lower.includes('garden') || lower.includes('outdoor') || lower.includes('patio')) return <Tree size={NAV_ICON_SIZE} className="nav-tab-icon" />;
-  if (lower.includes('hall') || lower.includes('entry') || lower.includes('foyer') || lower.includes('landing')) return <Door size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('garden') || lower.includes('outdoor') || lower.includes('patio'))
+    return <Tree size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (
+    lower.includes('hall') ||
+    lower.includes('entry') ||
+    lower.includes('foyer') ||
+    lower.includes('landing')
+  )
+    return <Door size={NAV_ICON_SIZE} className="nav-tab-icon" />;
   // Generic "room" check last (for "Bart's Room", "Maggie Room", etc.)
-  if (lower.includes('bedroom') || lower.includes('bed room') || lower.includes('room')) return <Bed size={NAV_ICON_SIZE} className="nav-tab-icon" />;
+  if (lower.includes('bedroom') || lower.includes('bed room') || lower.includes('room'))
+    return <Bed size={NAV_ICON_SIZE} className="nav-tab-icon" />;
 
   // Default to home icon for unrecognized rooms
   return <Home size={NAV_ICON_SIZE} className="nav-tab-icon" />;
 };
 
-export const BottomNav = ({
-  rooms = [],
-  zones = [],
-  selectedId,
-  onSelect
-}) => {
+export const BottomNav = ({ rooms = [], zones = [], selectedId, onSelect }) => {
   const isZonesSelected = selectedId === 'zones';
   const navRef = useDragScroll();
 
   return (
     <nav className="bottom-nav" ref={navRef}>
-      {rooms.map((room) => {
+      {rooms.map(room => {
         const isActive = selectedId === room.id;
         const lightsOn = room.stats?.lightsOnCount || 0;
 
@@ -114,9 +120,7 @@ export const BottomNav = ({
           >
             {getRoomIcon(room.name)}
             <span className="nav-tab-label">{room.name}</span>
-            {lightsOn > 0 && (
-              <span className="nav-tab-badge">{lightsOn}</span>
-            )}
+            {lightsOn > 0 && <span className="nav-tab-badge">{lightsOn}</span>}
           </button>
         );
       })}
