@@ -1776,7 +1776,6 @@ body.dark-theme {
 /* Room Content */
 .room-content {
   width: 100%;
-  max-width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -1863,29 +1862,40 @@ body.dark-theme {
    - iPad (1024x768): 4 columns x 2 rows
    - iPhone 14 (390x844): 2 columns x 4 rows
    - Raspberry Pi 7" (800x480): 4 columns x 2 rows
-   - Button constraints: min 44px, max 200px, always square
+   - Buttons fill available space, min 44px, always square
 */
 .light-tiles-grid {
+  --grid-cols: 2;
+  --grid-rows: 4;
+  /* Extra 48px buffer for padding and safety margin */
+  --available-height: calc(100vh - var(--toolbar-height) - var(--nav-height) - 48px);
+  --available-width: calc(100vw - 48px);
+  --tile-size-by-height: calc((var(--available-height) - (var(--grid-rows) - 1) * var(--light-tile-gap)) / var(--grid-rows));
+  --tile-size-by-width: calc((var(--available-width) - (var(--grid-cols) - 1) * var(--light-tile-gap)) / var(--grid-cols));
+  /* Use the smaller of width or height constrained size */
+  --tile-size: min(var(--tile-size-by-height), var(--tile-size-by-width));
+
   display: grid;
   gap: var(--light-tile-gap);
-  /* Default: 2 columns for narrow screens (iPhone) */
-  grid-template-columns: repeat(2, 1fr);
-  justify-items: center;
+  grid-template-columns: repeat(var(--grid-cols), var(--tile-size));
+  justify-content: center;
   align-content: center;
 }
 
-/* Wide screens: 4 columns (iPad landscape, Raspberry Pi, desktop) */
+/* Wide screens: 4 columns x 2 rows (iPad landscape, Raspberry Pi, desktop) */
 @media (min-width: 600px) {
   .light-tiles-grid {
-    grid-template-columns: repeat(4, 1fr);
+    --grid-cols: 4;
+    --grid-rows: 2;
   }
 }
 
 /* Light Tile */
 .light-tile {
-  width: 100%;
+  width: var(--tile-size);
+  height: var(--tile-size);
   min-width: 44px;
-  aspect-ratio: 1;
+  min-height: 44px;
   border-radius: 24px;
   background: var(--bg-card);
   border: 1px solid var(--accent-primary);
@@ -1901,21 +1911,17 @@ body.dark-theme {
 /* Mobile: slightly smaller gaps */
 @media (max-width: 500px) {
   .light-tiles-grid {
-    gap: 12px;
+    --light-tile-gap: 12px;
   }
 }
 
-/* Short screens (Raspberry Pi): compact gaps and constrained tile size */
+/* Short screens (Raspberry Pi): compact gaps and direct tile sizing */
 @media (max-height: 600px) {
   .light-tiles-grid {
-    gap: 8px;
-  }
-
-  /* Limit tile height to fit 2 rows without overlapping nav */
-  .light-tile {
-    /* Available: 100vh - 40 (toolbar) - 70 (nav) - 24 (padding) - 8 (gap) - extra margin */
-    max-height: calc((100vh - 170px) / 2);
-    max-width: calc((100vh - 170px) / 2);
+    --light-tile-gap: 8px;
+    /* Force recalculate with extra buffer to prevent overlap */
+    --tile-size: calc((100vh - 40px - 70px - 66px - var(--light-tile-gap)) / 2);
+    grid-template-columns: repeat(var(--grid-cols), var(--tile-size));
   }
 }
 
