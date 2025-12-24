@@ -214,37 +214,44 @@ fetch('/api/hue/clip/v2/resource/light?bridgeIp={ip}', {
    - Switches between RoomContent and ZonesView based on selection
 
 6. **LightControl/RoomContent.jsx**: Room display
-   - Scene selector and "All On/Off" toggle
-   - Grid of LightTile components
+   - Grid of LightTile components (vertically centered between toolbar and nav)
+   - Floating action button (FAB) to open SceneDrawer
+   - No inline controls - scenes and toggle moved to drawer
 
-7. **LightControl/LightTile.jsx**: Large light button
+7. **LightControl/SceneDrawer.jsx**: Slide-out drawer for scenes
+   - Slides in from right edge (280px wide)
+   - Lists all scenes with icons
+   - All On/Off toggle button at bottom
+   - Closes on overlay tap, close button, or Escape key
+
+8. **LightControl/LightTile.jsx**: Large light button
    - Brightness displayed as fill height from bottom
    - Dynamic fill gradient based on light color
    - Text contrast via background pill (semi-transparent)
    - Amber border accent
    - Colored glow shadow for bright lights
 
-8. **LightControl/ZonesView.jsx**: Zones list
+9. **LightControl/ZonesView.jsx**: Zones list
    - Shows all zones with stats, scene selector, on/off toggle
 
-9. **LightControl/Icons.jsx**: Lucide icon wrappers
+10. **LightControl/Icons.jsx**: Lucide icon wrappers
    - Uses `lucide-react` package for all icons
    - Consistent `strokeWidth: 1.5` styling
    - Room-specific icons: Sofa, DiningTable, Saucepan, Bed, DeskLamp, Shower, Car, Tree, Door
    - Scene icons: Sunrise, Sunset, Moon, Sun, Palette, Heart, Focus, Tv, UtensilsCrossed, etc.
    - `getSceneIcon(sceneName)` function maps scene names to appropriate icons
 
-10. **LightControl/SceneSelector.jsx**: Scene icon buttons
+11. **LightControl/SceneSelector.jsx**: Scene icon buttons (used in ZonesView)
     - Renders icon buttons for each scene (not a dropdown)
     - Icons are matched to scene names via `getSceneIcon()`
     - Tooltips show scene name on hover
     - 44x44px touch-friendly buttons
 
-11. **LightControl/DashboardSummary.jsx**: Statistics display
+12. **LightControl/DashboardSummary.jsx**: Statistics display
     - Shows total lights on, room count, scene count
     - Displays demo mode badge when active
 
-12. **MotionZones.jsx**: Compact motion status bar
+13. **MotionZones.jsx**: Compact motion status bar
     - Inline bar format with pill-shaped zone badges
     - Returns `null` if no MotionAware zones configured (auto-hide)
     - Shows green dot (no motion) or red dot (motion detected)
@@ -304,14 +311,23 @@ expect(screen.getByText(UI_TEXT.APP_TITLE)).toBeInTheDocument();
   - `--accent-primary: #f59e0b` - Amber accent for borders and highlights
   - `--text-primary: #ffffff`, `--text-secondary: #a0a0a0`
 - **Navigation layout**: Fixed bottom nav with room tabs, fixed top toolbar
+- **Main panel**: Absolutely positioned between toolbar and nav for precise centering
 - **Light tiles**: Large rounded squares with brightness fill effect
   - Fill height represents brightness percentage
   - Background pill for text contrast on mixed backgrounds
   - Colored glow shadows for bright lights (≥50%)
+  - Vertically centered with equal spacing above and below
+- **Responsive grid**: CSS Grid with CSS custom properties for dynamic sizing
+  - `--tile-size` calculated from available viewport space
+  - Device-specific layouts: iPad 4×2, iPhone 2×4, Raspberry Pi 4×2
+  - Minimum 44px buttons, fill available space
+- **Scene drawer**: Slide-out panel from right edge
+  - 280px wide with dark overlay
+  - Contains scene buttons and all on/off toggle
+  - Floating action button (FAB) trigger in bottom-right
 - **Amber borders**: Consistent accent on light tiles, scene selector, toggle buttons, bottom nav border-top
-- **Responsive grid**: CSS Grid for light tiles, auto-sizing based on viewport
 - **Mobile optimization**: iOS safe area handling for bottom nav
-- **Component classes**: `.top-toolbar`, `.bottom-nav`, `.main-panel`, `.light-tile`, `.room-content`, `.zones-view`
+- **Component classes**: `.top-toolbar`, `.bottom-nav`, `.main-panel`, `.light-tile`, `.room-content`, `.zones-view`, `.scene-drawer`, `.scene-drawer-trigger`
 
 ### UI Features & Patterns
 
@@ -438,29 +454,31 @@ getRoomLightStats(roomLights) {
 
 #### Responsive Design Strategy
 
+**Target Devices**:
+
+- **iPad** (1024×768): 4 columns × 2 rows of light tiles
+- **iPhone 14+** (390×844): 2 columns × 4 rows of light tiles
+- **Raspberry Pi 7"** (800×480): 4 columns × 2 rows of light tiles
+
+**Button Sizing**:
+
+- Minimum 44px for touch accessibility
+- Calculated dynamically to fill available space
+- Square aspect ratio maintained
+- Vertically centered with equal spacing above and below
+
 **Breakpoints**:
 
-- `max-width: 768px` - Mobile devices (reduced padding, smaller fonts)
-- `min-width: 1800px` - Large screens (cap at 4 rooms per row)
+- `max-width: 500px` - Narrower gaps (12px)
+- `min-width: 600px` - 4-column layout (iPad, Raspberry Pi)
+- `max-height: 600px` - Compact mode for short screens (Raspberry Pi)
 
-**Mobile Optimizations**:
+**Layout Approach**:
 
-- Container: `calc(100% - 16px)` width, `8px` padding
-- Header/footer: `12px` padding
-- Button size: `clamp(60px, 4vw, 80px)` scales with viewport
-
-**iPad Optimizations**:
-
-- Buttons scale up to 82px on iPad Pro (1024px)
-- Text labels increase to 100px max-width
-- Logo scales with `clamp(60px, 15vw, 120px)`
-
-**Layout Grid**:
-
-- Room cards: `repeat(auto-fill, minmax(440px, 1fr))`
-- Light buttons: `repeat(auto-fit, minmax(var(--button-size), 1fr))`
-- Maximum 4 rooms per row via media query
-- 5 light buttons per row when space allows
+- Main panel absolutely positioned between fixed toolbar and nav
+- CSS custom properties calculate tile size from viewport
+- `--tile-size = min(height-constrained, width-constrained)`
+- Grid uses explicit sizes: `repeat(cols, var(--tile-size))`
 
 ## Testing Infrastructure
 
@@ -804,6 +822,7 @@ The MotionAware zones feature is **NOT** available through traditional motion se
 │   │   │       ├── BottomNav.jsx        # Room tabs (drag-scrollable)
 │   │   │       ├── MainPanel.jsx        # Content switcher (room/zones)
 │   │   │       ├── RoomContent.jsx      # Light tiles grid for room
+│   │   │       ├── SceneDrawer.jsx      # Slide-out drawer for scenes
 │   │   │       ├── LightTile.jsx        # Large light button with fill
 │   │   │       ├── ZonesView.jsx        # All zones list
 │   │   │       ├── Icons.jsx            # Lucide icon wrappers
