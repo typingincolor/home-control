@@ -71,21 +71,21 @@ body {
 
 /* Header */
 .app-header {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 12px;
   padding: 30px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .app-header h1 {
   font-size: 2rem;
-  color: #2c3e50;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
 .app-header .subtitle {
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-size: 1rem;
   margin-bottom: 24px;
 }
@@ -109,8 +109,8 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #e0e0e0;
-  color: #95a5a6;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,7 +131,7 @@ body {
 
 .step-label {
   font-size: 0.85rem;
-  color: #7f8c8d;
+  color: var(--text-muted);
 }
 
 .step.active .step-label {
@@ -146,7 +146,7 @@ body {
 .progress-line {
   width: 60px;
   height: 3px;
-  background: #e0e0e0;
+  background: var(--bg-tertiary);
 }
 
 /* Main Content */
@@ -159,20 +159,20 @@ body {
 }
 
 .app-main h2 {
-  color: #2c3e50;
+  color: var(--text-primary);
   font-size: 1.5rem;
   margin-bottom: 0;
 }
 
 .app-main h3 {
-  color: #34495e;
+  color: var(--text-primary);
   font-size: 1.1rem;
   margin-bottom: 8px;
   margin-top: 12px;
 }
 
 .app-main h4 {
-  color: #34495e;
+  color: var(--text-primary);
   font-size: 1.1rem;
   margin-bottom: 12px;
 }
@@ -236,7 +236,7 @@ button.secondary:hover:not(:disabled) {
 .discovered-bridges {
   margin-top: 20px;
   padding: 16px;
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   border-radius: 8px;
 }
 
@@ -245,7 +245,7 @@ button.secondary:hover:not(:disabled) {
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background: white;
+  background: var(--bg-tertiary);
   border-radius: 6px;
   margin-top: 8px;
 }
@@ -253,12 +253,12 @@ button.secondary:hover:not(:disabled) {
 .bridge-ip {
   font-family: 'Courier New', monospace;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .divider {
   text-align: center;
-  color: #95a5a6;
+  color: var(--text-muted);
   font-weight: 600;
   margin: 32px 0;
   position: relative;
@@ -271,7 +271,7 @@ button.secondary:hover:not(:disabled) {
   top: 50%;
   width: 40%;
   height: 1px;
-  background: #e0e0e0;
+  background: var(--bg-tertiary);
 }
 
 .divider::before {
@@ -291,28 +291,34 @@ button.secondary:hover:not(:disabled) {
 .ip-input {
   flex: 1;
   padding: 12px 16px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
   font-family: 'Courier New', monospace;
   transition: border-color 0.3s ease;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .ip-input:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: var(--accent-primary);
+}
+
+.ip-input::placeholder {
+  color: var(--text-muted);
 }
 
 .help-text {
   margin-top: 24px;
   padding: 16px;
-  background: #e8f4f8;
+  background: rgba(52, 152, 219, 0.15);
   border-left: 4px solid #3498db;
   border-radius: 4px;
 }
 
 .help-text p {
-  color: #34495e;
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 
@@ -323,20 +329,20 @@ button.secondary:hover:not(:disabled) {
 }
 
 .bridge-info {
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 24px;
 }
 
 .bridge-info p {
-  color: #34495e;
+  color: var(--text-secondary);
   font-size: 1rem;
 }
 
 .bridge-info strong {
   font-family: 'Courier New', monospace;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .instructions {
@@ -367,7 +373,7 @@ button.secondary:hover:not(:disabled) {
 
 .instruction-text {
   font-size: 1.1rem;
-  color: #34495e;
+  color: var(--text-secondary);
   margin-bottom: 24px;
 }
 
@@ -399,7 +405,7 @@ button.secondary:hover:not(:disabled) {
 }
 
 .countdown p {
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 /* Connection Test */
@@ -700,18 +706,18 @@ button.secondary:hover:not(:disabled) {
 .error-box {
   margin-top: 24px;
   padding: 20px;
-  background: #ffe5e5;
+  background: rgba(231, 76, 60, 0.15);
   border-left: 4px solid #e74c3c;
   border-radius: 8px;
 }
 
 .error-box h4 {
-  color: #c0392b;
+  color: #ff6b6b;
   margin-bottom: 12px;
 }
 
 .error-message {
-  color: #e74c3c;
+  color: #ff8a8a;
   margin-bottom: 16px;
 }
 
@@ -720,14 +726,14 @@ button.secondary:hover:not(:disabled) {
 .troubleshooting {
   margin-top: 16px;
   padding: 16px;
-  background: white;
+  background: var(--bg-tertiary);
   border-radius: 6px;
 }
 
 .error-help h5,
 .cors-help h5,
 .troubleshooting h5 {
-  color: #34495e;
+  color: var(--text-primary);
   margin-bottom: 12px;
   font-size: 1rem;
 }
@@ -735,7 +741,7 @@ button.secondary:hover:not(:disabled) {
 .error-help p,
 .cors-help p,
 .troubleshooting p {
-  color: #34495e;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 8px;
 }
@@ -750,21 +756,21 @@ button.secondary:hover:not(:disabled) {
 .error-help li,
 .cors-help li,
 .troubleshooting li {
-  color: #34495e;
+  color: var(--text-secondary);
   line-height: 1.8;
   margin-bottom: 8px;
 }
 
 .cors-help code {
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   padding: 2px 6px;
   border-radius: 3px;
   font-family: 'Courier New', monospace;
-  color: #e74c3c;
+  color: #ff8a8a;
 }
 
 .cors-help a {
-  color: #3498db;
+  color: var(--accent-primary);
   text-decoration: none;
 }
 
@@ -779,10 +785,10 @@ button.secondary:hover:not(:disabled) {
 .warning {
   margin-top: 16px;
   padding: 16px;
-  background: #fff3cd;
+  background: rgba(243, 156, 18, 0.15);
   border-left: 4px solid #f39c12;
   border-radius: 4px;
-  color: #856404;
+  color: #ffc107;
 }
 
 .warning p {
@@ -791,17 +797,17 @@ button.secondary:hover:not(:disabled) {
 
 /* Footer */
 .app-footer {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 12px;
   padding: 20px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .footer-info p {
-  color: #95a5a6;
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
