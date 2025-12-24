@@ -1,3 +1,5 @@
+import { ERROR_CODES, ERROR_MESSAGES, ERROR_SUGGESTIONS } from '../constants/errorMessages.js';
+
 /**
  * Custom error classes for client-friendly error messages
  */
@@ -14,17 +16,17 @@ export class ApiError extends Error {
 
 // Authentication errors
 export class AuthenticationError extends ApiError {
-  constructor(message, suggestion = 'Check your bridge IP and username') {
-    super('authentication_error', message, suggestion, 401);
+  constructor(message, suggestion = ERROR_SUGGESTIONS.CHECK_CREDENTIALS) {
+    super(ERROR_CODES.AUTHENTICATION_ERROR, message, suggestion, 401);
   }
 }
 
 export class MissingCredentialsError extends ApiError {
   constructor(missing) {
     super(
-      'missing_credentials',
+      ERROR_CODES.MISSING_CREDENTIALS,
       `Missing required parameter: ${missing}`,
-      `Provide ${missing} in the request headers or query parameters`,
+      ERROR_SUGGESTIONS.MISSING_PARAM(missing),
       400
     );
   }
@@ -33,16 +35,16 @@ export class MissingCredentialsError extends ApiError {
 // Bridge connection errors
 export class BridgeConnectionError extends ApiError {
   constructor(bridgeIp, originalError) {
-    const message = `Cannot connect to Philips Hue Bridge at ${bridgeIp}`;
-    let suggestion = 'Check that the bridge IP address is correct and the bridge is powered on';
+    const message = ERROR_MESSAGES.BRIDGE_CONNECTION(bridgeIp);
+    let suggestion = ERROR_SUGGESTIONS.BRIDGE_POWERED_ON;
 
     if (originalError?.code === 'ETIMEDOUT') {
-      suggestion = 'The bridge is not responding. Check your network connection and bridge IP address';
+      suggestion = ERROR_SUGGESTIONS.BRIDGE_TIMEOUT;
     } else if (originalError?.code === 'ECONNREFUSED') {
-      suggestion = 'Connection refused. Verify the bridge IP address is correct';
+      suggestion = ERROR_SUGGESTIONS.BRIDGE_REFUSED;
     }
 
-    super('bridge_connection_error', message, suggestion, 503);
+    super(ERROR_CODES.BRIDGE_CONNECTION_ERROR, message, suggestion, 503);
   }
 }
 
@@ -50,9 +52,9 @@ export class BridgeConnectionError extends ApiError {
 export class ResourceNotFoundError extends ApiError {
   constructor(resourceType, resourceId) {
     super(
-      'resource_not_found',
+      ERROR_CODES.RESOURCE_NOT_FOUND,
       `The ${resourceType} '${resourceId}' was not found`,
-      `Check the ${resourceType} ID or refresh the dashboard to get current ${resourceType}s`,
+      ERROR_SUGGESTIONS.CHECK_RESOURCE(resourceType),
       404
     );
   }
@@ -61,9 +63,9 @@ export class ResourceNotFoundError extends ApiError {
 export class InvalidResourceError extends ApiError {
   constructor(resourceType, reason) {
     super(
-      'invalid_resource',
+      ERROR_CODES.INVALID_RESOURCE,
       `Invalid ${resourceType}: ${reason}`,
-      `Check the ${resourceType} data format`,
+      ERROR_SUGGESTIONS.CHECK_RESOURCE_FORMAT(resourceType),
       400
     );
   }
@@ -73,9 +75,9 @@ export class InvalidResourceError extends ApiError {
 export class DataProcessingError extends ApiError {
   constructor(operation, originalError) {
     super(
-      'data_processing_error',
+      ERROR_CODES.DATA_PROCESSING_ERROR,
       `Failed to ${operation}`,
-      'This might be a temporary issue. Try again in a moment',
+      ERROR_SUGGESTIONS.TRY_AGAIN,
       500
     );
     this.originalError = originalError?.message;
@@ -86,9 +88,9 @@ export class DataProcessingError extends ApiError {
 export class InvalidSessionError extends ApiError {
   constructor() {
     super(
-      'invalid_session',
-      'Your session has expired or is invalid',
-      'Authenticate again to create a new session',
+      ERROR_CODES.INVALID_SESSION,
+      ERROR_MESSAGES.SESSION_EXPIRED,
+      ERROR_SUGGESTIONS.AUTHENTICATE_AGAIN,
       401
     );
   }
@@ -97,9 +99,9 @@ export class InvalidSessionError extends ApiError {
 export class SessionNotFoundError extends ApiError {
   constructor() {
     super(
-      'session_not_found',
-      'No active session found',
-      'Create a session by connecting to your bridge first',
+      ERROR_CODES.SESSION_NOT_FOUND,
+      ERROR_MESSAGES.SESSION_NOT_FOUND,
+      ERROR_SUGGESTIONS.CREATE_SESSION,
       401
     );
   }
@@ -109,7 +111,7 @@ export class SessionNotFoundError extends ApiError {
 export class ValidationError extends ApiError {
   constructor(field, reason) {
     super(
-      'validation_error',
+      ERROR_CODES.VALIDATION_ERROR,
       `Invalid ${field}: ${reason}`,
       `Check the ${field} format and try again`,
       400
@@ -121,9 +123,9 @@ export class ValidationError extends ApiError {
 export class RateLimitError extends ApiError {
   constructor(retryAfter = 60) {
     super(
-      'rate_limit_exceeded',
-      'Too many requests',
-      `Wait ${retryAfter} seconds before trying again`,
+      ERROR_CODES.RATE_LIMIT_EXCEEDED,
+      ERROR_MESSAGES.RATE_LIMIT,
+      ERROR_SUGGESTIONS.RATE_LIMIT(retryAfter),
       429
     );
     this.retryAfter = retryAfter;
@@ -149,8 +151,8 @@ export function toApiError(error) {
   // Hue API errors
   if (error.message?.includes('Bridge returned')) {
     return new AuthenticationError(
-      'Unable to communicate with the bridge',
-      'Check your username/API key is valid'
+      ERROR_MESSAGES.UNABLE_TO_COMMUNICATE,
+      ERROR_SUGGESTIONS.CHECK_API_KEY
     );
   }
 
@@ -160,9 +162,9 @@ export function toApiError(error) {
 
   // Generic errors
   return new ApiError(
-    'internal_error',
-    'An unexpected error occurred',
-    'Try again or contact support if the problem persists',
+    ERROR_CODES.INTERNAL_ERROR,
+    ERROR_MESSAGES.INTERNAL_ERROR,
+    ERROR_SUGGESTIONS.CONTACT_SUPPORT,
     500
   );
 }
