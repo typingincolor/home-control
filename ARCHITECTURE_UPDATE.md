@@ -2,9 +2,9 @@
 
 ## Overview
 
-As of v2.0.0, business logic has been moved from frontend to backend, exposing a simplified v1 REST API with WebSocket support that pre-computes colors, shadows, and statistics. The legacy `/api/hue/*` proxy has been completely removed in favor of controlled v1 endpoints.
+Business logic resides in the backend, exposing a simplified v1 REST API with WebSocket support that pre-computes colors, shadows, and statistics. The legacy `/api/hue/*` proxy has been completely removed in favor of controlled v1 endpoints.
 
-**v1.0.0 additions:**
+**Key features in v1.0.0:**
 
 - Backend caching for static resources (5-minute TTL)
 - WebSocket cleanup mechanisms (orphaned interval cleanup, heartbeat monitoring, stale connection removal)
@@ -190,14 +190,14 @@ Three methods supported (in order of preference):
 - Manual room statistics calculations
 - 75 unit tests for business logic
 
-### After (v0.5.0)
+### After (v1.0.0)
 
 - **1 initial API call** (WebSocket initial state)
 - **Real-time updates** via WebSocket (no polling)
 - Zero frontend data transformation
 - Pre-computed colors and shadows from backend
 - Pre-computed statistics from backend
-- **91 tests total**: 16 component tests, 23 hook tests, 52 integration tests
+- Multi-client credential sharing (no re-pairing needed)
 
 ### Data Flow
 
@@ -234,10 +234,10 @@ const { dashboard, isConnected } = useWebSocket(bridgeIp, username);
 
 ### Testing
 
-- **139 backend tests** (81% coverage)
-- **193 frontend tests**
-- **332 tests total**
-- Stryker mutation testing configured
+- **424 backend tests** (81% coverage)
+- **241 frontend tests**
+- **665 tests total**
+- Stryker mutation testing configured (53% mutation score)
 
 ## Migration Benefits
 
