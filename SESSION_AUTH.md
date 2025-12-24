@@ -2,7 +2,7 @@
 
 ## Overview
 
-As of v2.0.0, the application supports **session-based authentication** using time-limited tokens. This provides better security than passing raw credentials on every request.
+The application supports **session-based authentication** using time-limited tokens. This provides better security than passing raw credentials on every request.
 
 ## How It Works
 
@@ -229,7 +229,7 @@ When users with old username-based auth visit:
 5. Stores new session token
 6. Removes old username from storage
 
-**Result:** Seamless upgrade from v1.x to v2.0.0
+**Result:** Seamless upgrade for users with legacy credentials
 
 ### Manual Migration
 
@@ -511,4 +511,4 @@ Session-based authentication provides:
 - ✅ Clean API (Authorization header)
 - ✅ WebSocket support (both modes)
 
-All authentication is now centralized and secure by default while maintaining 100% backward compatibility with v1.x.
+All authentication is now centralized and secure by default while maintaining backward compatibility with legacy authentication methods.

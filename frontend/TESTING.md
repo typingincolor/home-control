@@ -49,79 +49,83 @@ View mutation report: `open reports/mutation/html/index.html`
 
 ## Test Coverage
 
-### Unit Test Results (193 tests)
+### Unit Test Results (241 tests)
 
-#### Utilities - 100% Pass Rate
-
-- **colorConversion.js**: 31 tests
-  - xyToRgb conversion (7 tests)
-  - mirekToRgb conversion (7 tests)
-  - getLightColor with warm dim blending (10 tests)
-  - getLightShadow brightness-based shadows (7 tests)
+#### Utilities
 
 - **validation.js**: 8 tests
   - IP address format validation
   - Octet range validation (0-255)
   - Edge cases and boundary values
 
-- **roomUtils.js**: 23 tests
-  - getScenesForRoom filtering and sorting (5 tests)
-  - buildRoomHierarchy complex data mapping (8 tests)
-  - calculateRoomStats aggregation (10 tests)
+#### Hooks
 
-- **motionSensors.js**: 13 tests
-  - parseMotionSensors data combining (13 tests)
-  - MotionAware zone filtering
-  - Status aggregation from multiple sources
+- **useDemoMode.js**: 9 tests - URL parameter parsing
+- **useHueApi.js**: 4 tests - API selection (real vs mock)
+- **usePolling.js**: 10 tests - Interval polling
+- **useSession.js**: 25 tests - Session management
+- **useWebSocket.js**: 31 tests - WebSocket connection
+
+#### Services
+
+- **hueApi.js**: 22 tests - API client methods
+
+#### Components
+
+- **App.jsx**: 4 tests - App component
+- **MotionZones.jsx**: 9 tests - Motion zone alerts
+- **DashboardSummary.jsx**: 5 tests - Statistics rendering
+- **SceneSelector.jsx**: 8 tests - Scene icon buttons
+- **LightButton.jsx**: 15 tests - Light button rendering
+- **RoomCard.jsx**: 16 tests - Room card component
+- **ZoneCard.jsx**: 14 tests - Zone bar component
+- **index.zones.test.jsx**: 9 tests - Zone integration tests
+
+#### Integration
+
+- **integration.test.jsx**: 11 tests - Full app flow tests
+
+**Note:** Business logic tests (colorConversion, roomUtils, motionSensors) are in the backend test suite (424 tests).
 
 ## Mutation Testing Results
 
 ### Summary
 
-- **Total Mutants**: 400
-- **Killed**: 293 (73.25%)
-- **Survived**: 107 (26.75%)
+- **Total Mutants**: ~1300
+- **Mutation Score**: 53% (above 50% threshold)
 - **Threshold**: 50% (minimum to pass)
 
-### Mutation Score by File
+### Mutation Score by Category
 
-**colorConversion.js** - ~70% mutation score
+**Hooks** - Variable mutation scores
+- useSession, useWebSocket have good coverage
+- useHueBridge has lower coverage due to async complexity
 
-- Strong coverage on control flow
-- Mathematical operations well-tested
-- Some survivors in precise floating-point calculations (expected)
+**Components** - Generally good coverage
+- LightButton, RoomCard, ZoneCard well-tested
+- Some UI components have lower scores
 
-**validation.js** - ~85% mutation score
+**Services** - Good coverage
+- hueApi.js well-tested with mocks
 
-- Excellent coverage on validation logic
-- All edge cases tested
-
-**roomUtils.js** - ~75% mutation score
-
-- Good coverage on data transformations
-- Array operations well-tested
-
-**motionSensors.js** - ~80% mutation score
-
-- Strong coverage on data parsing
-- Filtering logic thoroughly tested
+**Utilities** - High coverage
+- validation.js ~94% mutation score
 
 ### Notable Survived Mutants
 
-Some mutants survive because they don't produce observable differences in the tested output ranges:
+Some mutants survive because they don't produce observable differences:
 
-1. **Matrix Operations** (colorConversion.js)
-   - Changing + to - in XYZ matrix calculations
-   - These produce out-of-range colors that get clamped to 0-255 anyway
-   - Not worth testing as they represent impossible color states
+1. **Async Logic** (useHueBridge.js, useWebSocket.js)
+   - Complex async state transitions
+   - Race conditions difficult to test deterministically
 
-2. **Gamma Correction** (colorConversion.js)
-   - Precise mathematical constants (e.g., 1.0/2.4)
-   - Small variations don't produce different RGB values in our test ranges
+2. **UI State Changes** (components)
+   - Visual-only changes that don't affect behavior
+   - CSS class toggling without functional impact
 
-3. **Normalization Edge Cases** (colorConversion.js)
-   - Changing > to >= for threshold comparisons
-   - Doesn't affect test cases which use clear boundaries
+3. **Error Handling Paths** (hueApi.js)
+   - Error branches that require specific failure conditions
+   - Network timeout scenarios
 
 ## Test Quality Metrics
 
@@ -144,8 +148,8 @@ Some mutants survive because they don't produce observable differences in the te
    - Mathematical code has expected survivors
 
 4. **Fast Execution**
-   - 193 tests run in <5 seconds
-   - Mutation testing completes in ~1 minute
+   - 241 tests run in <6 seconds
+   - Mutation testing completes in ~15 minutes
    - Enables rapid development cycles
 
 ## Test Organization
@@ -155,14 +159,27 @@ Some mutants survive because they don't produce observable differences in the te
 ```
 src/
 ├── utils/
-│   ├── colorConversion.js
-│   ├── colorConversion.test.js    ← Unit tests
 │   ├── validation.js
-│   ├── validation.test.js
-│   ├── roomUtils.js
-│   ├── roomUtils.test.js
-│   ├── motionSensors.js
-│   └── motionSensors.test.js
+│   └── validation.test.js
+├── hooks/
+│   ├── useDemoMode.test.js
+│   ├── useHueApi.test.js
+│   ├── usePolling.test.js
+│   ├── useSession.test.js
+│   └── useWebSocket.test.js
+├── services/
+│   └── hueApi.test.js
+├── components/
+│   ├── App.test.jsx
+│   ├── MotionZones.test.jsx
+│   └── LightControl/
+│       ├── DashboardSummary.test.jsx
+│       ├── SceneSelector.test.jsx
+│       ├── LightButton.test.jsx
+│       ├── RoomCard.test.jsx
+│       ├── ZoneCard.test.jsx
+│       └── index.zones.test.jsx
+├── integration.test.jsx
 └── test/
     └── setup.js                    ← Global setup
 ```
@@ -285,9 +302,9 @@ Some mutations are OK to survive:
 
 ### Pending Test Coverage
 
-- [ ] Custom hooks (useDemoMode, useHueApi, usePolling)
-- [ ] React components (with Testing Library)
-- [ ] Integration tests (API → UI flow)
+- [x] Custom hooks (useDemoMode, useHueApi, usePolling, useSession, useWebSocket)
+- [x] React components (with Testing Library)
+- [x] Integration tests (API → UI flow)
 - [ ] E2E tests (Playwright/Cypress)
 
 ### Potential Enhancements
