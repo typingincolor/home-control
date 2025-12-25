@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { UI_TEXT } from '../../constants/uiText';
-import { Logout, LightbulbOn, Home, Grid } from './Icons';
+import { Logout, LightbulbOn, Home, Grid, Menu } from './Icons';
+import { WeatherDisplay } from './WeatherDisplay';
+import { WeatherTooltip } from './WeatherTooltip';
 
 export const TopToolbar = ({
   summary = {},
@@ -8,8 +11,16 @@ export const TopToolbar = ({
   isReconnecting = false,
   isDemoMode = false,
   onLogout,
+  // Weather props
+  weather = null,
+  weatherLoading = false,
+  weatherError = null,
+  location = null,
+  units = 'celsius',
+  onOpenSettings,
 }) => {
   const { lightsOn = 0, roomCount = 0, sceneCount = 0 } = summary;
+  const [showWeatherTooltip, setShowWeatherTooltip] = useState(false);
 
   // Determine connection status text and style
   const getConnectionStatus = () => {
@@ -27,6 +38,36 @@ export const TopToolbar = ({
   return (
     <div className="top-toolbar">
       <div className="toolbar-left">
+        {/* Hamburger menu button */}
+        <button className="toolbar-menu" onClick={onOpenSettings} aria-label="Settings">
+          <Menu size={20} />
+        </button>
+
+        {/* Weather display */}
+        <div
+          className="toolbar-weather-container"
+          onMouseEnter={() => setShowWeatherTooltip(true)}
+          onMouseLeave={() => setShowWeatherTooltip(false)}
+        >
+          <WeatherDisplay
+            weather={weather}
+            location={location}
+            isLoading={weatherLoading}
+            error={weatherError}
+            units={units}
+            onClick={onOpenSettings}
+          />
+          {showWeatherTooltip && weather && location && (
+            <WeatherTooltip
+              weather={weather}
+              location={location}
+              units={units}
+            />
+          )}
+        </div>
+
+        <div className="toolbar-divider" />
+
         <div className="toolbar-stat">
           <LightbulbOn size={16} className="toolbar-stat-icon" />
           <span className="toolbar-stat-value">{lightsOn}</span>
@@ -71,4 +112,27 @@ TopToolbar.propTypes = {
   isReconnecting: PropTypes.bool,
   isDemoMode: PropTypes.bool,
   onLogout: PropTypes.func.isRequired,
+  // Weather props
+  weather: PropTypes.shape({
+    current: PropTypes.shape({
+      temperature: PropTypes.number,
+      weatherCode: PropTypes.number,
+      windSpeed: PropTypes.number,
+    }),
+    forecast: PropTypes.arrayOf(PropTypes.shape({
+      date: PropTypes.string,
+      weatherCode: PropTypes.number,
+      high: PropTypes.number,
+      low: PropTypes.number,
+    })),
+  }),
+  weatherLoading: PropTypes.bool,
+  weatherError: PropTypes.string,
+  location: PropTypes.shape({
+    lat: PropTypes.number,
+    lon: PropTypes.number,
+    name: PropTypes.string,
+  }),
+  units: PropTypes.oneOf(['celsius', 'fahrenheit']),
+  onOpenSettings: PropTypes.func,
 };
