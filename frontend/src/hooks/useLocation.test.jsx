@@ -11,6 +11,16 @@ vi.mock('../services/weatherApi', () => ({
   },
 }));
 
+// Mock DemoModeContext - default to non-demo mode
+let mockDemoModeValue = {
+  isDemoMode: false,
+  demoLocation: null,
+};
+
+vi.mock('../context/DemoModeContext', () => ({
+  useDemoMode: () => mockDemoModeValue,
+}));
+
 // Mock localStorage
 const localStorageMock = (() => {
   let store = {};
@@ -46,6 +56,11 @@ describe('useLocation', () => {
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
+    // Reset demo mode mock to default (non-demo mode)
+    mockDemoModeValue = {
+      isDemoMode: false,
+      demoLocation: null,
+    };
   });
 
   afterEach(() => {
@@ -385,36 +400,75 @@ describe('useLocation', () => {
     });
   });
 
-  describe('demo mode', () => {
-    it('should use demo location when in demo mode and no stored location', () => {
-      const { result } = renderHook(() => useLocation({ isDemoMode: true }));
+  describe('demo mode (via context)', () => {
+    const demoLocation = { lat: 51.5074, lon: -0.1278, name: 'London' };
 
-      expect(result.current.location).toEqual({
-        lat: 51.5074,
-        lon: -0.1278,
-        name: 'London',
-      });
+    it('should use demoLocation from context when in demo mode and no stored location', () => {
+      mockDemoModeValue = {
+        isDemoMode: true,
+        demoLocation,
+      };
+
+      const { result } = renderHook(() => useLocation());
+
+      expect(result.current.location).toEqual(demoLocation);
     });
 
-    it('should use stored location over demo location when available', () => {
+    it('should use stored location over demoLocation when available', () => {
       const storedLocation = { lat: 48.8566, lon: 2.3522, name: 'Paris' };
       localStorage.setItem(STORAGE_KEYS.WEATHER_LOCATION, JSON.stringify(storedLocation));
 
-      const { result } = renderHook(() => useLocation({ isDemoMode: true }));
+      mockDemoModeValue = {
+        isDemoMode: true,
+        demoLocation,
+      };
+
+      const { result } = renderHook(() => useLocation());
 
       expect(result.current.location).toEqual(storedLocation);
     });
 
     it('should return null when not in demo mode and no stored location', () => {
-      const { result } = renderHook(() => useLocation({ isDemoMode: false }));
+      mockDemoModeValue = {
+        isDemoMode: false,
+        demoLocation: null,
+      };
+
+      const { result } = renderHook(() => useLocation());
 
       expect(result.current.location).toBeNull();
     });
 
-    it('should work without options parameter', () => {
+    it('should use geolocation when not in demo mode', async () => {
+      mockDemoModeValue = {
+        isDemoMode: false,
+        demoLocation: null,
+      };
+
+      const mockPosition = {
+        coords: {
+          latitude: 40.7128,
+          longitude: -74.006,
+        },
+      };
+
+      mockGeolocation.getCurrentPosition.mockImplementation((success) => {
+        success(mockPosition);
+      });
+
+      weatherApi.reverseGeocode.mockResolvedValue('New York');
+
       const { result } = renderHook(() => useLocation());
 
-      expect(result.current.location).toBeNull();
+      await act(async () => {
+        await result.current.detectLocation();
+      });
+
+      expect(result.current.location).toEqual({
+        lat: 40.7128,
+        lon: -74.006,
+        name: 'New York',
+      });
     });
   });
 });

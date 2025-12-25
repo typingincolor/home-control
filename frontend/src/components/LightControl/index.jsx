@@ -29,7 +29,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
   // Weather hooks
   const { settings, updateSettings } = useSettings();
-  const { location, isDetecting, error: locationError, detectLocation } = useLocation({ isDemoMode });
+  const { location, isDetecting, error: locationError, detectLocation } = useLocation();
   const { weather, isLoading: weatherLoading, error: weatherError } = useWeather({
     location,
     isDemoMode,
