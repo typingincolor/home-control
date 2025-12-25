@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import { useHueApi } from '../../hooks/useHueApi';
 import { useDemoMode } from '../../hooks/useDemoMode';
 import { useWebSocket } from '../../hooks/useWebSocket';
+import { useSettings } from '../../hooks/useSettings';
+import { useLocation } from '../../hooks/useLocation';
+import { useWeather } from '../../hooks/useWeather';
 import { ERROR_MESSAGES } from '../../constants/messages';
 import { createLogger } from '../../utils/logger';
 import { TopToolbar } from './TopToolbar';
@@ -10,6 +13,7 @@ import { BottomNav } from './BottomNav';
 import { RoomContent } from './RoomContent';
 import { ZonesView } from './ZonesView';
 import { MotionZones } from '../MotionZones';
+import { SettingsDrawer } from './SettingsDrawer';
 
 const logger = createLogger('Dashboard');
 
@@ -25,6 +29,15 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     error: wsError,
   } = useWebSocket(sessionToken, null, !isDemoMode);
 
+  // Weather hooks
+  const { settings, updateSettings } = useSettings();
+  const { location, isDetecting, error: locationError, detectLocation } = useLocation();
+  const { weather, isLoading: weatherLoading, error: weatherError } = useWeather({
+    location,
+    isDemoMode,
+    units: settings.units,
+  });
+
   // Local dashboard state (for demo mode or manual updates)
   const [localDashboard, setLocalDashboard] = useState(null);
 
@@ -34,6 +47,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
   const [togglingLights, setTogglingLights] = useState(new Set());
   const [togglingZones, setTogglingZones] = useState(new Set());
   const [activatingScene, setActivatingScene] = useState(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   // Navigation state - 'zones' or a room ID
   const [selectedId, setSelectedId] = useState(null);
@@ -349,6 +363,12 @@ export const LightControl = ({ sessionToken, onLogout }) => {
         isReconnecting={wsReconnecting}
         isDemoMode={isDemoMode}
         onLogout={onLogout}
+        weather={weather}
+        weatherLoading={weatherLoading}
+        weatherError={weatherError}
+        location={location}
+        units={settings.units}
+        onOpenSettings={() => setSettingsOpen(true)}
       />
 
       <div className="main-panel">
@@ -379,6 +399,17 @@ export const LightControl = ({ sessionToken, onLogout }) => {
         zones={dashboard?.zones || []}
         selectedId={selectedId}
         onSelect={setSelectedId}
+      />
+
+      <SettingsDrawer
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        location={location}
+        settings={settings}
+        onUpdateSettings={updateSettings}
+        onDetectLocation={detectLocation}
+        isDetecting={isDetecting}
+        locationError={locationError}
       />
     </div>
   );
