@@ -4,12 +4,12 @@ import { UI_TEXT } from '../../constants/uiText';
 import { Logout, LightbulbOn, Home, Grid, Settings } from './Icons';
 import { WeatherDisplay } from './WeatherDisplay';
 import { WeatherTooltip } from './WeatherTooltip';
+import { useDemoMode } from '../../context/DemoModeContext';
 
 export const TopToolbar = ({
   summary = {},
   isConnected = true,
   isReconnecting = false,
-  isDemoMode = false,
   onLogout,
   // Weather props
   weather = null,
@@ -19,6 +19,7 @@ export const TopToolbar = ({
   units = 'celsius',
   onOpenSettings,
 }) => {
+  const { isDemoMode } = useDemoMode();
   const { lightsOn = 0, roomCount = 0, sceneCount = 0 } = summary;
   const [showWeatherTooltip, setShowWeatherTooltip] = useState(false);
 
@@ -111,7 +112,6 @@ TopToolbar.propTypes = {
   }),
   isConnected: PropTypes.bool,
   isReconnecting: PropTypes.bool,
-  isDemoMode: PropTypes.bool,
   onLogout: PropTypes.func.isRequired,
   // Weather props
   weather: PropTypes.shape({

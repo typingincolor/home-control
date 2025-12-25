@@ -341,7 +341,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
   if (error && !dashboard) {
     return (
       <div className="dark-layout">
-        <TopToolbar summary={{}} isConnected={false} isDemoMode={isDemoMode} onLogout={onLogout} />
+        <TopToolbar summary={{}} isConnected={false} onLogout={onLogout} />
         <div className="main-panel">
           <div className="empty-state-dark">
             <div className="empty-state-dark-icon">⚠️</div>
@@ -358,7 +358,6 @@ export const LightControl = ({ sessionToken, onLogout }) => {
         summary={dashboard?.summary || {}}
         isConnected={wsConnected || isDemoMode}
         isReconnecting={wsReconnecting}
-        isDemoMode={isDemoMode}
         onLogout={onLogout}
         weather={weather}
         weatherLoading={weatherLoading}
