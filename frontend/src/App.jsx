@@ -1,12 +1,16 @@
 import { useHueBridge } from './hooks/useHueBridge';
 import { useDemoMode } from './hooks/useDemoMode';
+import { DemoModeProvider } from './context/DemoModeContext';
 import { BridgeDiscovery } from './components/BridgeDiscovery';
 import { Authentication } from './components/Authentication';
 import { LightControl } from './components/LightControl';
 import { UI_TEXT } from './constants/uiText';
 import './App.css';
 
-function App() {
+/**
+ * Inner app content that uses the demo mode context
+ */
+function AppContent() {
   const isDemoMode = useDemoMode();
 
   const { step, bridgeIp, sessionToken, loading, error, setBridgeIp, authenticate, reset } =
@@ -83,6 +87,17 @@ function App() {
         </footer>
       )}
     </div>
+  );
+}
+
+/**
+ * Main App component wrapped with DemoModeProvider
+ */
+function App() {
+  return (
+    <DemoModeProvider>
+      <AppContent />
+    </DemoModeProvider>
   );
 }
 
