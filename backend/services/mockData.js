@@ -121,6 +121,20 @@ const initialLights = [
     color: { xy: { x: 0.1532, y: 0.0475 } }, // Blue (transitioning)
     metadata: { name: 'Reading' },
   },
+  {
+    id: 'light-15',
+    on: { on: true },
+    dimming: { brightness: 85 },
+    color: { xy: { x: 0.4449, y: 0.4066 } }, // Soft white
+    metadata: { name: 'Bookshelf' },
+  },
+  {
+    id: 'light-16',
+    on: { on: true },
+    dimming: { brightness: 70 },
+    color_temperature: { mirek: 300 }, // Warm white
+    metadata: { name: 'Side Table' },
+  },
 ];
 
 // Room data (Hue API v2 format - rooms reference devices)
@@ -131,6 +145,7 @@ const rooms = [
     children: [
       { rid: 'device-1', rtype: 'device' },
       { rid: 'device-2', rtype: 'device' },
+      { rid: 'device-6', rtype: 'device' },
     ],
   },
   {
@@ -189,18 +204,47 @@ const devices = [
       { rid: 'light-14', rtype: 'light' },
     ],
   },
+  {
+    id: 'device-6',
+    services: [
+      { rid: 'light-15', rtype: 'light' },
+      { rid: 'light-16', rtype: 'light' },
+    ],
+  },
 ];
 
 // Scene data (Hue API v2 format)
 const scenes = [
-  { id: 'scene-1', metadata: { name: 'Bright' }, group: { rid: 'room-1' } },
-  { id: 'scene-2', metadata: { name: 'Relax' }, group: { rid: 'room-1' } },
-  { id: 'scene-3', metadata: { name: 'Movie' }, group: { rid: 'room-1' } },
-  { id: 'scene-4', metadata: { name: 'Concentrate' }, group: { rid: 'room-2' } },
-  { id: 'scene-5', metadata: { name: 'Cooking' }, group: { rid: 'room-2' } },
-  { id: 'scene-6', metadata: { name: 'Nightlight' }, group: { rid: 'room-3' } },
-  { id: 'scene-7', metadata: { name: 'Relax' }, group: { rid: 'room-3' } },
-  { id: 'scene-8', metadata: { name: 'Read' }, group: { rid: 'room-3' } },
+  // Room scenes
+  { id: 'scene-1', metadata: { name: 'Bright' }, group: { rid: 'room-1', rtype: 'room' } },
+  { id: 'scene-2', metadata: { name: 'Relax' }, group: { rid: 'room-1', rtype: 'room' } },
+  { id: 'scene-3', metadata: { name: 'Movie' }, group: { rid: 'room-1', rtype: 'room' } },
+  { id: 'scene-4', metadata: { name: 'Concentrate' }, group: { rid: 'room-2', rtype: 'room' } },
+  { id: 'scene-5', metadata: { name: 'Cooking' }, group: { rid: 'room-2', rtype: 'room' } },
+  { id: 'scene-6', metadata: { name: 'Nightlight' }, group: { rid: 'room-3', rtype: 'room' } },
+  { id: 'scene-7', metadata: { name: 'Relax' }, group: { rid: 'room-3', rtype: 'room' } },
+  { id: 'scene-8', metadata: { name: 'Read' }, group: { rid: 'room-3', rtype: 'room' } },
+  // Zone scenes - Downstairs (zone-1)
+  { id: 'scene-z1-1', metadata: { name: 'Bright' }, group: { rid: 'zone-1', rtype: 'zone' } },
+  { id: 'scene-z1-2', metadata: { name: 'Relax' }, group: { rid: 'zone-1', rtype: 'zone' } },
+  { id: 'scene-z1-3', metadata: { name: 'Dimmed' }, group: { rid: 'zone-1', rtype: 'zone' } },
+  { id: 'scene-z1-4', metadata: { name: 'Evening' }, group: { rid: 'zone-1', rtype: 'zone' } },
+  { id: 'scene-z1-5', metadata: { name: 'Movie' }, group: { rid: 'zone-1', rtype: 'zone' } },
+  { id: 'scene-z1-6', metadata: { name: 'Nightlight' }, group: { rid: 'zone-1', rtype: 'zone' } },
+  // Zone scenes - Upstairs (zone-2)
+  { id: 'scene-z2-1', metadata: { name: 'Bright' }, group: { rid: 'zone-2', rtype: 'zone' } },
+  { id: 'scene-z2-2', metadata: { name: 'Relax' }, group: { rid: 'zone-2', rtype: 'zone' } },
+  { id: 'scene-z2-3', metadata: { name: 'Dimmed' }, group: { rid: 'zone-2', rtype: 'zone' } },
+  { id: 'scene-z2-4', metadata: { name: 'Night' }, group: { rid: 'zone-2', rtype: 'zone' } },
+  { id: 'scene-z2-5', metadata: { name: 'Read' }, group: { rid: 'zone-2', rtype: 'zone' } },
+  { id: 'scene-z2-6', metadata: { name: 'Sleep' }, group: { rid: 'zone-2', rtype: 'zone' } },
+  // Zone scenes - All Lights (zone-3)
+  { id: 'scene-z3-1', metadata: { name: 'Bright' }, group: { rid: 'zone-3', rtype: 'zone' } },
+  { id: 'scene-z3-2', metadata: { name: 'Relax' }, group: { rid: 'zone-3', rtype: 'zone' } },
+  { id: 'scene-z3-3', metadata: { name: 'Dimmed' }, group: { rid: 'zone-3', rtype: 'zone' } },
+  { id: 'scene-z3-4', metadata: { name: 'Evening' }, group: { rid: 'zone-3', rtype: 'zone' } },
+  { id: 'scene-z3-5', metadata: { name: 'Party' }, group: { rid: 'zone-3', rtype: 'zone' } },
+  { id: 'scene-z3-6', metadata: { name: 'Nightlight' }, group: { rid: 'zone-3', rtype: 'zone' } },
 ];
 
 // Zone data (Hue API v2 format - zones can span multiple rooms)
@@ -241,6 +285,8 @@ const zones = [
       { rid: 'light-12', rtype: 'light' },
       { rid: 'light-13', rtype: 'light' },
       { rid: 'light-14', rtype: 'light' },
+      { rid: 'light-15', rtype: 'light' },
+      { rid: 'light-16', rtype: 'light' },
     ],
   },
 ];

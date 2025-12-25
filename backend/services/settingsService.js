@@ -60,14 +60,14 @@ class SettingsService {
    * @returns {object} Settings object
    */
   getSettings(sessionId, demoMode = false) {
-    // Demo mode returns fixed mock settings
-    if (demoMode) {
-      return getMockSettings();
-    }
-
-    // Return existing settings or defaults
+    // Return existing settings if stored
     if (sessionSettings.has(sessionId)) {
       return { ...sessionSettings.get(sessionId) };
+    }
+
+    // Demo mode returns mock settings as defaults
+    if (demoMode) {
+      return getMockSettings();
     }
 
     return getDefaultSettings();
@@ -77,16 +77,10 @@ class SettingsService {
    * Update settings for a session
    * @param {string} sessionId - Session identifier
    * @param {object} updates - Settings updates (location, units)
-   * @param {boolean} demoMode - Whether in demo mode
+   * @param {boolean} demoMode - Whether in demo mode (unused, kept for API compatibility)
    * @returns {object} Updated settings
    */
   updateSettings(sessionId, updates, demoMode = false) {
-    // Demo mode is read-only
-    if (demoMode) {
-      logger.debug('Ignoring settings update in demo mode', { sessionId });
-      return getMockSettings();
-    }
-
     // Validate updates
     if (updates.units !== undefined) {
       validateUnits(updates.units);

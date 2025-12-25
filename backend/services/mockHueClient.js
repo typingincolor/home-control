@@ -93,8 +93,10 @@ class MockHueClient {
         id: `behavior-${zone.id}`,
         type: 'behavior_instance',
         enabled: zone.enabled,
-        configuration: {
+        metadata: {
           name: zone.name,
+        },
+        configuration: {
           motion: {
             motion_service: {
               rid: `motion-service-${zone.id}`,

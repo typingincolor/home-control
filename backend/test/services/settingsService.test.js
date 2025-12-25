@@ -84,12 +84,12 @@ describe('SettingsService', () => {
       expect(result.units).toBe('fahrenheit');
     });
 
-    it('should ignore demo mode updates (demo mode is read-only)', () => {
-      const originalSettings = SettingsService.getSettings('demo-session', true);
+    it('should persist settings even in demo mode', () => {
+      // Demo mode now allows settings to be stored in memory
       SettingsService.updateSettings('demo-session', { units: 'fahrenheit' }, true);
 
       const result = SettingsService.getSettings('demo-session', true);
-      expect(result).toEqual(originalSettings);
+      expect(result.units).toBe('fahrenheit');
     });
   });
 
