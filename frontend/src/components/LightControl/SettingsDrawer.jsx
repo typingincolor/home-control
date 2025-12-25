@@ -106,6 +106,10 @@ export const SettingsDrawer = ({
             </div>
           </div>
         </div>
+
+        <div className="settings-drawer-footer">
+          <span className="settings-auto-saved">{UI_TEXT.SETTINGS_AUTO_SAVED}</span>
+        </div>
       </div>
     </>
   );

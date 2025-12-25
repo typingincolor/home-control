@@ -89,4 +89,5 @@ export const UI_TEXT = {
   SETTINGS_DETECT_LOCATION: 'Detect Location',
   SETTINGS_DETECTING: 'Detecting...',
   SETTINGS_WEATHER_ENABLED: 'Show Weather',
+  SETTINGS_AUTO_SAVED: 'Changes saved automatically',
 };

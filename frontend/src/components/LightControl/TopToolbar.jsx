@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { UI_TEXT } from '../../constants/uiText';
-import { Logout, LightbulbOn, Home, Grid, Menu } from './Icons';
+import { Logout, LightbulbOn, Home, Grid, Settings } from './Icons';
 import { WeatherDisplay } from './WeatherDisplay';
 import { WeatherTooltip } from './WeatherTooltip';
 
@@ -38,11 +38,23 @@ export const TopToolbar = ({
   return (
     <div className="top-toolbar">
       <div className="toolbar-left">
-        {/* Hamburger menu button */}
-        <button className="toolbar-menu" onClick={onOpenSettings} aria-label="Settings">
-          <Menu size={20} />
-        </button>
+        <div className="toolbar-stat">
+          <LightbulbOn size={16} className="toolbar-stat-icon" />
+          <span className="toolbar-stat-value">{lightsOn}</span>
+        </div>
+        <div className="toolbar-stat">
+          <Home size={16} className="toolbar-stat-icon" />
+          <span className="toolbar-stat-value">{roomCount}</span>
+        </div>
+        <div className="toolbar-stat">
+          <Grid size={16} className="toolbar-stat-icon" />
+          <span className="toolbar-stat-value">{sceneCount}</span>
+        </div>
+      </div>
 
+      <div className="toolbar-center"></div>
+
+      <div className="toolbar-right">
         {/* Weather display */}
         <div
           className="toolbar-weather-container"
@@ -68,23 +80,6 @@ export const TopToolbar = ({
 
         <div className="toolbar-divider" />
 
-        <div className="toolbar-stat">
-          <LightbulbOn size={16} className="toolbar-stat-icon" />
-          <span className="toolbar-stat-value">{lightsOn}</span>
-        </div>
-        <div className="toolbar-stat">
-          <Home size={16} className="toolbar-stat-icon" />
-          <span className="toolbar-stat-value">{roomCount}</span>
-        </div>
-        <div className="toolbar-stat">
-          <Grid size={16} className="toolbar-stat-icon" />
-          <span className="toolbar-stat-value">{sceneCount}</span>
-        </div>
-      </div>
-
-      <div className="toolbar-center"></div>
-
-      <div className="toolbar-right">
         {isDemoMode && (
           <span className="toolbar-status" style={{ color: 'var(--accent-primary)' }}>
             {UI_TEXT.LABEL_DEMO_MODE}
@@ -94,6 +89,9 @@ export const TopToolbar = ({
           <span className={`toolbar-status-dot ${connectionStatus.className}`} />
           <span>{connectionStatus.text}</span>
         </div>
+        <button className="toolbar-settings" onClick={onOpenSettings} aria-label="Settings">
+          <Settings size={18} />
+        </button>
         <button className="toolbar-logout" onClick={onLogout}>
           <Logout size={16} />
         </button>

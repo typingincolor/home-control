@@ -2567,8 +2567,8 @@ body.dark-theme {
    WEATHER STYLES
    ================================================ */
 
-/* Toolbar menu button (hamburger) */
-.toolbar-menu {
+/* Toolbar settings button (gear icon) */
+.toolbar-settings {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2582,7 +2582,7 @@ body.dark-theme {
   transition: all 0.15s ease;
 }
 
-.toolbar-menu:hover {
+.toolbar-settings:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
 }
@@ -2647,7 +2647,7 @@ body.dark-theme {
 .weather-tooltip {
   position: absolute;
   top: calc(100% + 8px);
-  left: 0;
+  right: 0;
   min-width: 200px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
@@ -2918,6 +2918,19 @@ body.dark-theme {
   border-color: var(--accent-primary);
   color: var(--bg-primary);
   font-weight: 500;
+}
+
+/* Settings footer */
+.settings-drawer-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.settings-auto-saved {
+  display: block;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 /* Responsive adjustments */
