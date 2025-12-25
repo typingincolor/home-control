@@ -1,0 +1,424 @@
+import { test, expect } from '@playwright/test';
+
+/**
+ * Layout Spacing E2E Tests
+ *
+ * Verifies that all visual components:
+ * - Do not overlap with each other
+ * - Have minimum spacing from screen edges (16px)
+ * - Are properly contained within the viewport
+ */
+
+const VIEWPORTS = {
+  ipad: { width: 1024, height: 768, name: 'iPad' },
+  iphone14: { width: 390, height: 844, name: 'iPhone 14' },
+  raspberryPi: { width: 800, height: 480, name: 'Raspberry Pi 7"' },
+};
+
+const MIN_EDGE_SPACING = 16;
+const MIN_COMPONENT_GAP = 8;
+
+// Note: E2E tests run on port 5174 (separate from dev server on 5173)
+
+test.describe('Layout Spacing - Desktop', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/?demo=true');
+    await page.waitForSelector('.top-toolbar');
+  });
+
+  test('settings button should have vertical spacing from toolbar edges', async ({ page }) => {
+    const toolbar = page.locator('.top-toolbar');
+    const settingsButton = page.locator('.toolbar-settings');
+
+    const toolbarBox = await toolbar.boundingBox();
+    const buttonBox = await settingsButton.boundingBox();
+
+    expect(toolbarBox).not.toBeNull();
+    expect(buttonBox).not.toBeNull();
+
+    if (toolbarBox && buttonBox) {
+      // Button should have at least 1px spacing from toolbar top
+      const topGap = buttonBox.y - toolbarBox.y;
+      expect(topGap).toBeGreaterThanOrEqual(1);
+
+      // Button should have at least 1px spacing from toolbar bottom (amber line)
+      const bottomGap = (toolbarBox.y + toolbarBox.height) - (buttonBox.y + buttonBox.height);
+      expect(bottomGap).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  test('toolbar should have minimum edge spacing', async ({ page }) => {
+    const toolbar = page.locator('.top-toolbar');
+    const toolbarBox = await toolbar.boundingBox();
+    const settingsButton = page.locator('.toolbar-settings');
+    const settingsBox = await settingsButton.boundingBox();
+    const logoutButton = page.locator('.toolbar-logout');
+    const logoutBox = await logoutButton.boundingBox();
+
+    expect(toolbarBox).not.toBeNull();
+    expect(settingsBox).not.toBeNull();
+    expect(logoutBox).not.toBeNull();
+
+    if (toolbarBox && settingsBox && logoutBox) {
+      // Settings button should be at least MIN_EDGE_SPACING from left edge
+      expect(settingsBox.x).toBeGreaterThanOrEqual(MIN_EDGE_SPACING);
+
+      // Logout button should be at least MIN_EDGE_SPACING from right edge
+      const viewportSize = page.viewportSize();
+      if (viewportSize) {
+        const rightEdgeGap = viewportSize.width - (logoutBox.x + logoutBox.width);
+        expect(rightEdgeGap).toBeGreaterThanOrEqual(MIN_EDGE_SPACING);
+      }
+    }
+  });
+
+  test('toolbar components should not overlap', async ({ page }) => {
+    const toolbarLeft = page.locator('.toolbar-left');
+    const toolbarRight = page.locator('.toolbar-right');
+
+    const leftBox = await toolbarLeft.boundingBox();
+    const rightBox = await toolbarRight.boundingBox();
+
+    expect(leftBox).not.toBeNull();
+    expect(rightBox).not.toBeNull();
+
+    if (leftBox && rightBox) {
+      // Left and right sections should not overlap
+      expect(leftBox.x + leftBox.width).toBeLessThan(rightBox.x);
+    }
+  });
+
+  test('main content should not overlap with toolbar or nav', async ({ page }) => {
+    const toolbar = page.locator('.top-toolbar');
+    const bottomNav = page.locator('.bottom-nav');
+    const mainPanel = page.locator('.main-panel');
+
+    const toolbarBox = await toolbar.boundingBox();
+    const navBox = await bottomNav.boundingBox();
+    const mainBox = await mainPanel.boundingBox();
+
+    expect(toolbarBox).not.toBeNull();
+    expect(navBox).not.toBeNull();
+    expect(mainBox).not.toBeNull();
+
+    if (toolbarBox && navBox && mainBox) {
+      // Main panel should start below toolbar
+      expect(mainBox.y).toBeGreaterThanOrEqual(toolbarBox.y + toolbarBox.height);
+
+      // Main panel should end above bottom nav
+      expect(mainBox.y + mainBox.height).toBeLessThanOrEqual(navBox.y);
+    }
+  });
+
+  test('light tiles should have spacing from edges', async ({ page }) => {
+    const grid = page.locator('.light-tiles-grid');
+    await expect(grid).toBeVisible();
+
+    const gridBox = await grid.boundingBox();
+    const viewportSize = page.viewportSize();
+
+    expect(gridBox).not.toBeNull();
+    expect(viewportSize).not.toBeNull();
+
+    if (gridBox && viewportSize) {
+      // Grid should have minimum spacing from left edge
+      expect(gridBox.x).toBeGreaterThanOrEqual(MIN_EDGE_SPACING);
+
+      // Grid should have minimum spacing from right edge
+      const rightGap = viewportSize.width - (gridBox.x + gridBox.width);
+      expect(rightGap).toBeGreaterThanOrEqual(MIN_EDGE_SPACING);
+    }
+  });
+
+  test('bottom nav tabs should have spacing from edges', async ({ page }) => {
+    const bottomNav = page.locator('.bottom-nav');
+    const firstTab = page.locator('.nav-tab').first();
+
+    const navBox = await bottomNav.boundingBox();
+    const firstTabBox = await firstTab.boundingBox();
+
+    expect(navBox).not.toBeNull();
+    expect(firstTabBox).not.toBeNull();
+
+    if (navBox && firstTabBox) {
+      // First tab should have spacing from left edge of nav
+      const leftGap = firstTabBox.x - navBox.x;
+      expect(leftGap).toBeGreaterThanOrEqual(MIN_COMPONENT_GAP);
+    }
+  });
+});
+
+test.describe('Layout Spacing - iPad (1024x768)', () => {
+  test.use({ viewport: VIEWPORTS.ipad });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/?demo=true');
+    await page.waitForSelector('.top-toolbar');
+  });
+
+  test('all components should be within viewport', async ({ page }) => {
+    const toolbar = page.locator('.top-toolbar');
+    const bottomNav = page.locator('.bottom-nav');
+    const grid = page.locator('.light-tiles-grid');
+
+    const toolbarBox = await toolbar.boundingBox();
+    const navBox = await bottomNav.boundingBox();
+    const gridBox = await grid.boundingBox();
+
+    expect(toolbarBox).not.toBeNull();
+    expect(navBox).not.toBeNull();
+    expect(gridBox).not.toBeNull();
+
+    if (toolbarBox && navBox && gridBox) {
+      // Toolbar should start at top
+      expect(toolbarBox.y).toBe(0);
+
+      // Nav should end at bottom
+      expect(navBox.y + navBox.height).toBe(VIEWPORTS.ipad.height);
+
+      // Grid should be fully within viewport
+      expect(gridBox.x).toBeGreaterThanOrEqual(0);
+      expect(gridBox.x + gridBox.width).toBeLessThanOrEqual(VIEWPORTS.ipad.width);
+    }
+  });
+
+  test('settings drawer should not exceed viewport', async ({ page }) => {
+    const settingsButton = page.locator('.toolbar-settings');
+    await settingsButton.click();
+
+    const drawer = page.locator('.settings-drawer');
+    await expect(drawer).toBeVisible();
+
+    // Wait for slide-in animation to complete (250ms)
+    await page.waitForTimeout(300);
+
+    const drawerBox = await drawer.boundingBox();
+    expect(drawerBox).not.toBeNull();
+
+    if (drawerBox) {
+      // Drawer should start at or near left edge (within 1px for rounding)
+      expect(drawerBox.x).toBeLessThanOrEqual(1);
+
+      // Drawer should span full height
+      expect(drawerBox.height).toBe(VIEWPORTS.ipad.height);
+
+      // Drawer should not exceed half viewport width
+      expect(drawerBox.width).toBeLessThan(VIEWPORTS.ipad.width / 2);
+    }
+  });
+
+  test('scene drawer should not exceed viewport', async ({ page }) => {
+    const drawerTrigger = page.locator('.scene-drawer-trigger');
+    await drawerTrigger.click();
+
+    const drawer = page.locator('.scene-drawer');
+    await expect(drawer).toBeVisible();
+
+    // Wait for slide-in animation to complete (250ms)
+    await page.waitForTimeout(300);
+
+    const drawerBox = await drawer.boundingBox();
+    expect(drawerBox).not.toBeNull();
+
+    if (drawerBox) {
+      // Drawer should end at or near right edge (within 1px for rounding)
+      expect(drawerBox.x + drawerBox.width).toBeGreaterThanOrEqual(VIEWPORTS.ipad.width - 1);
+
+      // Drawer should span full height
+      expect(drawerBox.height).toBe(VIEWPORTS.ipad.height);
+    }
+  });
+});
+
+test.describe('Layout Spacing - iPhone 14 (390x844)', () => {
+  test.use({ viewport: VIEWPORTS.iphone14 });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/?demo=true');
+    await page.waitForSelector('.top-toolbar');
+  });
+
+  test('toolbar essential items should be visible', async ({ page }) => {
+    // On mobile, some toolbar items may be hidden but essential ones should remain
+    const settingsButton = page.locator('.toolbar-settings');
+    const logoutButton = page.locator('.toolbar-logout');
+
+    // Essential buttons should be visible
+    await expect(settingsButton).toBeVisible();
+    await expect(logoutButton).toBeVisible();
+
+    // Both buttons should be on screen
+    const settingsBox = await settingsButton.boundingBox();
+    const logoutBox = await logoutButton.boundingBox();
+
+    expect(settingsBox).not.toBeNull();
+    expect(logoutBox).not.toBeNull();
+
+    if (settingsBox && logoutBox) {
+      // Settings should be on left side
+      expect(settingsBox.x).toBeLessThan(VIEWPORTS.iphone14.width / 2);
+
+      // Logout should be fully visible (not cut off)
+      expect(logoutBox.x + logoutBox.width).toBeLessThanOrEqual(VIEWPORTS.iphone14.width);
+    }
+  });
+
+  test('light tiles should fit on mobile screen', async ({ page }) => {
+    const grid = page.locator('.light-tiles-grid');
+    const gridBox = await grid.boundingBox();
+
+    expect(gridBox).not.toBeNull();
+
+    if (gridBox) {
+      // Grid should fit within viewport with spacing
+      expect(gridBox.x).toBeGreaterThanOrEqual(MIN_EDGE_SPACING);
+      expect(gridBox.x + gridBox.width).toBeLessThanOrEqual(
+        VIEWPORTS.iphone14.width - MIN_EDGE_SPACING
+      );
+    }
+  });
+
+  test('bottom nav should be fully accessible', async ({ page }) => {
+    const bottomNav = page.locator('.bottom-nav');
+    const navBox = await bottomNav.boundingBox();
+
+    expect(navBox).not.toBeNull();
+
+    if (navBox) {
+      // Nav should span full width
+      expect(navBox.x).toBe(0);
+      expect(navBox.width).toBe(VIEWPORTS.iphone14.width);
+
+      // Nav should be at bottom
+      expect(navBox.y + navBox.height).toBe(VIEWPORTS.iphone14.height);
+    }
+  });
+});
+
+test.describe('Layout Spacing - Raspberry Pi 7" (800x480)', () => {
+  test.use({ viewport: VIEWPORTS.raspberryPi });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/?demo=true');
+    await page.waitForSelector('.top-toolbar');
+  });
+
+  test('settings button should not touch toolbar edges on compact screen', async ({ page }) => {
+    const toolbar = page.locator('.top-toolbar');
+    const settingsButton = page.locator('.toolbar-settings');
+
+    const toolbarBox = await toolbar.boundingBox();
+    const buttonBox = await settingsButton.boundingBox();
+
+    expect(toolbarBox).not.toBeNull();
+    expect(buttonBox).not.toBeNull();
+
+    if (toolbarBox && buttonBox) {
+      // Button should have spacing from toolbar top
+      const topGap = buttonBox.y - toolbarBox.y;
+      expect(topGap).toBeGreaterThanOrEqual(1);
+
+      // Button should have spacing from toolbar bottom (amber line)
+      const bottomGap = (toolbarBox.y + toolbarBox.height) - (buttonBox.y + buttonBox.height);
+      expect(bottomGap).toBeGreaterThanOrEqual(1);
+
+      // Button should fit entirely within toolbar
+      expect(buttonBox.y).toBeGreaterThanOrEqual(toolbarBox.y);
+      expect(buttonBox.y + buttonBox.height).toBeLessThanOrEqual(toolbarBox.y + toolbarBox.height);
+    }
+  });
+
+  test('compact layout should not have overlapping elements', async ({ page }) => {
+    const toolbar = page.locator('.top-toolbar');
+    const bottomNav = page.locator('.bottom-nav');
+    const mainPanel = page.locator('.main-panel');
+
+    const toolbarBox = await toolbar.boundingBox();
+    const navBox = await bottomNav.boundingBox();
+    const mainBox = await mainPanel.boundingBox();
+
+    expect(toolbarBox).not.toBeNull();
+    expect(navBox).not.toBeNull();
+    expect(mainBox).not.toBeNull();
+
+    if (toolbarBox && navBox && mainBox) {
+      // Main panel should have positive height (not squished)
+      expect(mainBox.height).toBeGreaterThan(100);
+
+      // Content areas should not overlap
+      expect(mainBox.y).toBeGreaterThanOrEqual(toolbarBox.y + toolbarBox.height);
+      expect(mainBox.y + mainBox.height).toBeLessThanOrEqual(navBox.y);
+    }
+  });
+
+  test('grid tiles should fit in compact view', async ({ page }) => {
+    const grid = page.locator('.light-tiles-grid');
+    const toolbar = page.locator('.top-toolbar');
+    const bottomNav = page.locator('.bottom-nav');
+
+    const gridBox = await grid.boundingBox();
+    const toolbarBox = await toolbar.boundingBox();
+    const navBox = await bottomNav.boundingBox();
+
+    expect(gridBox).not.toBeNull();
+    expect(toolbarBox).not.toBeNull();
+    expect(navBox).not.toBeNull();
+
+    if (gridBox && toolbarBox && navBox) {
+      // Grid should not overlap with toolbar or nav
+      expect(gridBox.y).toBeGreaterThanOrEqual(toolbarBox.y + toolbarBox.height);
+      expect(gridBox.y + gridBox.height).toBeLessThanOrEqual(navBox.y);
+    }
+  });
+});
+
+test.describe('Weather Tooltip Positioning', () => {
+  test('tooltip should stay within viewport bounds', async ({ page }) => {
+    await page.goto('/?demo=true');
+    await page.waitForSelector('.weather-display');
+
+    const weatherContainer = page.locator('.toolbar-weather-container');
+    await weatherContainer.hover();
+
+    const tooltip = page.locator('.weather-tooltip');
+    await expect(tooltip).toBeVisible();
+
+    const tooltipBox = await tooltip.boundingBox();
+    const viewportSize = page.viewportSize();
+
+    expect(tooltipBox).not.toBeNull();
+    expect(viewportSize).not.toBeNull();
+
+    if (tooltipBox && viewportSize) {
+      // Tooltip should be within viewport
+      expect(tooltipBox.x).toBeGreaterThanOrEqual(0);
+      expect(tooltipBox.x + tooltipBox.width).toBeLessThanOrEqual(viewportSize.width);
+      expect(tooltipBox.y).toBeGreaterThanOrEqual(0);
+      expect(tooltipBox.y + tooltipBox.height).toBeLessThanOrEqual(viewportSize.height);
+    }
+  });
+
+  test.describe('tooltip on narrow viewport', () => {
+    test.use({ viewport: VIEWPORTS.iphone14 });
+
+    test('tooltip should not overflow on mobile', async ({ page }) => {
+      await page.goto('/?demo=true');
+      await page.waitForSelector('.weather-display');
+
+      const weatherContainer = page.locator('.toolbar-weather-container');
+      await weatherContainer.hover();
+
+      const tooltip = page.locator('.weather-tooltip');
+      await expect(tooltip).toBeVisible();
+
+      const tooltipBox = await tooltip.boundingBox();
+
+      expect(tooltipBox).not.toBeNull();
+
+      if (tooltipBox) {
+        // Tooltip should fit within mobile viewport
+        expect(tooltipBox.x + tooltipBox.width).toBeLessThanOrEqual(VIEWPORTS.iphone14.width);
+      }
+    });
+  });
+});

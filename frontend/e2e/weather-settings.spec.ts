@@ -18,22 +18,8 @@ const VIEWPORTS = {
   raspberryPi: { width: 800, height: 480, name: 'Raspberry Pi 7"' },
 };
 
-// Clear test-related localStorage before each test to ensure isolation
-// This runs BEFORE the test, so dev server state is restored after tests complete
-test.beforeEach(async ({ page }) => {
-  await page.goto('about:blank');
-  await page.evaluate(() => {
-    // Clear weather/settings keys that tests will modify
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && (key.includes('weather') || key.includes('hue_weather'))) {
-        keysToRemove.push(key);
-      }
-    }
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-  });
-});
+// Note: E2E tests run on port 5174 (separate from dev server on 5173)
+// This ensures complete isolation - no localStorage cleanup needed
 
 test.describe('Weather Display', () => {
   test.beforeEach(async ({ page }) => {
@@ -239,6 +225,30 @@ test.describe('Settings Button', () => {
     // Should not be transparent (rgba with 0 alpha)
     expect(backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
     expect(backgroundColor).not.toBe('transparent');
+  });
+
+  test('settings button should contain visible icon', async ({ page }) => {
+    const settingsButton = page.locator('.toolbar-settings');
+    await expect(settingsButton).toBeVisible();
+
+    // Check that the button contains an SVG icon
+    const svgIcon = settingsButton.locator('svg');
+    await expect(svgIcon).toHaveCount(1);
+
+    // Check the icon has visible size and dimensions
+    const iconBox = await svgIcon.boundingBox();
+    expect(iconBox).not.toBeNull();
+
+    if (iconBox) {
+      expect(iconBox.width).toBeGreaterThan(10);
+      expect(iconBox.height).toBeGreaterThan(10);
+    }
+
+    // Verify icon has stroke color applied
+    const strokeColor = await svgIcon.evaluate((el) => {
+      return window.getComputedStyle(el).stroke;
+    });
+    expect(strokeColor).not.toBe('none');
   });
 
   test('settings button should be on far left of toolbar', async ({ page }) => {

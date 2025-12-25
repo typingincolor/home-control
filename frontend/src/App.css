@@ -10,6 +10,9 @@
   --icon-size: clamp(54px, 3.6vw, 72px);
   --grid-gap: clamp(6px, 0.4vw, 10px);
 
+  /* Minimum spacing from screen edges */
+  --min-edge-spacing: 16px;
+
   /* Dark theme colors */
   --bg-primary: #1a1a1a;
   --bg-secondary: #2d2d2d;
@@ -38,14 +41,14 @@
 
   /* Navigation - responsive heights */
   --nav-height: 100px;
-  --toolbar-height: 48px;
+  --toolbar-height: 54px; /* 44px button + 4px margin + 6px buffer */
 }
 
 /* Compact layout for short screens (Raspberry Pi 7" = 480px height) */
 @media (max-height: 600px) {
   :root {
     --nav-height: 70px;
-    --toolbar-height: 40px;
+    --toolbar-height: 52px; /* Accommodate 44px buttons + padding */
     --light-tile-gap: 12px;
   }
 }
@@ -1620,13 +1623,15 @@ body.dark-theme {
   top: 0;
   left: 0;
   right: 0;
-  height: var(--toolbar-height);
+  height: calc(var(--toolbar-height) + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--accent-primary);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
+  padding-left: max(var(--min-edge-spacing), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--min-edge-spacing), env(safe-area-inset-right, 0px));
   z-index: 100;
 }
 
@@ -1771,10 +1776,12 @@ body.dark-theme {
 /* Main Panel */
 .main-panel {
   position: absolute;
-  top: var(--toolbar-height);
-  bottom: var(--nav-height);
+  top: calc(var(--toolbar-height) + env(safe-area-inset-top, 0px));
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
   left: 0;
   right: 0;
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -1876,9 +1883,13 @@ body.dark-theme {
 .light-tiles-grid {
   --grid-cols: 2;
   --grid-rows: 4;
-  /* Available space (parent container is positioned between toolbar and nav) */
-  --available-height: calc(100vh - var(--toolbar-height) - var(--nav-height));
-  --available-width: calc(100vw - 48px);
+  /* Available space - account for safe areas and minimum edge spacing */
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --available-height: calc(100vh - var(--toolbar-height) - var(--nav-height) - var(--safe-top) - var(--safe-bottom));
+  --available-width: calc(100vw - var(--min-edge-spacing) * 2 - var(--safe-left) - var(--safe-right));
   /* Reserve space for vertical centering (half above, half below) */
   --centering-buffer: 32px;
   --grid-content-height: calc(var(--available-height) - var(--centering-buffer));
@@ -2011,7 +2022,7 @@ body.dark-theme {
   bottom: 0;
   left: 0;
   right: 0;
-  height: var(--nav-height);
+  height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
   background: var(--bg-secondary);
   border-top: 1px solid var(--accent-primary);
   display: flex;
@@ -2019,7 +2030,9 @@ body.dark-theme {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: max(8px, env(safe-area-inset-left, 0px));
+  padding-right: max(8px, env(safe-area-inset-right, 0px));
 }
 
 .bottom-nav::-webkit-scrollbar {
@@ -2114,7 +2127,7 @@ body.dark-theme {
 .zones-view {
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 16px var(--min-edge-spacing);
   box-sizing: border-box;
   width: 100%;
 }
@@ -2251,7 +2264,16 @@ body.dark-theme {
 /* Responsive adjustments for dark layout */
 @media (max-width: 768px) {
   .top-toolbar {
-    padding: 0 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .toolbar-left {
+    gap: 8px;
+  }
+
+  .toolbar-right {
+    gap: 8px;
   }
 
   .toolbar-center {
@@ -2260,6 +2282,36 @@ body.dark-theme {
 
   .toolbar-stat-value {
     font-size: 0.9rem;
+  }
+
+  /* Hide connection status text on tablets, keep dot only */
+  .toolbar-status span:not(.toolbar-status-dot) {
+    display: none;
+  }
+}
+
+/* More aggressive hiding for mobile phones */
+@media (max-width: 500px) {
+  .top-toolbar {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .toolbar-left {
+    gap: 6px;
+  }
+
+  .toolbar-right {
+    gap: 6px;
+  }
+
+  /* Hide demo mode label on mobile */
+  .toolbar-status[style*="color"] {
+    display: none;
+  }
+
+  .toolbar-divider {
+    display: none;
   }
 
   .room-header-bar {
@@ -2392,6 +2444,9 @@ body.dark-theme {
   flex-direction: column;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.4);
   animation: slideIn 0.25s ease;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 @keyframes slideIn {
@@ -2574,18 +2629,26 @@ body.dark-theme {
   justify-content: center;
   width: 44px;
   height: 44px;
+  min-width: 44px;
+  margin: 2px 0;
   border: 1px solid var(--border-color);
   background: var(--bg-tertiary);
-  color: var(--text-primary);
+  color: var(--text-secondary);
   cursor: pointer;
   border-radius: 10px;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.toolbar-settings svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
 }
 
 .toolbar-settings:hover {
   background: var(--bg-hover);
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
+  color: var(--text-primary);
 }
 
 /* Weather container in toolbar */
@@ -2650,6 +2713,7 @@ body.dark-theme {
   top: calc(100% + 8px);
   right: 0;
   min-width: 200px;
+  max-width: calc(100vw - var(--min-edge-spacing) * 2);
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -2783,6 +2847,9 @@ body.dark-theme {
   flex-direction: column;
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
   animation: slideInLeft 0.25s ease;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
 }
 
 @keyframes slideInLeft {
