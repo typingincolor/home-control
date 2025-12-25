@@ -73,6 +73,7 @@ export const UI_TEXT = {
   // Weather
   WEATHER_LOADING: 'Loading...',
   WEATHER_ERROR: 'Weather unavailable',
+  WEATHER_SET_LOCATION: 'Set location',
   WEATHER_FEELS_LIKE: 'Feels like',
   WEATHER_HUMIDITY: 'Humidity',
   WEATHER_WIND: 'Wind',
