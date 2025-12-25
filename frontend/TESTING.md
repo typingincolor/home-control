@@ -49,7 +49,7 @@ View mutation report: `open reports/mutation/html/index.html`
 
 ## Test Coverage
 
-### Unit Test Results (257 tests)
+### Unit Test Results (242 tests)
 
 #### Utilities
 
@@ -57,11 +57,10 @@ View mutation report: `open reports/mutation/html/index.html`
 
 #### Hooks
 
-- **useDemoMode.js**: 9 tests - URL parameter parsing
-- **useSession.js**: 25 tests - Session management
+- **useSession.js**: 23 tests - Session management
 - **useSettings.js**: 10 tests - Settings API
 - **useWeather.js**: 10 tests - Weather API
-- **useWebSocket.js**: 31 tests - WebSocket connection
+- **useWebSocket.js**: 28 tests - WebSocket connection
 
 #### Services
 
@@ -80,9 +79,9 @@ View mutation report: `open reports/mutation/html/index.html`
 
 #### Integration
 
-- **integration.test.jsx**: 11 tests - Full app flow tests
+- **integration.test.jsx**: 10 tests - Full app flow tests
 
-**Note:** Business logic tests (colorConversion, roomUtils, motionSensors) are in the backend test suite (501 tests).
+**Note:** Business logic tests (colorConversion, roomUtils, motionSensors) are in the backend test suite (497 tests).
 
 ## Mutation Testing Results
 
@@ -101,7 +100,7 @@ View mutation report: `open reports/mutation/html/index.html`
 
 **Components** - Generally good coverage
 
-- LightButton, RoomCard, ZoneCard well-tested
+- LightTile, RoomContent, ZonesView well-tested
 - Some UI components have lower scores
 
 **Services** - Good coverage
@@ -149,7 +148,7 @@ Some mutants survive because they don't produce observable differences:
    - Mathematical code has expected survivors
 
 4. **Fast Execution**
-   - 257 tests run in <5 seconds
+   - 242 tests run in <5 seconds
    - Mutation testing completes in ~15 minutes
    - Enables rapid development cycles
 
@@ -162,7 +161,6 @@ src/
 ├── utils/
 │   └── validation.test.js
 ├── hooks/
-│   ├── useDemoMode.test.js
 │   ├── useSession.test.js
 │   ├── useSettings.test.js
 │   ├── useWeather.test.jsx
@@ -302,7 +300,7 @@ Some mutations are OK to survive:
 
 ### Pending Test Coverage
 
-- [x] Custom hooks (useDemoMode, useHueApi, usePolling, useSession, useWebSocket)
+- [x] Custom hooks (useHueBridge, useSession, useSettings, useWeather, useWebSocket)
 - [x] React components (with Testing Library)
 - [x] Integration tests (API → UI flow)
 - [x] E2E tests (Playwright)

@@ -28,13 +28,14 @@ npm run deploy           # Build and start production
 - **Frontend:** React 18 + Vite 6 (`frontend/`)
 - **Backend:** Express 5 (`backend/`)
 
-### API Proxy Pattern
+### Authentication
 
-Backend proxies Hue Bridge requests (CORS + self-signed cert handling):
+Session-based authentication with two modes:
 
-- Frontend: `/api/*` → Backend → Hue Bridge
-- Bridge IP via query param: `?bridgeIp={ip}`
-- Auth via header: `hue-application-key: {username}`
+- **Session Token:** `Authorization: Bearer <token>` header
+- **Demo Mode:** `X-Demo-Mode: true` header (no bridge required)
+
+Backend proxies Hue Bridge requests (CORS + self-signed cert handling).
 
 ### Dual-Mode Serving
 
@@ -116,11 +117,11 @@ Backend-based demo allows testing without Hue Bridge:
 
 ### Data Flow
 
-- **localStorage:** Bridge IP, username persistence
+- **localStorage:** Bridge IP, session token persistence
 - **useHueBridge:** Bridge connection state
-- **useDemoMode:** URL param detection
+- **DemoModeContext:** Demo mode detection and API selection
 - **useWebSocket:** Real-time updates with reconnection
-- **hueApi:** API calls with demo mode header
+- **hueApi:** API calls with session token or demo mode header
 
 ### UI Text Constants
 
@@ -149,8 +150,8 @@ See `frontend/TESTING.md` for detailed testing documentation.
 
 ### Test Suites
 
-- **Backend:** 501 tests (services, middleware, utils)
-- **Frontend:** 257 tests (hooks, components, integration)
+- **Backend:** 497 tests (services, middleware, utils)
+- **Frontend:** 242 tests (hooks, components, integration)
 - **E2E:** 158 tests (Playwright, demo mode)
 
 ### Running Tests

@@ -42,7 +42,7 @@ A modern React web application for controlling Philips Hue lights locally using 
 - **Multi-Machine Support**: Access from any device on your network
 - **Centralized Configuration**: All settings managed through config.json
 - **Modern API v2**: Uses the latest Philips Hue API for future-proof functionality
-- **Comprehensive Testing**: 952 tests (395 frontend + 557 backend) with integration test suite
+- **Comprehensive Testing**: 739 tests (242 frontend + 497 backend) with integration test suite
 
 ## Prerequisites
 
@@ -170,10 +170,16 @@ philips-hue-connector/
 │       │   ├── MotionZones.jsx
 │       │   └── LightControl/
 │       │       ├── index.jsx          # Main container
-│       │       ├── LightButton.jsx    # Individual light button
-│       │       ├── RoomCard.jsx       # Room grouping
-│       │       ├── ZoneCard.jsx       # Compact zone control bar
-│       │       ├── SceneSelector.jsx  # Scene dropdown
+│       │       ├── TopToolbar.jsx     # Header bar
+│       │       ├── BottomNav.jsx      # Room tabs
+│       │       ├── MainPanel.jsx      # Content container
+│       │       ├── RoomContent.jsx    # Room display
+│       │       ├── LightTile.jsx      # Light button with fill
+│       │       ├── ZonesView.jsx      # Zones list
+│       │       ├── SceneDrawer.jsx    # Slide-out drawer for scenes
+│       │       ├── SceneSelector.jsx  # Scene icons
+│       │       ├── SettingsDrawer.jsx # Weather settings
+│       │       ├── WeatherDisplay.jsx # Toolbar weather
 │       │       └── DashboardSummary.jsx
 │       ├── utils/             # Utility functions
 │       │   └── validation.js  # IP validation (frontend-only)
@@ -186,12 +192,13 @@ philips-hue-connector/
 │       │   └── messages.js
 │       ├── services/
 │       │   ├── hueApi.js      # v1 API client (calls backend endpoints)
-│       │   └── mockData.js    # Demo mode data
+│       │   └── weatherApi.js  # Weather API integration
 │       ├── hooks/             # Custom React hooks
 │       │   ├── useHueBridge.js
-│       │   ├── useDemoMode.js
-│       │   ├── useHueApi.js
-│       │   └── usePolling.js
+│       │   ├── useSession.js
+│       │   ├── useSettings.js
+│       │   ├── useWeather.js
+│       │   └── useWebSocket.js
 │       └── test/
 │           └── setup.js       # Test environment setup
 └── backend/                    # Express backend workspace
@@ -404,19 +411,19 @@ Runs mutation testing with Stryker (validates test quality)
 
 ## Testing
 
-The project includes comprehensive testing infrastructure with **952 tests total** (395 frontend + 557 backend) and mutation testing to ensure code quality.
+The project includes comprehensive testing infrastructure with **739 tests total** (242 frontend + 497 backend) and mutation testing to ensure code quality.
 
 ### Test Coverage
 
-**Frontend Tests (395 tests):**
+**Frontend Tests (242 tests):**
 
 - **Unit tests**: Utilities, hooks, and components
-- **Integration tests**: 11 end-to-end flow tests with MSW
+- **Integration tests**: 10 end-to-end flow tests with MSW
 - **Vitest 4.0** - Fast, Vite-native test runner
 - **Testing Library** - React component testing with user-centric approach
 - **MSW** - Network-level API mocking for integration tests
 
-**Backend Tests (557 tests):**
+**Backend Tests (497 tests):**
 
 - **Service layer tests**: Color conversion, room hierarchy, motion sensors, statistics, WebSocket service
 - **Route tests**: API endpoint validation
@@ -441,21 +448,22 @@ frontend/src/
 ├── utils/
 │   └── validation.test.js          # 8 tests - IP validation
 ├── hooks/
-│   ├── useDemoMode.test.js         # 9 tests - Demo mode detection
-│   ├── useHueApi.test.js           # 4 tests - API selection
-│   └── usePolling.test.js          # 10 tests - Polling intervals
+│   ├── useSession.test.js          # 23 tests - Session management
+│   ├── useSettings.test.js         # 10 tests - Settings API
+│   ├── useWeather.test.jsx         # 10 tests - Weather API
+│   └── useWebSocket.test.js        # 28 tests - WebSocket connection
 ├── components/
-│   ├── MotionZones.test.jsx        # 10 tests - Motion zone compact bar
+│   ├── MotionZones.test.jsx        # 9 tests - Motion zone compact bar
 │   └── LightControl/
 │       ├── DashboardSummary.test.jsx   # 5 tests - Summary statistics
-│       ├── SceneSelector.test.jsx      # 11 tests - Scene dropdown
-│       ├── LightButton.test.jsx        # 15 tests - Light button rendering
-│       ├── RoomCard.test.jsx           # 16 tests - Room card component
-│       ├── ZoneCard.test.jsx           # 14 tests - Zone bar component
-│       └── index.zones.test.jsx        # 8 tests - Zone integration tests
+│       ├── SceneSelector.test.jsx      # 8 tests - Scene icon buttons
+│       ├── SettingsDrawer.test.jsx     # 16 tests - Settings drawer
+│       ├── WeatherDisplay.test.jsx     # 11 tests - Weather display
+│       ├── index.test.jsx              # 18 tests - Main control component
+│       └── index.zones.test.jsx        # 9 tests - Zone integration tests
 ├── services/
-│   └── hueApi.test.js              # 15 tests - API client methods
-└── integration.test.jsx            # 11 tests - Full app flow tests
+│   └── hueApi.test.js              # 22 tests - API client methods
+└── integration.test.jsx            # 10 tests - Full app flow tests
 ```
 
 **Backend Tests:**
@@ -888,7 +896,7 @@ PORT=8080 npm run start
 ## Security Notes
 
 - **Session tokens** are stored in browser localStorage and expire after 24 hours
-- **Bridge username** is also stored for session recovery
+- **Bridge credentials** are stored server-side only (not in browser)
 - Session tokens act as API keys - keep them secure
 - Clear browser data to remove saved credentials
 - **Auto-refresh**: Sessions are automatically refreshed before expiration
@@ -900,28 +908,22 @@ PORT=8080 npm run start
 
 ## Version History
 
-### v1.4.0 (Current)
+### v1.0.0 (Current)
 
-- **Backend Demo Mode** - Demo mode moved from frontend to backend for multi-client support
+- **Session-only authentication** - Simplified to Bearer tokens only (removed header/query auth)
+- **DemoModeContext** - Demo mode uses React Context directly instead of hook wrapper
+- **Backend demo mode** - Demo mode moved from frontend to backend for multi-client support
 - **Demo via header** - Use `X-Demo-Mode: true` header or `?demo=true` URL parameter
 - **MockHueClient** - Full mock implementation of HueClient with state persistence
-- **Settings API** - New `/api/v1/settings` endpoints for location and unit preferences
-- **Weather API** - New `/api/v1/weather` endpoint (uses Open-Meteo, mock for demo)
-- **HueClient Factory** - Pattern for selecting real vs mock client based on request context
+- **Settings API** - `/api/v1/settings` endpoints for location and unit preferences
+- **Weather API** - `/api/v1/weather` endpoint (uses Open-Meteo, mock for demo)
 - **WebSocket demo auth** - Authenticate with `{ type: 'auth', demoMode: true }`
-- **Test improvements** - 952 tests total (395 frontend + 557 backend)
-
-### v1.0.0
-
-- **Multi-client support** - Second client connects instantly using server-stored credentials (no re-pairing)
-- **Session restore improvements** - Validates session with server before showing dashboard, graceful fallbacks
-- **New auth endpoints** - `POST /connect` and `GET /bridge-status` for multi-client credential sharing
+- **API cleanup** - Removed legacy authentication, backward compatibility code, and unused parameters
+- **OpenAPI v2.0.0** - Updated API documentation reflecting session-only auth
+- **Multi-client support** - Second client connects instantly using server-stored credentials
 - **Performance optimizations** - Backend caching for static resources (5-minute TTL), 15-second WebSocket polling
 - **Optimistic updates** - UI responds immediately to user actions without waiting for polling
-- **Brightness minimum** - Lights display minimum 5% when on (prevents 0% display artifacts)
-- **WebSocket cleanup** - Automatic cleanup of orphaned polling intervals, heartbeat monitoring, stale connection removal
-- **Stats endpoint** - New `/api/v1/stats/websocket` endpoint for debugging connection issues
-- **Test improvements** - 665 tests total (241 frontend + 424 backend) with multi-client integration tests
+- **Test suite** - 739 tests total (242 frontend + 497 backend)
 
 ### v0.8.1
 
