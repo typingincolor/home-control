@@ -3,8 +3,15 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LightControl } from './index';
 
-// Create mutable reference for mock API
-let mockApi;
+// Create mutable reference for mock API (initialized with defaults for hoisted vi.mock)
+let mockApi = {
+  getDashboard: vi.fn(),
+  updateLight: vi.fn(),
+  updateRoomLights: vi.fn(),
+  updateZoneLights: vi.fn(),
+  activateSceneV1: vi.fn(),
+  subscribeToMotion: vi.fn().mockReturnValue(() => {}),
+};
 let mockDashboardData;
 
 const baseDashboard = {
@@ -52,13 +59,14 @@ const baseDashboard = {
   motionZones: [],
 };
 
-// Mock hooks
-vi.mock('../../hooks/useHueApi', () => ({
-  useHueApi: () => mockApi,
-}));
-
-vi.mock('../../hooks/useDemoMode', () => ({
-  useDemoMode: () => true, // Always demo mode for tests
+// Mock the DemoModeContext
+vi.mock('../../context/DemoModeContext', () => ({
+  useDemoMode: () => ({
+    isDemoMode: true,
+    api: mockApi,
+    subscribeToMotion: mockApi.subscribeToMotion,
+    demoLocation: { lat: 51.5074, lon: -0.1278, name: 'London' },
+  }),
 }));
 
 vi.mock('../../hooks/useWebSocket', () => ({

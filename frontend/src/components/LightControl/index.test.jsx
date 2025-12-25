@@ -3,11 +3,18 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LightControl } from './index';
 
-// Create mutable references for mocks
-let mockApi;
+// Create mutable references for mocks (initialized with defaults for hoisted vi.mock)
+let mockApi = {
+  getDashboard: vi.fn(),
+  updateLight: vi.fn(),
+  updateRoomLights: vi.fn(),
+  updateZoneLights: vi.fn(),
+  activateSceneV1: vi.fn(),
+  subscribeToMotion: vi.fn().mockReturnValue(() => {}),
+};
 let mockDashboardData;
 let mockWebSocketState;
-let mockIsDemoMode;
+let mockIsDemoMode = true;
 
 const baseDashboard = {
   summary: {
@@ -66,13 +73,14 @@ const baseDashboard = {
   motionZones: [],
 };
 
-// Mock hooks
-vi.mock('../../hooks/useHueApi', () => ({
-  useHueApi: () => mockApi,
-}));
-
-vi.mock('../../hooks/useDemoMode', () => ({
-  useDemoMode: () => mockIsDemoMode,
+// Mock the DemoModeContext
+vi.mock('../../context/DemoModeContext', () => ({
+  useDemoMode: () => ({
+    isDemoMode: mockIsDemoMode,
+    api: mockApi,
+    subscribeToMotion: mockApi.subscribeToMotion,
+    demoLocation: mockIsDemoMode ? { lat: 51.5074, lon: -0.1278, name: 'London' } : null,
+  }),
 }));
 
 vi.mock('../../hooks/useWebSocket', () => ({

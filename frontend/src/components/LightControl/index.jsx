@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useHueApi } from '../../hooks/useHueApi';
-import { useDemoMode } from '../../hooks/useDemoMode';
+import { useDemoMode } from '../../context/DemoModeContext';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import { useSettings } from '../../hooks/useSettings';
 import { useLocation } from '../../hooks/useLocation';
@@ -18,8 +17,7 @@ import { SettingsDrawer } from './SettingsDrawer';
 const logger = createLogger('Dashboard');
 
 export const LightControl = ({ sessionToken, onLogout }) => {
-  const isDemoMode = useDemoMode();
-  const api = useHueApi();
+  const { isDemoMode, api, subscribeToMotion } = useDemoMode();
 
   // WebSocket connection (disabled in demo mode)
   const {
@@ -136,9 +134,9 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
   // Subscribe to motion updates in demo mode
   useEffect(() => {
-    if (!isDemoMode || !api.subscribeToMotion) return;
+    if (!isDemoMode || !subscribeToMotion) return;
 
-    const unsubscribe = api.subscribeToMotion((updatedMotionZones) => {
+    const unsubscribe = subscribeToMotion((updatedMotionZones) => {
       setLocalDashboard((prev) => {
         if (!prev) return prev;
         return {
@@ -149,7 +147,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     });
 
     return unsubscribe;
-  }, [isDemoMode, api]);
+  }, [isDemoMode, subscribeToMotion]);
 
   // Helper: Get light by UUID from dashboard
   const getLightByUuid = (uuid) => {
