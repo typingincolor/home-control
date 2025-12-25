@@ -12,6 +12,13 @@ import { test, expect } from '@playwright/test';
  * - Scene drawer slides in from right
  */
 
+// Clean up localStorage after each test to prevent interference with dev server
+test.afterEach(async ({ page }) => {
+  await page.evaluate(() => {
+    localStorage.removeItem('hue_session_token');
+  });
+});
+
 // Viewport definitions
 const VIEWPORTS = {
   ipad: { width: 1024, height: 768, name: 'iPad' },

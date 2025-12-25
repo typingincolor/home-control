@@ -1,5 +1,13 @@
 import { test, expect } from '@playwright/test';
 
+// Clean up localStorage after each test to prevent interference with dev server
+test.afterEach(async ({ page }) => {
+  await page.evaluate(() => {
+    // Clear session token set during tests to avoid auth issues
+    localStorage.removeItem('hue_session_token');
+  });
+});
+
 test.describe('Demo Mode Dashboard', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to demo mode - skips authentication

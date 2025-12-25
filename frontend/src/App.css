@@ -2572,19 +2572,20 @@ body.dark-theme {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 10px;
   transition: all 0.15s ease;
 }
 
 .toolbar-settings:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 /* Weather container in toolbar */

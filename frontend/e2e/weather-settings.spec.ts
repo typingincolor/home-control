@@ -18,6 +18,21 @@ const VIEWPORTS = {
   raspberryPi: { width: 800, height: 480, name: 'Raspberry Pi 7"' },
 };
 
+// Clean up localStorage after each test to prevent interference with dev server
+test.afterEach(async ({ page }) => {
+  await page.evaluate(() => {
+    // Only clear weather-related keys, preserve auth keys
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.includes('weather') || key.includes('settings'))) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+  });
+});
+
 test.describe('Weather Display', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/?demo=true');
@@ -194,6 +209,34 @@ test.describe('Settings Button', () => {
   test('should display settings button in toolbar', async ({ page }) => {
     const settingsButton = page.locator('.toolbar-settings');
     await expect(settingsButton).toBeVisible();
+  });
+
+  test('settings button should be at least 44x44px for touch accessibility', async ({ page }) => {
+    const settingsButton = page.locator('.toolbar-settings');
+    await expect(settingsButton).toBeVisible();
+
+    const box = await settingsButton.boundingBox();
+    expect(box).not.toBeNull();
+
+    if (box) {
+      // Minimum 44px for touch accessibility
+      expect(box.width).toBeGreaterThanOrEqual(44);
+      expect(box.height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  test('settings button should have visible background', async ({ page }) => {
+    const settingsButton = page.locator('.toolbar-settings');
+    await expect(settingsButton).toBeVisible();
+
+    // Check that the button has a visible background (not transparent)
+    const backgroundColor = await settingsButton.evaluate((el) => {
+      return window.getComputedStyle(el).backgroundColor;
+    });
+
+    // Should not be transparent (rgba with 0 alpha)
+    expect(backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+    expect(backgroundColor).not.toBe('transparent');
   });
 
   test('settings button should be on far left of toolbar', async ({ page }) => {
