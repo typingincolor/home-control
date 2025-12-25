@@ -1,6 +1,15 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { STORAGE_KEYS } from '../constants/storage';
 import { weatherApi } from '../services/weatherApi';
+
+/**
+ * Demo location for demo mode
+ */
+const DEMO_LOCATION = {
+  lat: 51.5074,
+  lon: -0.1278,
+  name: 'London',
+};
 
 /**
  * Load location from localStorage
@@ -38,12 +47,28 @@ const getGeolocationErrorMessage = (code) => {
 
 /**
  * Hook for managing user location with geolocation detection and localStorage persistence
+ * @param {object} options - Hook options
+ * @param {boolean} options.isDemoMode - Whether to use demo location as fallback
  * @returns {object} { location, isDetecting, error, detectLocation, setManualLocation, clearLocation }
  */
-export const useLocation = () => {
-  const [location, setLocation] = useState(() => loadLocation());
+export const useLocation = ({ isDemoMode = false } = {}) => {
+  const [location, setLocation] = useState(() => {
+    const stored = loadLocation();
+    // In demo mode, use demo location as fallback if nothing stored
+    if (!stored && isDemoMode) {
+      return DEMO_LOCATION;
+    }
+    return stored;
+  });
   const [isDetecting, setIsDetecting] = useState(false);
   const [error, setError] = useState(null);
+
+  // Update location if demo mode changes
+  useEffect(() => {
+    if (isDemoMode && !location) {
+      setLocation(DEMO_LOCATION);
+    }
+  }, [isDemoMode, location]);
 
   /**
    * Detect location using browser geolocation API

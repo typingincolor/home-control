@@ -384,4 +384,37 @@ describe('useLocation', () => {
       });
     });
   });
+
+  describe('demo mode', () => {
+    it('should use demo location when in demo mode and no stored location', () => {
+      const { result } = renderHook(() => useLocation({ isDemoMode: true }));
+
+      expect(result.current.location).toEqual({
+        lat: 51.5074,
+        lon: -0.1278,
+        name: 'London',
+      });
+    });
+
+    it('should use stored location over demo location when available', () => {
+      const storedLocation = { lat: 48.8566, lon: 2.3522, name: 'Paris' };
+      localStorage.setItem(STORAGE_KEYS.WEATHER_LOCATION, JSON.stringify(storedLocation));
+
+      const { result } = renderHook(() => useLocation({ isDemoMode: true }));
+
+      expect(result.current.location).toEqual(storedLocation);
+    });
+
+    it('should return null when not in demo mode and no stored location', () => {
+      const { result } = renderHook(() => useLocation({ isDemoMode: false }));
+
+      expect(result.current.location).toBeNull();
+    });
+
+    it('should work without options parameter', () => {
+      const { result } = renderHook(() => useLocation());
+
+      expect(result.current.location).toBeNull();
+    });
+  });
 });
