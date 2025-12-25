@@ -315,10 +315,17 @@ Some mutations are OK to survive:
 
 ### Setup
 
-E2E tests use **Playwright** and run against the dev server in demo mode.
+E2E tests use **Playwright** with automatic server management. Tests run on **isolated ports** to avoid conflicts with dev servers:
+
+| Server | Dev Port | E2E Port |
+|--------|----------|----------|
+| Frontend | 5173 | 5174 |
+| Backend | 3001 | 3002 |
+
+Playwright automatically starts and stops both servers for each test run.
 
 ```bash
-# Run E2E tests (starts dev server automatically)
+# Run E2E tests (auto-starts servers on ports 5174/3002)
 npm run test:e2e
 
 # Run with UI (interactive mode)
@@ -328,13 +335,17 @@ npm run test:e2e:ui
 npm run test:e2e:headed
 ```
 
-### Test Files
+### Test Files (158 tests)
 
 ```
 e2e/
 ├── demo-mode.spec.ts    # Dashboard tests in demo mode
 ├── discovery.spec.ts    # Bridge discovery flow
 ├── auth.spec.ts         # Authentication flow
+├── rooms.spec.ts        # Room navigation and controls
+├── zones.spec.ts        # Zone display and controls
+├── scenes.spec.ts       # Scene activation
+├── settings.spec.ts     # Settings persistence
 └── session.spec.ts      # Session persistence
 ```
 
@@ -351,10 +362,12 @@ All E2E tests use `?demo=true` URL parameter:
 
 See `playwright.config.ts` for:
 
-- Base URL: `http://localhost:5173`
+- Base URL: `http://localhost:5174` (isolated E2E port)
+- Backend: `http://localhost:3002/api/health` (isolated E2E port)
 - Browser: Chromium only (for speed)
 - Screenshots on failure
 - Trace on first retry
+- Auto server management with 2-minute timeout
 
 ### Potential Enhancements
 
