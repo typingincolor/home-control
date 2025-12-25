@@ -45,6 +45,18 @@ import {
   Bath,
   Baby,
   Star,
+  // Weather icons
+  Cloud as LucideCloud,
+  CloudSun as LucideCloudSun,
+  CloudRain as LucideCloudRain,
+  CloudSnow as LucideCloudSnow,
+  CloudDrizzle as LucideCloudDrizzle,
+  CloudFog as LucideCloudFog,
+  CloudLightning as LucideCloudLightning,
+  Wind as LucideWind,
+  Thermometer as LucideThermometer,
+  MapPin as LucideMapPin,
+  Settings as LucideSettings,
 } from 'lucide-react';
 
 // Default props for consistent styling
@@ -214,5 +226,82 @@ export const SceneIcon = ({ name, ...props }) => {
   // Get the icon component constructor - this is a valid pattern for dynamic icon selection
   const IconComponent = getSceneIcon(name);
 
+  return <IconComponent {...defaultProps} {...props} />;
+};
+
+// ============================================
+// Weather Icons
+// ============================================
+
+// Weather icon exports
+export const Cloud = (props) => <LucideCloud {...defaultProps} {...props} />;
+export const CloudSun = (props) => <LucideCloudSun {...defaultProps} {...props} />;
+export const CloudRain = (props) => <LucideCloudRain {...defaultProps} {...props} />;
+export const CloudSnow = (props) => <LucideCloudSnow {...defaultProps} {...props} />;
+export const CloudDrizzle = (props) => <LucideCloudDrizzle {...defaultProps} {...props} />;
+export const CloudFog = (props) => <LucideCloudFog {...defaultProps} {...props} />;
+export const CloudLightning = (props) => <LucideCloudLightning {...defaultProps} {...props} />;
+export const Wind = (props) => <LucideWind {...defaultProps} {...props} />;
+export const Thermometer = (props) => <LucideThermometer {...defaultProps} {...props} />;
+export const MapPin = (props) => <LucideMapPin {...defaultProps} {...props} />;
+export const Settings = (props) => <LucideSettings {...defaultProps} {...props} />;
+
+// Weather code to icon mapping
+// See: https://open-meteo.com/en/docs#weathervariables
+const weatherIconMap = {
+  // Clear sky
+  0: LucideSun,
+  // Mainly clear, partly cloudy
+  1: LucideCloudSun,
+  2: LucideCloudSun,
+  // Overcast
+  3: LucideCloud,
+  // Fog
+  45: LucideCloudFog,
+  48: LucideCloudFog,
+  // Drizzle
+  51: LucideCloudDrizzle,
+  53: LucideCloudDrizzle,
+  55: LucideCloudDrizzle,
+  56: LucideCloudDrizzle,
+  57: LucideCloudDrizzle,
+  // Rain
+  61: LucideCloudRain,
+  63: LucideCloudRain,
+  65: LucideCloudRain,
+  66: LucideCloudRain,
+  67: LucideCloudRain,
+  // Snow
+  71: LucideCloudSnow,
+  73: LucideCloudSnow,
+  75: LucideCloudSnow,
+  77: LucideCloudSnow,
+  // Rain showers
+  80: LucideCloudRain,
+  81: LucideCloudRain,
+  82: LucideCloudRain,
+  // Snow showers
+  85: LucideCloudSnow,
+  86: LucideCloudSnow,
+  // Thunderstorm
+  95: LucideCloudLightning,
+  96: LucideCloudLightning,
+  99: LucideCloudLightning,
+};
+
+/**
+ * Get the weather icon component for a weather code
+ * @param {number} weatherCode - Open-Meteo weather code
+ * @returns {React.Component} Icon component
+ */
+export const getWeatherIcon = (weatherCode) => {
+  return weatherIconMap[weatherCode] || LucideSun;
+};
+
+/**
+ * Weather icon component that auto-selects icon based on weather code
+ */
+export const WeatherIcon = ({ code, ...props }) => {
+  const IconComponent = getWeatherIcon(code);
   return <IconComponent {...defaultProps} {...props} />;
 };
