@@ -211,6 +211,21 @@ class HueClient {
   }
 
   /**
+   * Trigger a smart scene (automation)
+   */
+  async triggerSmartScene(bridgeIp, username, smartSceneId) {
+    return this._request(
+      'PUT',
+      bridgeIp,
+      `/clip/v2/resource/smart_scene/${smartSceneId}`,
+      username,
+      {
+        recall: { action: 'activate' },
+      }
+    );
+  }
+
+  /**
    * Update multiple lights in parallel
    */
   async updateLights(bridgeIp, username, lightUpdates) {

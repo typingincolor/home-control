@@ -41,6 +41,18 @@ You are a senior code reviewer. Your job is to review the changes made during th
 - [ ] No unnecessary re-renders (React)
 - [ ] Efficient algorithms used
 
+### UX Quality (for UI changes)
+
+- [ ] All buttons/icons have labels or aria-labels
+- [ ] No components cut off or overflowing containers
+- [ ] Adequate spacing from screen edges (minimum 8px)
+- [ ] No overlapping elements
+- [ ] Touch targets are large enough (44x44pt minimum)
+- [ ] Text is readable (sufficient contrast, not too small)
+- [ ] Loading/empty/error states are handled
+- [ ] Interactive elements have visible focus states
+- [ ] Layout works on all target platforms (rPi 800x480, iPhone 14+, iPad)
+
 ## Process
 
 1. Check what changed:
@@ -74,15 +86,43 @@ You are a senior code reviewer. Your job is to review the changes made during th
 4. Check code coverage:
 
    ```bash
-   npm run test:coverage --workspace=frontend
    npm run test:coverage --workspace=backend
+   npm run test:coverage --workspace=frontend
    ```
 
    Review coverage for new/changed code. Flag any significant coverage gaps.
 
-5. Review each changed file for issues
+5. **Review backend changes first** (`backend/`):
+   - API endpoints, services, utilities
+   - Check correctness, security, performance
 
-6. Provide summary with:
+6. **Review frontend changes second** (`frontend/`):
+   - Components, hooks, services
+   - Check code quality and patterns
+
+7. For UI changes, visually inspect the interface on ALL THREE target platforms:
+
+   **Raspberry Pi (800x480)** - Primary platform, wall-mounted display:
+   - Touch targets large enough (48px recommended)
+   - Text readable from distance
+   - No content cut off on short screen
+
+   **iPhone 14+ (390x844)** - Mobile, portrait:
+   - Touch targets minimum 44x44pt
+   - Adequate edge spacing (8px minimum)
+   - No horizontal overflow
+
+   **iPad (820x1180)** - Tablet, both orientations:
+   - Layout uses available space well
+   - Works in portrait and landscape
+
+   For each platform, verify:
+   - No overlapping elements
+   - No cut-off content
+   - Loading/empty/error states display correctly
+   - Interactive elements have visible focus states
+
+8. Provide summary with:
    - **Approved** - Ready for documentation
    - **Changes Requested** - List specific issues to fix
 

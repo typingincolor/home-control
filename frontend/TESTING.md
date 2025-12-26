@@ -49,9 +49,9 @@ View mutation report: `open reports/mutation/html/index.html`
 
 ## Test Coverage
 
-### Unit Test Results (226 frontend + 471 backend = 697 tests)
+### Unit Test Results (261 frontend + 487 backend = 748 tests)
 
-#### Frontend (226 tests)
+#### Frontend (261 tests)
 
 - **Hooks**: useSession (23), useSettings (10), useWeather (10), useWebSocket (19), useLocation (16)
 - **Services**: hueApi (24)
@@ -60,9 +60,9 @@ View mutation report: `open reports/mutation/html/index.html`
 - **Utils**: validation (8)
 - **Integration**: integration.test.jsx (10)
 
-#### Backend (470 tests)
+#### Backend (487 tests)
 
-Business logic tests including colorConversion (49), roomService, zoneService, sessionManager (43), websocketService (26), and more.
+Business logic tests including colorConversion (49), roomService, zoneService, automationService (16), sessionManager (43), websocketService (26), and more.
 
 ## Mutation Testing Results
 
@@ -129,7 +129,7 @@ Some mutants survive because they don't produce observable differences:
    - Mathematical code has expected survivors
 
 4. **Fast Execution**
-   - 697 tests run in <5 seconds
+   - 748 tests run in <5 seconds
    - Mutation testing completes in ~15 minutes
    - Enables rapid development cycles
 
@@ -310,7 +310,7 @@ npm run test:e2e:ui
 npm run test:e2e:headed
 ```
 
-### Test Files (158 tests)
+### Test Files (179 tests)
 
 ```
 e2e/
@@ -319,6 +319,7 @@ e2e/
 ├── auth.spec.ts         # Authentication flow
 ├── rooms.spec.ts        # Room navigation and controls
 ├── zones.spec.ts        # Zone display and controls
+├── automations.spec.ts  # Automation triggering (21 tests)
 ├── scenes.spec.ts       # Scene activation
 ├── settings.spec.ts     # Settings persistence
 └── session.spec.ts      # Session persistence

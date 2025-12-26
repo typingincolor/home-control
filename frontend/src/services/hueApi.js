@@ -176,4 +176,20 @@ export const hueApi = {
 
   // Weather
   getWeather: (token) => api.get('/v1/weather', authHeader(token)).then((r) => r.data),
+
+  // Automations
+  getAutomations: (token) => api.get('/v1/automations', authHeader(token)).then((r) => r.data),
+
+  async triggerAutomation(token, automationId) {
+    try {
+      const { data } = await api.post(
+        `/v1/automations/${automationId}/trigger`,
+        null,
+        authHeader(token)
+      );
+      return data;
+    } catch (error) {
+      throw new Error(error.data?.message || 'Failed to trigger automation');
+    }
+  },
 };

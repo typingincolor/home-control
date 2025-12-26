@@ -85,6 +85,7 @@ Backend-based demo allows testing without Hue Bridge:
 | `dashboardService.js`               | Dashboard data aggregation  |
 | `roomService.js` / `zoneService.js` | Hierarchy building          |
 | `motionService.js`                  | Motion zone handling        |
+| `automationService.js`              | Smart scene automations     |
 | `sessionManager.js`                 | Session token management    |
 | `websocketService.js`               | Socket.IO real-time updates |
 
@@ -98,16 +99,18 @@ Backend-based demo allows testing without Hue Bridge:
 
 ## API Endpoints
 
-| Method  | Endpoint                      | Purpose                |
-| ------- | ----------------------------- | ---------------------- |
-| POST    | `/api/v1/auth/connect`        | Connect to bridge      |
-| GET     | `/api/v1/dashboard`           | Full dashboard data    |
-| PUT     | `/api/v1/lights/:id`          | Update light state     |
-| PUT     | `/api/v1/rooms/:id/lights`    | Update all room lights |
-| PUT     | `/api/v1/zones/:id/lights`    | Update all zone lights |
-| POST    | `/api/v1/scenes/:id/activate` | Activate scene         |
-| GET/PUT | `/api/v1/settings`            | User settings          |
-| GET     | `/api/v1/weather`             | Weather data           |
+| Method  | Endpoint                          | Purpose                |
+| ------- | --------------------------------- | ---------------------- |
+| POST    | `/api/v1/auth/connect`            | Connect to bridge      |
+| GET     | `/api/v1/dashboard`               | Full dashboard data    |
+| PUT     | `/api/v1/lights/:id`              | Update light state     |
+| PUT     | `/api/v1/rooms/:id/lights`        | Update all room lights |
+| PUT     | `/api/v1/zones/:id/lights`        | Update all zone lights |
+| POST    | `/api/v1/scenes/:id/activate`     | Activate scene         |
+| GET     | `/api/v1/automations`             | List automations       |
+| POST    | `/api/v1/automations/:id/trigger` | Trigger automation     |
+| GET/PUT | `/api/v1/settings`                | User settings          |
+| GET     | `/api/v1/weather`                 | Weather data           |
 
 **WebSocket:** Connect to `/api/v1/ws`, auth with `{ sessionToken }` or `{ demoMode: true }`
 
@@ -129,8 +132,8 @@ Headers returned: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Res
 See `frontend/TESTING.md` for detailed documentation.
 
 ```bash
-npm run test:all         # All unit tests (697 tests)
-npm run test:e2e         # E2E tests (158 tests)
+npm run test:all         # All unit tests (748 tests)
+npm run test:e2e         # E2E tests (179 tests)
 npm run test:mutation:all # Mutation testing
 ```
 

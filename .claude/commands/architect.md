@@ -24,11 +24,27 @@ Brief description of what will be implemented.
 
 ### Files to Modify/Create
 
-List each file with a one-line description of changes.
+List each file with a one-line description of changes, organized by:
+
+**Backend** (implement first):
+
+- List backend files
+
+**Frontend** (implement after backend):
+
+- List frontend files
 
 ### Implementation Steps
 
-Numbered steps for the developer to follow.
+Numbered steps for the developer to follow. Always complete backend changes before frontend:
+
+**Backend Steps:**
+
+1. ...
+
+**Frontend Steps:**
+
+1. ...
 
 ### Test Cases
 
@@ -48,4 +64,4 @@ Edge cases, performance concerns, security issues, etc.
 
 ## Handoff
 
-After creating the design, tell the user to run `/red` to begin writing tests.
+After creating the design, tell the user to run `/uxdesigner` to create the UX specification (for UI features) or `/red` to begin writing tests (for backend-only features).

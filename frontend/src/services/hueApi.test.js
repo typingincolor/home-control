@@ -350,6 +350,46 @@ describe('hueApi', () => {
     });
   });
 
+  describe('automations API', () => {
+    it('getAutomations should fetch automations with authorization', async () => {
+      const mockAutomations = {
+        automations: [
+          { id: 'automation-1', name: 'Good Morning', type: 'smart_scene', enabled: true },
+        ],
+      };
+      axios.get.mockResolvedValue({ data: mockAutomations });
+
+      const result = await hueApi.getAutomations('test-token');
+
+      expect(axios.get).toHaveBeenCalledWith('/v1/automations', {
+        headers: { Authorization: 'Bearer test-token' },
+      });
+      expect(result).toEqual(mockAutomations);
+    });
+
+    it('triggerAutomation should send POST request to trigger endpoint', async () => {
+      const mockResponse = { success: true };
+      axios.post.mockResolvedValue({ data: mockResponse });
+
+      const result = await hueApi.triggerAutomation('test-token', 'automation-1');
+
+      expect(axios.post).toHaveBeenCalledWith('/v1/automations/automation-1/trigger', null, {
+        headers: { Authorization: 'Bearer test-token' },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('triggerAutomation should throw error on failure', async () => {
+      const error = new Error('Failed to trigger');
+      error.data = { message: 'Automation not found' };
+      axios.post.mockRejectedValue(error);
+
+      await expect(hueApi.triggerAutomation('test-token', 'invalid-id')).rejects.toThrow(
+        'Automation not found'
+      );
+    });
+  });
+
   describe('discoverBridge', () => {
     it('should return bridge data on success', async () => {
       const mockBridges = [{ id: 'bridge-1', internalipaddress: '192.168.1.100' }];

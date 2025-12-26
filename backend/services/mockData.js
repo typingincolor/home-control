@@ -291,6 +291,65 @@ const zones = [
   },
 ];
 
+// Behavior instances (automations) data (Hue API v2 format)
+const behaviorInstances = [
+  {
+    id: 'behavior-1',
+    metadata: { name: 'Good Morning' },
+    script_id: 'wake_up',
+    enabled: true,
+    configuration: {
+      style: 'sunrise',
+      fade_out_duration: { seconds: 1800 },
+      when: {
+        time_point: { time: { hour: 7, minute: 0 } },
+        recurrence_days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+      },
+      where: [{ group: { rid: 'room-3', rtype: 'room' } }],
+    },
+  },
+  {
+    id: 'behavior-2',
+    metadata: { name: 'Away Mode' },
+    script_id: 'away',
+    enabled: true,
+    configuration: {
+      when: {
+        time_point: { time: { hour: 9, minute: 0 } },
+        recurrence_days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+      },
+    },
+  },
+  {
+    id: 'behavior-3',
+    metadata: { name: 'Go to sleep' },
+    script_id: 'go_to_sleep',
+    enabled: true,
+    configuration: {
+      style: 'sunset',
+      fade_out_duration: { seconds: 900 },
+      end_state: 'turn_off',
+      when: {
+        time_point: { time: { hour: 22, minute: 30 } },
+        recurrence_days: ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday'],
+      },
+      where: [{ group: { rid: 'room-3', rtype: 'room' } }],
+    },
+  },
+  {
+    id: 'behavior-4',
+    metadata: { name: 'Weekend Party' },
+    script_id: 'timer',
+    enabled: true,
+    configuration: {
+      when: {
+        time_point: { time: { hour: 20, minute: 0 } },
+        recurrence_days: ['friday', 'saturday'],
+      },
+    },
+  },
+];
+
 // Motion zones (simplified format for demo)
 const initialMotionZones = [
   { id: 'motion-1', name: 'Living Room', motionDetected: false, enabled: true, reachable: true },
@@ -373,6 +432,14 @@ export const getMockZones = () => ({
  * Get mock motion zones (simplified format)
  */
 export const getMockMotionZones = () => deepClone(currentMotionZones);
+
+/**
+ * Get mock behavior instances (Hue API v2 format)
+ */
+export const getMockBehaviorInstances = () => ({
+  errors: [],
+  data: deepClone(behaviorInstances),
+});
 
 /**
  * Get mock weather data

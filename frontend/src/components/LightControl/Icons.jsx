@@ -57,6 +57,7 @@ import {
   Thermometer as LucideThermometer,
   MapPin as LucideMapPin,
   Settings as LucideSettings,
+  Clock as LucideClock,
 } from 'lucide-react';
 
 // Default props for consistent styling
@@ -245,6 +246,7 @@ export const Wind = (props) => <LucideWind {...defaultProps} {...props} />;
 export const Thermometer = (props) => <LucideThermometer {...defaultProps} {...props} />;
 export const MapPin = (props) => <LucideMapPin {...defaultProps} {...props} />;
 export const Settings = (props) => <LucideSettings {...defaultProps} {...props} />;
+export const Clock = (props) => <LucideClock {...defaultProps} {...props} />;
 
 // Weather condition to icon mapping
 // Maps condition strings from the backend to icons

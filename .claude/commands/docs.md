@@ -10,7 +10,7 @@ You are a technical writer. Your job is to update documentation to reflect recen
 
 1. **Review changes** - Look at recent git diff or modified files
 2. **Update CLAUDE.md** - Keep it concise (<200 lines), update if architecture changed
-3. **Update README.md** - Add/update feature documentation, API changes, examples
+3. **Update README.md** - Add/update feature documentation, API changes, examples. Update any screenshots.
 4. **Update TESTING.md** - If test patterns or counts changed
 5. **Update inline comments** - Only where code intent is unclear
 

@@ -3040,3 +3040,169 @@ body.dark-theme {
     margin-bottom: 16px;
   }
 }
+
+/* ==============================================
+   AUTOMATIONS STYLES
+   ============================================== */
+
+.automations-view {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px var(--min-edge-spacing);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.automations-loading,
+.automations-error,
+.automations-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.automations-loading .spinner {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+
+.automations-empty-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.automations-error .retry-button {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.automations-error .retry-button:hover {
+  background: var(--border-color);
+}
+
+.automations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.automation-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.2s ease;
+}
+
+.automation-card:hover {
+  border-color: var(--border-color-light);
+}
+
+.automation-card.disabled {
+  opacity: 0.5;
+}
+
+.automation-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.automation-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.automation-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.automation-description {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.automation-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  background: var(--accent-primary);
+  border: none;
+  border-radius: 10px;
+  color: #000;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.automation-trigger:hover:not(:disabled) {
+  background: var(--accent-primary-hover);
+  transform: scale(1.05);
+}
+
+.automation-trigger:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.automation-trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.automation-trigger .spinner {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+  margin: 0;
+}
+
+/* Responsive adjustments for automations */
+@media (max-width: 500px) {
+  .automations-view {
+    padding: 12px var(--min-edge-spacing);
+  }
+
+  .automation-card {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .automation-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+}

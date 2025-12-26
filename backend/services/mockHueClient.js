@@ -10,6 +10,7 @@ import {
   getMockScenes,
   getMockZones,
   getMockMotionZones,
+  getMockBehaviorInstances,
   updateMockLight,
   updateMockLights,
 } from './mockData.js';
@@ -82,29 +83,52 @@ class MockHueClient {
   }
 
   /**
-   * Get behavior instances (motion zone configurations)
+   * Trigger a behavior instance (automation)
+   * @param {string} _bridgeIp - Ignored in mock
+   * @param {string} _username - Ignored in mock
+   * @param {string} behaviorId - The behavior instance ID to trigger
+   */
+  async triggerSmartScene(_bridgeIp, _username, behaviorId) {
+    const behaviors = getMockBehaviorInstances().data;
+    const scene = behaviors.find((s) => s.id === behaviorId);
+
+    if (!scene) {
+      throw new Error('Resource not found');
+    }
+
+    // In demo mode, just return success
+    return { success: true };
+  }
+
+  /**
+   * Get behavior instances (motion zone configurations + automations)
    * @private
    */
   _getBehaviorInstances() {
     const motionZones = getMockMotionZones();
-    return {
-      errors: [],
-      data: motionZones.map((zone) => ({
-        id: `behavior-${zone.id}`,
-        type: 'behavior_instance',
-        enabled: zone.enabled,
-        metadata: {
-          name: zone.name,
-        },
-        configuration: {
-          motion: {
-            motion_service: {
-              rid: `motion-service-${zone.id}`,
-              rtype: 'convenience_area_motion',
-            },
+    const automations = getMockBehaviorInstances().data;
+
+    // Motion-related behavior instances
+    const motionBehaviors = motionZones.map((zone) => ({
+      id: `motion-behavior-${zone.id}`,
+      type: 'behavior_instance',
+      enabled: zone.enabled,
+      metadata: {
+        name: zone.name,
+      },
+      configuration: {
+        motion: {
+          motion_service: {
+            rid: `motion-service-${zone.id}`,
+            rtype: 'convenience_area_motion',
           },
         },
-      })),
+      },
+    }));
+
+    return {
+      errors: [],
+      data: [...automations, ...motionBehaviors],
     };
   }
 

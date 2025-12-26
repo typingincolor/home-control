@@ -295,6 +295,79 @@ components:
             - celsius
             - fahrenheit
           example: celsius
+    Automation:
+      type: object
+      description: A Hue automation (behavior_instance)
+      properties:
+        id:
+          type: string
+          example: behavior-uuid-123
+        name:
+          type: string
+          example: Good Morning
+        type:
+          type: string
+          example: behavior_instance
+        scriptId:
+          type: string
+          example: wake_up
+          description: The type of automation script
+        enabled:
+          type: boolean
+          example: true
+        triggerTime:
+          type: object
+          nullable: true
+          properties:
+            hour:
+              type: integer
+              example: 7
+            minute:
+              type: integer
+              example: 0
+        recurrenceDays:
+          type: array
+          nullable: true
+          items:
+            type: string
+          example: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+        targets:
+          type: object
+          nullable: true
+          properties:
+            groups:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  type:
+                    type: string
+                  name:
+                    type: string
+            lights:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+        styleInfo:
+          type: object
+          nullable: true
+          properties:
+            style:
+              type: string
+              example: sunrise
+            fadeOutMinutes:
+              type: integer
+              example: 30
+            endState:
+              type: string
+              example: turn_off
 paths:
   /auth/pair:
     post:
@@ -981,6 +1054,66 @@ paths:
                   error:
                     type: string
                     example: No location set. Use PUT /settings/location first.
+  /automations:
+    get:
+      summary: Get all automations
+      description: Returns all Hue automations (behavior_instances) with trigger times, recurrence, and target info
+      tags:
+        - Automations
+      security:
+        - BearerAuth: []
+        - DemoMode: []
+      responses:
+        '200':
+          description: List of automations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  automations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Automation'
+        '401':
+          description: Missing or invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /automations/{id}/trigger:
+    post:
+      summary: Trigger an automation
+      description: Manually trigger a Hue automation (behavior_instance)
+      tags:
+        - Automations
+      security:
+        - BearerAuth: []
+        - DemoMode: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Automation UUID
+      responses:
+        '200':
+          description: Automation triggered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '404':
+          description: Automation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 tags:
   - name: Authentication
     description: Session management
@@ -996,3 +1129,9 @@ tags:
     description: Scene activation
   - name: Motion
     description: MotionAware zones
+  - name: Automations
+    description: Hue automations (behavior_instances) - scheduled lighting routines
+  - name: Settings
+    description: User settings (location and units)
+  - name: Weather
+    description: Weather data for the stored location

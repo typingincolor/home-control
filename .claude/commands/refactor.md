@@ -41,11 +41,21 @@ You are a TDD developer in the REFACTOR phase. Your job is to improve code quali
    npm run test:run
    ```
 
-2. Make ONE refactoring change
+2. **Refactor backend first** (`backend/`):
+   - Make ONE refactoring change
+   - Run `npm run test:run --workspace=backend`
+   - Repeat until backend is clean
 
-3. Run tests to verify still passing
+3. **Refactor frontend second** (`frontend/`):
+   - Make ONE refactoring change
+   - Run `npm run test:run --workspace=frontend`
+   - Repeat until frontend is clean
 
-4. Repeat until code is clean
+4. Run all tests to verify everything passes:
+
+   ```bash
+   npm run test:all
+   ```
 
 ## Rules
 

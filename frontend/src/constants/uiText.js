@@ -66,6 +66,15 @@ export const UI_TEXT = {
   STATUS_LIGHTS_ON: 'on',
   STATUS_TOTAL_LIGHTS: 'total',
 
+  // Automations
+  NAV_AUTOMATIONS: 'Automations',
+  AUTOMATIONS_TITLE: 'Automations',
+  AUTOMATIONS_LOADING: 'Loading automations...',
+  AUTOMATIONS_EMPTY: 'No automations configured',
+  AUTOMATIONS_EMPTY_HINT: 'Set up automations in the Hue app',
+  AUTOMATIONS_ERROR: 'Failed to load automations',
+  AUTOMATIONS_TRIGGER_FAILED: 'Failed to trigger automation',
+
   // Common
   ERROR_OCCURRED: 'An error occurred',
   RETRY: 'Retry',

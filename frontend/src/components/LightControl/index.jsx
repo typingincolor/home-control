@@ -11,6 +11,7 @@ import { TopToolbar } from './TopToolbar';
 import { BottomNav } from './BottomNav';
 import { RoomContent } from './RoomContent';
 import { ZonesView } from './ZonesView';
+import { AutomationsView } from './AutomationsView';
 import { MotionZones } from '../MotionZones';
 import { SettingsDrawer } from './SettingsDrawer';
 
@@ -72,7 +73,13 @@ export const LightControl = ({ sessionToken, onLogout }) => {
   const [activatingScene, setActivatingScene] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  // Navigation state - 'zones' or a room ID
+  // Automations state
+  const [automations, setAutomations] = useState([]);
+  const [automationsLoading, setAutomationsLoading] = useState(false);
+  const [automationsError, setAutomationsError] = useState(null);
+  const [triggeringId, setTriggeringId] = useState(null);
+
+  // Navigation state - 'zones', 'automations', or a room ID
   const [selectedId, setSelectedId] = useState(null);
 
   // Use local dashboard (synced from WebSocket in real mode, manually fetched in demo mode)
@@ -331,9 +338,49 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     }
   };
 
+  // Fetch automations
+  const fetchAutomations = async () => {
+    setAutomationsLoading(true);
+    setAutomationsError(null);
+
+    try {
+      const result = await api.getAutomations(sessionToken);
+      setAutomations(result.automations || []);
+    } catch (err) {
+      logger.error('Failed to fetch automations:', err);
+      setAutomationsError(err.message);
+    } finally {
+      setAutomationsLoading(false);
+    }
+  };
+
+  // Fetch automations when navigating to automations tab
+  useEffect(() => {
+    if (selectedId === 'automations' && automations.length === 0 && !automationsLoading) {
+      fetchAutomations();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Only fetch when navigating to automations
+  }, [selectedId]);
+
+  const handleTriggerAutomation = async (automationId) => {
+    setTriggeringId(automationId);
+
+    try {
+      await api.triggerAutomation(sessionToken, automationId);
+      logger.info('Automation triggered', { automationId });
+    } catch (err) {
+      logger.error('Failed to trigger automation:', err);
+      alert(`Failed to trigger automation: ${err.message}`);
+    } finally {
+      setTriggeringId(null);
+    }
+  };
+
   // Get the selected room from dashboard
   const selectedRoom =
-    selectedId !== 'zones' ? dashboard?.rooms?.find((r) => r.id === selectedId) : null;
+    selectedId !== 'zones' && selectedId !== 'automations'
+      ? dashboard?.rooms?.find((r) => r.id === selectedId)
+      : null;
 
   // Loading state
   if (loading && !dashboard) {
@@ -377,7 +424,16 @@ export const LightControl = ({ sessionToken, onLogout }) => {
       />
 
       <div className="main-panel">
-        {selectedId === 'zones' ? (
+        {selectedId === 'automations' ? (
+          <AutomationsView
+            automations={automations}
+            onTrigger={handleTriggerAutomation}
+            isLoading={automationsLoading}
+            error={automationsError}
+            onRetry={fetchAutomations}
+            triggeringId={triggeringId}
+          />
+        ) : selectedId === 'zones' ? (
           <ZonesView
             zones={dashboard?.zones || []}
             onToggleZone={toggleZone}
@@ -402,6 +458,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
       <BottomNav
         rooms={dashboard?.rooms || []}
         zones={dashboard?.zones || []}
+        hasAutomations={true}
         selectedId={selectedId}
         onSelect={setSelectedId}
       />

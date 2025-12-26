@@ -13,6 +13,7 @@ import {
   Car,
   Tree,
   Door,
+  Clock,
 } from './Icons';
 
 // Icon size for nav tabs
@@ -49,8 +50,15 @@ const getRoomIcon = (name) => {
   return <Home size={NAV_ICON_SIZE} className="nav-tab-icon" />;
 };
 
-export const BottomNav = ({ rooms = [], zones = [], selectedId, onSelect }) => {
+export const BottomNav = ({
+  rooms = [],
+  zones = [],
+  hasAutomations = false,
+  selectedId,
+  onSelect,
+}) => {
   const isZonesSelected = selectedId === 'zones';
+  const isAutomationsSelected = selectedId === 'automations';
   const navRef = useDragScroll();
 
   return (
@@ -82,6 +90,16 @@ export const BottomNav = ({ rooms = [], zones = [], selectedId, onSelect }) => {
           <span className="nav-tab-badge">{zones.length}</span>
         </button>
       )}
+
+      {hasAutomations && (
+        <button
+          className={`nav-tab ${isAutomationsSelected ? 'active' : ''}`}
+          onClick={() => onSelect('automations')}
+        >
+          <Clock size={NAV_ICON_SIZE} className="nav-tab-icon" />
+          <span className="nav-tab-label">{UI_TEXT.NAV_AUTOMATIONS}</span>
+        </button>
+      )}
     </nav>
   );
 };
@@ -97,6 +115,7 @@ BottomNav.propTypes = {
     })
   ),
   zones: PropTypes.array,
+  hasAutomations: PropTypes.bool,
   selectedId: PropTypes.string,
   onSelect: PropTypes.func.isRequired,
 };
