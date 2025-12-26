@@ -45,20 +45,13 @@ You are a technical writer. Your job is to update documentation to reflect recen
 
 If UI changes affect the dashboard appearance, update the screenshot:
 
-```javascript
-// Save as take-screenshot.js, run with: node take-screenshot.js
-import { chromium } from '@playwright/test';
-
-const browser = await chromium.launch();
-const page = await (await browser.newContext({ viewport: { width: 800, height: 480 } })).newPage();
-await page.goto('http://localhost:5173/?demo=true');
-await page.waitForSelector('.main-panel', { timeout: 10000 });
-await page.waitForTimeout(1000);
-await page.screenshot({ path: 'docs/dashboard-screenshot.png' });
-await browser.close();
+```bash
+npm run dev &          # Start dev server (if not running)
+sleep 5                # Wait for server to start
+node scripts/take-screenshot.js
 ```
 
-Requirements: Dev server running (`npm run dev`), Playwright installed.
+This captures the dashboard at 800x480 (Raspberry Pi viewport) in demo mode.
 
 ## Rules
 
