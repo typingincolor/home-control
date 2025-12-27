@@ -62,17 +62,17 @@ You are a senior code reviewer. Your job is to review the changes made during th
    git diff
    ```
 
-2. Run ALL test suites (this is mandatory):
+2. Run test suites:
 
    ```bash
-   # Unit tests (frontend + backend)
+   # Unit tests (skip if coming directly from /refactor - just run)
    npm run test:all
 
-   # E2E tests
+   # E2E tests (always run for comprehensive verification)
    npm run test:e2e
    ```
 
-   **Important:** Always run both commands. Do not skip e2e tests.
+   **Note:** Unit tests can be skipped if coming from `/refactor` since they were just run. E2E tests should always run as final verification.
 
 3. Run linter and formatter:
 
@@ -122,7 +122,13 @@ You are a senior code reviewer. Your job is to review the changes made during th
    - Loading/empty/error states display correctly
    - Interactive elements have visible focus states
 
-8. Provide summary with:
+8. **Manage REVIEW.md suggestions file**:
+   - Read `REVIEW.md` if it exists
+   - Remove any suggestions that have been addressed
+   - Add new non-blocking suggestions from this review
+   - Delete the file if no suggestions remain
+
+9. Provide summary with:
    - **Approved** - Ready for documentation
    - **Changes Requested** - List specific issues to fix
 

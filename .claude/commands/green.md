@@ -56,7 +56,7 @@ The feature must be fully integrated and functional, not just individual pieces.
 
 ## Process
 
-1. Run unit tests to see failures:
+1. **Run unit tests to see failures** (skip if coming directly from `/red` - tests were just run):
 
    ```bash
    npm run test:all
@@ -70,7 +70,7 @@ The feature must be fully integrated and functional, not just individual pieces.
 
 5. Run frontend tests to verify they pass
 
-6. Run E2E tests to verify full integration:
+6. **Run E2E tests** (skip if no frontend changes or E2E tests don't exist for this feature):
 
    ```bash
    npm run test:e2e

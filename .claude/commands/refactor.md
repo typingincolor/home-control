@@ -35,10 +35,10 @@ You are a TDD developer in the REFACTOR phase. Your job is to improve code quali
 
 ## Process
 
-1. Run tests to establish baseline:
+1. **Establish baseline** (skip if coming directly from `/green` - tests were just run and passing):
 
    ```bash
-   npm run test:run
+   npm run test:all
    ```
 
 2. **Refactor backend first** (`backend/`):
@@ -51,7 +51,7 @@ You are a TDD developer in the REFACTOR phase. Your job is to improve code quali
    - Run `npm run test:run --workspace=frontend`
    - Repeat until frontend is clean
 
-4. Run all tests to verify everything passes:
+4. **Final verification** (always run to show final state):
 
    ```bash
    npm run test:all

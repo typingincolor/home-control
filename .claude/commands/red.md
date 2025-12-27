@@ -40,13 +40,13 @@ This ensures backend APIs exist before frontend consumes them.
 
 ## Process
 
-1. **First, verify E2E tests from /uxdesigner are failing:**
+1. **Check for E2E tests** (skip if backend-only feature with no UI):
 
    ```bash
    npm run test:e2e
    ```
 
-   If E2E tests don't exist or pass, stop and ask the user to run /uxdesigner first.
+   If E2E tests exist for this feature and pass, stop and ask the user to run /uxdesigner first.
 
 2. **Write backend unit tests** - Create tests in `backend/test/`
 
@@ -56,17 +56,19 @@ This ensures backend APIs exist before frontend consumes them.
    npm run test:run --workspace=backend
    ```
 
-4. **Write frontend unit tests** - Create tests in `frontend/src/`
+4. **Write frontend unit tests** (skip if backend-only feature) - Create tests in `frontend/src/`
 
 5. **Run all unit tests to confirm they fail:**
 
    ```bash
-   npm run test:run --workspace=frontend
+   npm run test:all
    ```
 
 ## Output
 
-Show the failing test output for both E2E and unit tests, then tell the user to run `/green` to implement the feature.
+Show the failing test output, then tell the user to run `/green` to implement the feature.
+
+**Note:** The test output from this phase serves as the starting point for `/green` - no need to re-run tests at the start of `/green`.
 
 ## Constraints
 

@@ -62,6 +62,29 @@ Edge cases, performance concerns, security issues, etc.
 - ONLY read files and produce a design document
 - Keep the design focused and minimal - avoid over-engineering
 
+## Prefer Packages Over Custom Code
+
+Always evaluate whether an npm package would be more appropriate than writing custom code:
+
+- **Search for well-maintained packages** before designing custom solutions
+- **Use built-in Node.js modules** (crypto, fs, path) when they fit the use case
+- **Prefer battle-tested libraries** for security-sensitive features (auth, encryption, validation)
+- **Consider maintenance burden** - external packages are maintained by others
+- **Document package recommendations** in the design with rationale
+
+Examples:
+
+- Password hashing → use `bcrypt` or `argon2`, not custom hashing
+- HTTP requests → use `axios` or built-in `fetch`, not raw http module
+- Validation → use `zod` or `joi`, not custom validation logic
+- Date handling → use `date-fns` or `dayjs`, not custom date parsing
+
+Only write custom code when:
+
+- No suitable package exists
+- Package would add unnecessary complexity for a simple task
+- Built-in Node.js modules are sufficient (e.g., `crypto` for AES encryption)
+
 ## Handoff
 
 After creating the design, tell the user to run `/uxdesigner` to create the UX specification (for UI features) or `/red` to begin writing tests (for backend-only features).

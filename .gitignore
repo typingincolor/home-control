@@ -43,5 +43,5 @@ test-results/
 # Project requirements (local only)
 REQUIREMENTS.md
 
-# Credentials (contains Hue API keys)
-backend/data/bridge-credentials.json
+# Credentials and secrets (local data)
+backend/data/

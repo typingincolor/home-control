@@ -49,7 +49,7 @@ View mutation report: `open reports/mutation/html/index.html`
 
 ## Test Coverage
 
-### Unit Test Results (261 frontend + 497 backend = 758 tests)
+### Unit Test Results (261 frontend + 553 backend = 814 tests)
 
 #### Frontend (261 tests)
 
@@ -60,7 +60,7 @@ View mutation report: `open reports/mutation/html/index.html`
 - **Utils**: validation (8)
 - **Integration**: integration.test.jsx (10)
 
-#### Backend (497 tests)
+#### Backend (553 tests)
 
 Business logic tests including colorConversion (49), roomService, zoneService, automationService (16), sessionManager (53), websocketService (26), and more.
 
@@ -129,7 +129,7 @@ Some mutants survive because they don't produce observable differences:
    - Mathematical code has expected survivors
 
 4. **Fast Execution**
-   - 758 tests run in <5 seconds
+   - 814 tests run in <5 seconds
    - Mutation testing completes in ~15 minutes
    - Enables rapid development cycles
 
@@ -310,19 +310,19 @@ npm run test:e2e:ui
 npm run test:e2e:headed
 ```
 
-### Test Files (179 tests)
+### Test Files (233 tests)
 
 ```
 e2e/
-├── demo-mode.spec.ts    # Dashboard tests in demo mode
-├── discovery.spec.ts    # Bridge discovery flow
-├── auth.spec.ts         # Authentication flow
-├── rooms.spec.ts        # Room navigation and controls
-├── zones.spec.ts        # Zone display and controls
-├── automations.spec.ts  # Automation triggering (21 tests)
-├── scenes.spec.ts       # Scene activation
-├── settings.spec.ts     # Settings persistence
-└── session.spec.ts      # Session persistence
+├── auth.spec.ts            # Authentication flow
+├── automations.spec.ts     # Automation triggering
+├── demo-mode.spec.ts       # Dashboard tests in demo mode
+├── discovery.spec.ts       # Bridge discovery flow
+├── hive.spec.ts            # Hive heating integration
+├── responsive-layout.spec.ts # Responsive design tests
+├── session.spec.ts         # Session persistence
+├── spacing-layout.spec.ts  # Layout spacing tests
+└── weather-settings.spec.ts # Weather settings
 ```
 
 ### Demo Mode Testing
