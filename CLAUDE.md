@@ -89,6 +89,7 @@ Backend-based demo allows testing without Hue Bridge:
 | `sessionManager.js`                 | Session token management    |
 | `websocketService.js`               | Socket.IO real-time updates |
 | `hiveService.js`                    | UK Hive heating integration |
+| `hiveAuthService.js`                | Hive AWS Cognito auth + 2FA |
 | `hiveCredentialsManager.js`         | Encrypted Hive credentials  |
 
 ## Frontend Structure
@@ -113,7 +114,8 @@ Backend-based demo allows testing without Hue Bridge:
 | POST    | `/api/v1/automations/:id/trigger` | Trigger automation     |
 | GET/PUT | `/api/v1/settings`                | User settings          |
 | GET     | `/api/v1/weather`                 | Weather data           |
-| POST    | `/api/v1/hive/connect`            | Connect to Hive        |
+| POST    | `/api/v1/hive/connect`            | Connect to Hive (→2FA) |
+| POST    | `/api/v1/hive/verify-2fa`         | Verify SMS 2FA code    |
 | POST    | `/api/v1/hive/disconnect`         | Disconnect from Hive   |
 | GET     | `/api/v1/hive/connection`         | Hive connection status |
 | GET     | `/api/v1/hive/status`             | Hive thermostat status |
@@ -139,8 +141,8 @@ Headers returned: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Res
 See `frontend/TESTING.md` for detailed documentation.
 
 ```bash
-npm run test:all         # All unit tests (927 tests)
-npm run test:e2e         # E2E tests (217 tests)
+npm run test:all         # All unit tests (996 tests)
+npm run test:e2e         # E2E tests (250 tests)
 npm run test:mutation:all # Mutation testing
 ```
 

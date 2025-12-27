@@ -4,6 +4,7 @@
  * and device registration for skipping future 2FA
  */
 
+import { CognitoUserPool, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 import hiveCredentialsManager, { HIVE_DEMO_CREDENTIALS } from './hiveCredentialsManager.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -19,7 +20,41 @@ const COGNITO_CONFIG = {
 // Cached Cognito config
 let cachedConfig = null;
 
+/**
+ * Extract tokens from a Cognito session object
+ * @param {CognitoUserSession} session - Cognito session
+ * @returns {{accessToken: string, refreshToken: string, idToken: string}}
+ */
+function extractTokensFromSession(session) {
+  return {
+    accessToken: session.getAccessToken().getJwtToken(),
+    refreshToken: session.getRefreshToken().getToken(),
+    idToken: session.getIdToken().getJwtToken(),
+  };
+}
+
+// Store pending auth sessions (CognitoUser instances) between initiateAuth and verify2fa
+const pendingAuthSessions = new Map();
+
 class HiveAuthService {
+  constructor() {
+    this._userPool = null;
+  }
+
+  /**
+   * Get or create the Cognito user pool (lazy initialization)
+   * @returns {CognitoUserPool}
+   */
+  _getUserPool() {
+    if (!this._userPool) {
+      this._userPool = new CognitoUserPool({
+        UserPoolId: COGNITO_CONFIG.poolId,
+        ClientId: COGNITO_CONFIG.clientId,
+      });
+    }
+    return this._userPool;
+  }
+
   /**
    * Fetch Cognito configuration from Hive SSO page
    * In practice, we use hardcoded values since they rarely change
@@ -62,16 +97,75 @@ class HiveAuthService {
         logger.debug('Device auth failed, falling back to standard auth');
       }
 
-      // Standard SRP authentication would go here
-      // For now, simulate SMS MFA challenge
       logger.info('Initiating Cognito SRP authentication', { username });
 
-      // In real implementation, this would use amazon-cognito-identity-js
-      // For now, we simulate the 2FA challenge
-      return {
-        requires2fa: true,
-        session: `session-${Date.now()}`,
-      };
+      // Create authentication details
+      const authDetails = new AuthenticationDetails({
+        Username: username,
+        Password: password,
+      });
+
+      // Create Cognito user
+      const cognitoUser = new CognitoUser({
+        Username: username,
+        Pool: this._getUserPool(),
+      });
+
+      // Wrap callback-based API in a Promise
+      return new Promise((resolve) => {
+        cognitoUser.authenticateUser(authDetails, {
+          onSuccess: (session) => {
+            // Direct success (no MFA required - rare for Hive)
+            const tokens = extractTokensFromSession(session);
+            this.storeTokens(tokens);
+            resolve(tokens);
+          },
+
+          onFailure: (err) => {
+            logger.error('Authentication failed', { error: err.message });
+            resolve({
+              error: err.message || 'Authentication failed',
+            });
+          },
+
+          mfaRequired: (challengeName, challengeParameters) => {
+            // SMS MFA required - store the cognitoUser for verify2fa
+            const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            pendingAuthSessions.set(sessionId, cognitoUser);
+
+            logger.info('MFA required', {
+              challengeName,
+              destination: challengeParameters?.CODE_DELIVERY_DESTINATION,
+            });
+
+            resolve({
+              requires2fa: true,
+              session: sessionId,
+            });
+          },
+
+          newPasswordRequired: (userAttributes) => {
+            logger.warn('New password required', { userAttributes });
+            resolve({
+              error: 'Password change required. Please use the Hive app to update your password.',
+            });
+          },
+
+          totpRequired: () => {
+            logger.warn('TOTP required instead of SMS');
+            resolve({
+              error: 'TOTP authentication not supported. Please use SMS MFA.',
+            });
+          },
+
+          customChallenge: () => {
+            logger.warn('Custom challenge required');
+            resolve({
+              error: 'Custom authentication challenge not supported.',
+            });
+          },
+        });
+      });
     } catch (error) {
       logger.error('Authentication error', { error: error.message });
       return {
@@ -102,41 +196,52 @@ class HiveAuthService {
         return { error: 'Session expired. Please login again.' };
       }
 
-      // Validate code (in demo, accept 123456)
-      if (code === '000000' || code.length !== 6) {
-        return { error: 'Invalid verification code' };
+      // Retrieve the stored CognitoUser
+      const cognitoUser = pendingAuthSessions.get(session);
+      if (!cognitoUser) {
+        return { error: 'Session expired. Please login again.' };
       }
 
       logger.info('Verifying 2FA code', { username });
 
-      // In real implementation, this would respond to SMS_MFA challenge
-      // For now, simulate successful verification
-      const tokens = {
-        success: true,
-        accessToken: `access-${Date.now()}`,
-        refreshToken: `refresh-${Date.now()}`,
-        idToken: `id-${Date.now()}`,
-      };
+      // Wrap callback-based API in a Promise
+      return new Promise((resolve) => {
+        cognitoUser.sendMFACode(code, {
+          onSuccess: (cognitoSession) => {
+            // Clean up the pending session
+            pendingAuthSessions.delete(session);
 
-      // Register device for future logins (skip 2FA)
-      const deviceCreds = {
-        deviceKey: `device-${Date.now()}`,
-        deviceGroupKey: 'group-key',
-        devicePassword: `device-pass-${Date.now()}`,
-      };
+            // Extract tokens from Cognito session
+            const tokens = {
+              success: true,
+              ...extractTokensFromSession(cognitoSession),
+            };
 
-      // Store device credentials
-      if (hiveCredentialsManager.setDeviceCredentials) {
-        hiveCredentialsManager.setDeviceCredentials(deviceCreds);
-      }
+            // Store tokens
+            this.storeTokens(tokens);
 
-      // Store tokens
-      await this.storeTokens(tokens);
+            // Store device credentials if available
+            if (hiveCredentialsManager.setDeviceCredentials) {
+              const deviceCreds = {
+                deviceKey: `device-${Date.now()}`,
+                deviceGroupKey: 'group-key',
+                devicePassword: `device-pass-${Date.now()}`,
+              };
+              hiveCredentialsManager.setDeviceCredentials(deviceCreds);
+              resolve({ ...tokens, ...deviceCreds });
+            } else {
+              resolve(tokens);
+            }
+          },
 
-      return {
-        ...tokens,
-        ...deviceCreds,
-      };
+          onFailure: (err) => {
+            logger.error('2FA verification failed', { error: err.message });
+            resolve({
+              error: err.message || 'Invalid verification code',
+            });
+          },
+        });
+      });
     } catch (error) {
       logger.error('2FA verification error', { error: error.message });
       return { error: 'Failed to verify code' };

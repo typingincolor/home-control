@@ -1117,7 +1117,7 @@ paths:
   /hive/connect:
     post:
       summary: Connect to Hive
-      description: Authenticate with UK Hive heating system API
+      description: Initiate Hive authentication. Returns requires2fa=true for SMS verification.
       tags:
         - Hive
       security:
@@ -1141,7 +1141,58 @@ paths:
                   description: Hive account password
       responses:
         '200':
-          description: Connected successfully
+          description: 2FA required or connected successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requires2fa:
+                    type: boolean
+                    description: True if SMS verification needed
+                    example: true
+                  session:
+                    type: string
+                    description: Session token for verify-2fa call
+                  success:
+                    type: boolean
+                    description: True if connected without 2FA (device auth)
+        '400':
+          description: Missing credentials
+        '401':
+          description: Invalid credentials
+  /hive/verify-2fa:
+    post:
+      summary: Verify Hive 2FA code
+      description: Complete Hive authentication by verifying SMS code
+      tags:
+        - Hive
+      security:
+        - BearerAuth: []
+        - DemoMode: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - session
+              properties:
+                code:
+                  type: string
+                  description: 6-digit SMS verification code
+                  example: '123456'
+                session:
+                  type: string
+                  description: Session token from connect response
+                username:
+                  type: string
+                  description: Hive account email (for device registration)
+      responses:
+        '200':
+          description: Verified successfully
           content:
             application/json:
               schema:
@@ -1151,9 +1202,9 @@ paths:
                     type: boolean
                     example: true
         '400':
-          description: Missing credentials
+          description: Invalid verification code
         '401':
-          description: Invalid credentials
+          description: Session expired
   /hive/disconnect:
     post:
       summary: Disconnect from Hive
