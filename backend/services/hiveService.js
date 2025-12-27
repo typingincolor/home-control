@@ -11,7 +11,8 @@ import { createLogger } from '../utils/logger.js';
 
 const logger = createLogger('HIVE');
 
-const HIVE_API_URL = 'https://api.hivehome.com/v6';
+// Hive beekeeper API - UK endpoint
+const HIVE_API_URL = 'https://beekeeper-uk.hivehome.com/1.0';
 
 class HiveService {
   constructor() {
@@ -173,13 +174,17 @@ class HiveService {
 
     try {
       const token = hiveCredentialsManager.getSessionToken();
-      const response = await fetch(`${HIVE_API_URL}/nodes`, {
+      // Beekeeper API uses lowercase 'authorization' header without Bearer prefix
+      const response = await fetch(`${HIVE_API_URL}/nodes/all?products=true&devices=true&actions=true`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          authorization: token,
         },
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        logger.error('Hive API error', { status: response.status, body: errorText });
         throw new Error(`Hive API error: ${response.status}`);
       }
 
@@ -209,18 +214,22 @@ class HiveService {
 
     try {
       const token = hiveCredentialsManager.getSessionToken();
-      const response = await fetch(`${HIVE_API_URL}/schedules`, {
+      // Beekeeper API uses lowercase 'authorization' header without Bearer prefix
+      const response = await fetch(`${HIVE_API_URL}/nodes/all?products=true&devices=true&actions=true`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          authorization: token,
         },
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        logger.error('Hive API error', { status: response.status, body: errorText });
         throw new Error(`Hive API error: ${response.status}`);
       }
 
       const data = await response.json();
-      return data;
+      return this._transformSchedules(data);
     } catch (error) {
       logger.error('Failed to get Hive schedules', { error: error.message });
       throw error;
@@ -228,23 +237,66 @@ class HiveService {
   }
 
   /**
-   * Transform Hive API response to our format
+   * Transform Hive beekeeper API response to our status format
    * @private
    */
   _transformStatus(apiData) {
-    // This would need to be adapted to actual Hive API response format
+    // Beekeeper API returns { products: [...], devices: [...], actions: [...] }
+    const products = apiData.products || [];
+
+    // Find heating thermostat
+    const heating = products.find((p) => p.type === 'heating') || {};
+    const heatingProps = heating.props || {};
+    const heatingState = heating.state || {};
+
+    // Find hot water
+    const hotWater = products.find((p) => p.type === 'hotwater') || {};
+    const hotWaterState = hotWater.state || {};
+
+    logger.debug('Transformed Hive status', {
+      heatingType: heating.type,
+      hotWaterType: hotWater.type,
+      productsCount: products.length,
+    });
+
     return {
       heating: {
-        currentTemperature: apiData.heating?.currentTemperature || 0,
-        targetTemperature: apiData.heating?.targetTemperature || 0,
-        isHeating: apiData.heating?.isHeating || false,
-        mode: apiData.heating?.mode || 'off',
+        currentTemperature: heatingProps.temperature || 0,
+        targetTemperature: heatingState.target || 0,
+        isHeating: heatingState.status === 'ON',
+        mode: heatingState.mode || 'off',
       },
       hotWater: {
-        isOn: apiData.hotWater?.isOn || false,
-        mode: apiData.hotWater?.mode || 'off',
+        isOn: hotWaterState.status === 'ON',
+        mode: hotWaterState.mode || 'off',
       },
     };
+  }
+
+  /**
+   * Transform Hive beekeeper API response to schedules format
+   * @private
+   */
+  _transformSchedules(apiData) {
+    // Beekeeper API returns { products: [...], devices: [...], actions: [...] }
+    const actions = apiData.actions || [];
+
+    // Filter for schedule-type actions
+    const schedules = actions
+      .filter((a) => a.type === 'schedule' || a.enabled !== undefined)
+      .map((action) => ({
+        id: action.id,
+        name: action.name || 'Unnamed Schedule',
+        type: action.type,
+        enabled: action.enabled,
+        start: action.start,
+        end: action.end,
+        days: action.days || [],
+      }));
+
+    logger.debug('Transformed Hive schedules', { count: schedules.length });
+
+    return schedules;
   }
 }
 

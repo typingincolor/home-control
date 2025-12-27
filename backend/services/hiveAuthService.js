@@ -294,14 +294,15 @@ class HiveAuthService {
    * @param {object} tokens - Token object with accessToken, refreshToken, etc.
    */
   async storeTokens(tokens) {
-    if (!tokens.accessToken) {
+    // Hive beekeeper API uses idToken (not accessToken) for authorization
+    if (!tokens.idToken) {
       return;
     }
 
     const expiresIn = tokens.expiresIn || 3600;
     const expiresAt = Date.now() + expiresIn * 1000;
 
-    hiveCredentialsManager.setSessionToken(tokens.accessToken, expiresAt);
+    hiveCredentialsManager.setSessionToken(tokens.idToken, expiresAt);
     logger.debug('Stored authentication tokens');
   }
 
