@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import fs from 'fs';
 
 // Mock logger to suppress output
 vi.mock('../../utils/logger.js', () => ({
@@ -473,6 +474,146 @@ describe('SessionManager', () => {
         sessionManager.bridgeCredentials.clear();
 
         expect(sessionManager.hasBridgeCredentials(bridgeIp)).toBe(false);
+      });
+    });
+  });
+
+  describe('Credential Persistence', () => {
+    const testCredentialsPath = '/tmp/test-bridge-credentials.json';
+
+    beforeEach(() => {
+      // Clean up any existing test file
+      try {
+        fs.unlinkSync(testCredentialsPath);
+      } catch {
+        // File doesn't exist, that's fine
+      }
+      sessionManager.bridgeCredentials.clear();
+    });
+
+    afterEach(() => {
+      // Clean up test file
+      try {
+        fs.unlinkSync(testCredentialsPath);
+      } catch {
+        // File doesn't exist, that's fine
+      }
+    });
+
+    describe('_saveCredentials', () => {
+      it('should save credentials to file', () => {
+        sessionManager.credentialsFilePath = testCredentialsPath;
+        sessionManager.storeBridgeCredentials('192.168.1.100', 'user1');
+        sessionManager.storeBridgeCredentials('192.168.1.101', 'user2');
+
+        sessionManager._saveCredentials();
+
+        const fileContents = fs.readFileSync(testCredentialsPath, 'utf8');
+        const saved = JSON.parse(fileContents);
+
+        expect(saved['192.168.1.100']).toBe('user1');
+        expect(saved['192.168.1.101']).toBe('user2');
+      });
+
+      it('should create parent directory if it does not exist', () => {
+        const nestedPath = '/tmp/nested/test/credentials.json';
+        sessionManager.credentialsFilePath = nestedPath;
+        sessionManager.storeBridgeCredentials(bridgeIp, username);
+
+        sessionManager._saveCredentials();
+
+        expect(fs.existsSync(nestedPath)).toBe(true);
+
+        // Cleanup
+        fs.unlinkSync(nestedPath);
+        fs.rmdirSync('/tmp/nested/test');
+        fs.rmdirSync('/tmp/nested');
+      });
+
+      it('should handle write errors gracefully', () => {
+        sessionManager.credentialsFilePath = '/nonexistent/readonly/path.json';
+        sessionManager.storeBridgeCredentials(bridgeIp, username);
+
+        // Should not throw, just log warning
+        expect(() => sessionManager._saveCredentials()).not.toThrow();
+      });
+    });
+
+    describe('_loadCredentials', () => {
+      it('should load credentials from file on startup', () => {
+        // Write credentials file manually
+        const credentials = {
+          '192.168.1.100': 'user1',
+          '192.168.1.101': 'user2',
+        };
+        fs.writeFileSync(testCredentialsPath, JSON.stringify(credentials));
+
+        sessionManager.credentialsFilePath = testCredentialsPath;
+        sessionManager._loadCredentials();
+
+        expect(sessionManager.getBridgeCredentials('192.168.1.100')).toBe('user1');
+        expect(sessionManager.getBridgeCredentials('192.168.1.101')).toBe('user2');
+      });
+
+      it('should handle missing file gracefully', () => {
+        sessionManager.credentialsFilePath = '/tmp/nonexistent-file.json';
+
+        // Should not throw, just start with empty credentials
+        expect(() => sessionManager._loadCredentials()).not.toThrow();
+        expect(sessionManager.bridgeCredentials.size).toBe(0);
+      });
+
+      it('should handle corrupted JSON gracefully', () => {
+        fs.writeFileSync(testCredentialsPath, 'not valid json {{{');
+        sessionManager.credentialsFilePath = testCredentialsPath;
+
+        // Should not throw, just start with empty credentials
+        expect(() => sessionManager._loadCredentials()).not.toThrow();
+        expect(sessionManager.bridgeCredentials.size).toBe(0);
+      });
+
+      it('should handle empty file gracefully', () => {
+        fs.writeFileSync(testCredentialsPath, '');
+        sessionManager.credentialsFilePath = testCredentialsPath;
+
+        expect(() => sessionManager._loadCredentials()).not.toThrow();
+        expect(sessionManager.bridgeCredentials.size).toBe(0);
+      });
+    });
+
+    describe('storeBridgeCredentials with persistence', () => {
+      it('should automatically save to file when storing credentials', () => {
+        sessionManager.credentialsFilePath = testCredentialsPath;
+        sessionManager.storeBridgeCredentials(bridgeIp, username);
+
+        // File should be written automatically
+        const fileContents = fs.readFileSync(testCredentialsPath, 'utf8');
+        const saved = JSON.parse(fileContents);
+
+        expect(saved[bridgeIp]).toBe(username);
+      });
+
+      it('should persist credentials across SessionManager instances', async () => {
+        sessionManager.credentialsFilePath = testCredentialsPath;
+        sessionManager.storeBridgeCredentials(bridgeIp, username);
+
+        // Simulate restart by creating new instance
+        vi.resetModules();
+        const newModule = await import('../../services/sessionManager.js');
+        const newSessionManager = newModule.default;
+        newSessionManager.credentialsFilePath = testCredentialsPath;
+        newSessionManager._loadCredentials();
+
+        expect(newSessionManager.getBridgeCredentials(bridgeIp)).toBe(username);
+
+        newSessionManager.stopCleanup();
+      });
+    });
+
+    describe('constructor with persistence', () => {
+      it('should have default credentials file path', () => {
+        expect(sessionManager.credentialsFilePath).toBeDefined();
+        expect(sessionManager.credentialsFilePath).toContain('bridge-credentials.json');
       });
     });
   });

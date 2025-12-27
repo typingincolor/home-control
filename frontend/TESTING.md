@@ -49,7 +49,7 @@ View mutation report: `open reports/mutation/html/index.html`
 
 ## Test Coverage
 
-### Unit Test Results (261 frontend + 487 backend = 748 tests)
+### Unit Test Results (261 frontend + 497 backend = 758 tests)
 
 #### Frontend (261 tests)
 
@@ -60,9 +60,9 @@ View mutation report: `open reports/mutation/html/index.html`
 - **Utils**: validation (8)
 - **Integration**: integration.test.jsx (10)
 
-#### Backend (487 tests)
+#### Backend (497 tests)
 
-Business logic tests including colorConversion (49), roomService, zoneService, automationService (16), sessionManager (43), websocketService (26), and more.
+Business logic tests including colorConversion (49), roomService, zoneService, automationService (16), sessionManager (53), websocketService (26), and more.
 
 ## Mutation Testing Results
 
@@ -129,7 +129,7 @@ Some mutants survive because they don't produce observable differences:
    - Mathematical code has expected survivors
 
 4. **Fast Execution**
-   - 748 tests run in <5 seconds
+   - 758 tests run in <5 seconds
    - Mutation testing completes in ~15 minutes
    - Enables rapid development cycles
 

@@ -1,8 +1,15 @@
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { SESSION_EXPIRY_MS, SESSION_CLEANUP_INTERVAL_MS } from '../constants/timings.js';
 import { createLogger } from '../utils/logger.js';
 
 const logger = createLogger('SESSION');
+
+// Get the directory of this module for default credentials path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * SessionManager - Manages user sessions to avoid repeating bridge credentials
@@ -21,6 +28,12 @@ class SessionManager {
     this.SESSION_EXPIRY = SESSION_EXPIRY_MS;
     this.CLEANUP_INTERVAL = SESSION_CLEANUP_INTERVAL_MS;
 
+    // Default path for credentials file
+    this.credentialsFilePath = path.join(__dirname, '..', 'data', 'bridge-credentials.json');
+
+    // Load persisted credentials on startup
+    this._loadCredentials();
+
     // Start cleanup interval
     this.startCleanup();
   }
@@ -32,6 +45,7 @@ class SessionManager {
    */
   storeBridgeCredentials(bridgeIp, username) {
     this.bridgeCredentials.set(bridgeIp, username);
+    this._saveCredentials();
     logger.info('Stored bridge credentials', { bridgeIp });
   }
 
@@ -225,6 +239,54 @@ class SessionManager {
     }
 
     return newest;
+  }
+
+  /**
+   * Save bridge credentials to file
+   * @private
+   */
+  _saveCredentials() {
+    try {
+      // Ensure directory exists
+      const dir = path.dirname(this.credentialsFilePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      // Convert Map to object for JSON serialization
+      const credentials = Object.fromEntries(this.bridgeCredentials);
+      fs.writeFileSync(this.credentialsFilePath, JSON.stringify(credentials, null, 2));
+      logger.debug('Saved bridge credentials to file');
+    } catch (error) {
+      logger.warn('Failed to save bridge credentials', { error: error.message });
+    }
+  }
+
+  /**
+   * Load bridge credentials from file
+   * @private
+   */
+  _loadCredentials() {
+    try {
+      if (!fs.existsSync(this.credentialsFilePath)) {
+        logger.debug('No credentials file found, starting fresh');
+        return;
+      }
+
+      const contents = fs.readFileSync(this.credentialsFilePath, 'utf8');
+      if (!contents || contents.trim() === '') {
+        logger.debug('Credentials file is empty, starting fresh');
+        return;
+      }
+
+      const credentials = JSON.parse(contents);
+      this.bridgeCredentials = new Map(Object.entries(credentials));
+      logger.info('Loaded bridge credentials from file', { count: this.bridgeCredentials.size });
+    } catch (error) {
+      logger.warn('Failed to load bridge credentials', { error: error.message });
+      // Start with empty credentials on error
+      this.bridgeCredentials = new Map();
+    }
   }
 }
 
