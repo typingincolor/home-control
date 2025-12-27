@@ -55,7 +55,6 @@ export const BottomNav = ({
   rooms = [],
   zones = [],
   hasAutomations = false,
-  hasHive = false,
   selectedId,
   onSelect,
 }) => {
@@ -104,15 +103,14 @@ export const BottomNav = ({
         </button>
       )}
 
-      {hasHive && (
-        <button
-          className={`nav-tab ${isHiveSelected ? 'active' : ''}`}
-          onClick={() => onSelect('hive')}
-        >
-          <Thermometer size={NAV_ICON_SIZE} className="nav-tab-icon" />
-          <span className="nav-tab-label">{UI_TEXT.NAV_HIVE}</span>
-        </button>
-      )}
+      {/* Hive tab is always visible (login form shown if not connected) */}
+      <button
+        className={`nav-tab ${isHiveSelected ? 'active' : ''}`}
+        onClick={() => onSelect('hive')}
+      >
+        <Thermometer size={NAV_ICON_SIZE} className="nav-tab-icon" />
+        <span className="nav-tab-label">{UI_TEXT.NAV_HIVE}</span>
+      </button>
     </nav>
   );
 };
@@ -129,7 +127,6 @@ BottomNav.propTypes = {
   ),
   zones: PropTypes.array,
   hasAutomations: PropTypes.bool,
-  hasHive: PropTypes.bool,
   selectedId: PropTypes.string,
   onSelect: PropTypes.func.isRequired,
 };

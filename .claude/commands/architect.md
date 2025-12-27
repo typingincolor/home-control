@@ -81,6 +81,16 @@ const { data } = useHive(demoMode);
 await connectHive(username, password);
 ```
 
+## Prefer Packages Over Custom Code
+
+Always evaluate whether an npm package would be more appropriate than writing custom code:
+
+- **Search for well-maintained packages** before designing custom solutions
+- **Use built-in Node.js modules** (crypto, fs, path) when they fit the use case
+- **Prefer battle-tested libraries** for security-sensitive features (auth, encryption, validation)
+
+Only write custom code when no suitable package exists or built-in modules are sufficient.
+
 ## Constraints
 
 - DO NOT write implementation code
@@ -89,29 +99,16 @@ await connectHive(username, password);
 - ONLY read files and produce a design document
 - Keep the design focused and minimal - avoid over-engineering
 
-## Prefer Packages Over Custom Code
-
-Always evaluate whether an npm package would be more appropriate than writing custom code:
-
-- **Search for well-maintained packages** before designing custom solutions
-- **Use built-in Node.js modules** (crypto, fs, path) when they fit the use case
-- **Prefer battle-tested libraries** for security-sensitive features (auth, encryption, validation)
-- **Consider maintenance burden** - external packages are maintained by others
-- **Document package recommendations** in the design with rationale
-
-Examples:
-
-- Password hashing → use `bcrypt` or `argon2`, not custom hashing
-- HTTP requests → use `axios` or built-in `fetch`, not raw http module
-- Validation → use `zod` or `joi`, not custom validation logic
-- Date handling → use `date-fns` or `dayjs`, not custom date parsing
-
-Only write custom code when:
-
-- No suitable package exists
-- Package would add unnecessary complexity for a simple task
-- Built-in Node.js modules are sufficient (e.g., `crypto` for AES encryption)
-
 ## Handoff
 
-After creating the design, tell the user to run `/uxdesigner` to create the UX specification (for UI features) or `/red` to begin writing tests (for backend-only features).
+After creating the design, provide:
+
+### Notes for Next Phase
+
+Summarize key decisions for the next phase:
+
+- **Critical patterns** - Must-follow patterns (e.g., "all Hive auth requires 2FA")
+- **File dependencies** - Order matters (e.g., "create service before route")
+- **Gotchas** - Non-obvious requirements discovered during design
+
+Then tell the user to run `/uxdesigner` (for UI features) or `/red` (for backend-only features).

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { X, MapPin, Spinner } from './Icons';
 import { UI_TEXT } from '../../constants/uiText';
 
@@ -16,13 +16,8 @@ export const SettingsDrawer = ({
   isDetecting,
   locationError,
   hiveConnected,
-  hiveConnecting,
-  hiveError,
-  onHiveConnect,
   onHiveDisconnect,
 }) => {
-  const [hiveUsername, setHiveUsername] = useState('');
-  const [hivePassword, setHivePassword] = useState('');
   // Close on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -122,32 +117,8 @@ export const SettingsDrawer = ({
                 </button>
               </div>
             ) : (
-              <div className="settings-hive-login">
-                <input
-                  type="text"
-                  className="settings-hive-input"
-                  placeholder={UI_TEXT.HIVE_USERNAME_PLACEHOLDER}
-                  value={hiveUsername}
-                  onChange={(e) => setHiveUsername(e.target.value)}
-                  autoComplete="email"
-                  disabled={hiveConnecting}
-                />
-                <input
-                  type="password"
-                  className="settings-hive-input"
-                  placeholder={UI_TEXT.HIVE_PASSWORD_PLACEHOLDER}
-                  value={hivePassword}
-                  onChange={(e) => setHivePassword(e.target.value)}
-                  disabled={hiveConnecting}
-                />
-                <button
-                  className="settings-hive-btn"
-                  onClick={() => onHiveConnect(hiveUsername, hivePassword)}
-                  disabled={hiveConnecting}
-                >
-                  {hiveConnecting ? UI_TEXT.HIVE_CONNECTING : UI_TEXT.HIVE_CONNECT}
-                </button>
-                {hiveError && <div className="settings-error">{hiveError}</div>}
+              <div className="settings-hive-link">
+                <span>{UI_TEXT.HIVE_TAB_LINK}</span>
               </div>
             )}
           </div>

@@ -113,22 +113,29 @@ describe('LightControl - Hive Integration', () => {
       status: null,
       schedules: [],
       error: null,
+      requires2fa: false,
+      twoFaSession: null,
+      pendingUsername: null,
+      isVerifying: false,
       connect: vi.fn(),
       disconnect: vi.fn(),
       refresh: vi.fn(),
       checkConnection: vi.fn(),
+      submit2faCode: vi.fn(),
+      cancel2fa: vi.fn(),
     };
   });
 
   describe('Navigation', () => {
-    it('should not show Hive tab when not connected', async () => {
+    it('should always show Hive tab (even when not connected)', async () => {
       render(<LightControl sessionToken="test-token" />);
 
       await waitFor(() => {
         expect(screen.getByText('Living Room')).toBeInTheDocument();
       });
 
-      expect(screen.queryByText(UI_TEXT.NAV_HIVE)).not.toBeInTheDocument();
+      // Hive tab should always be visible (login form shown when not connected)
+      expect(screen.getByText(UI_TEXT.NAV_HIVE)).toBeInTheDocument();
     });
 
     it('should show Hive tab when connected', async () => {
@@ -190,7 +197,7 @@ describe('LightControl - Hive Integration', () => {
       expect(hiveTab).toHaveClass('active');
     });
 
-    it('should hide Hive tab after disconnect', async () => {
+    it('should keep Hive tab visible after disconnect (shows login form)', async () => {
       const disconnectFn = vi.fn();
       mockHiveState = {
         ...mockHiveState,
@@ -216,8 +223,9 @@ describe('LightControl - Hive Integration', () => {
 
       rerender(<LightControl sessionToken="test-token" />);
 
+      // Hive tab should still be visible (login form will be shown when clicked)
       await waitFor(() => {
-        expect(screen.queryByText(UI_TEXT.NAV_HIVE)).not.toBeInTheDocument();
+        expect(screen.getByText(UI_TEXT.NAV_HIVE)).toBeInTheDocument();
       });
     });
   });
@@ -327,7 +335,7 @@ describe('LightControl - Hive Integration', () => {
       });
     });
 
-    it('should show Connect button in settings when not connected', async () => {
+    it('should show link to Hive tab in settings when not connected', async () => {
       const user = userEvent.setup();
       render(<LightControl sessionToken="test-token" />);
 
@@ -338,7 +346,7 @@ describe('LightControl - Hive Integration', () => {
       await user.click(screen.getByLabelText('settings'));
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: UI_TEXT.HIVE_CONNECT })).toBeInTheDocument();
+        expect(screen.getByText(UI_TEXT.HIVE_TAB_LINK)).toBeInTheDocument();
       });
     });
 

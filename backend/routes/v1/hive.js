@@ -9,9 +9,11 @@ const router = express.Router();
 /**
  * POST /api/v1/hive/connect
  * Connect to Hive API with credentials
+ * May return requires2fa: true with session token if 2FA is needed
  *
  * Auth: Session token required
  * Body: { username: string, password: string }
+ * Response: { success: true } or { requires2fa: true, session: string }
  */
 router.post('/connect', requireSession, async (req, res, next) => {
   try {
@@ -28,6 +30,14 @@ router.post('/connect', requireSession, async (req, res, next) => {
 
     const result = await hiveService.connect(username, password, demoMode);
 
+    // Handle 2FA requirement
+    if (result.requires2fa) {
+      return res.json({
+        requires2fa: true,
+        session: result.session,
+      });
+    }
+
     if (!result.success) {
       return res.status(401).json({
         error: result.error || 'Failed to connect to Hive',
@@ -37,6 +47,41 @@ router.post('/connect', requireSession, async (req, res, next) => {
     res.json({ success: true });
   } catch (error) {
     logger.error('Failed to connect to Hive', { error: error.message });
+    next(error);
+  }
+});
+
+/**
+ * POST /api/v1/hive/verify-2fa
+ * Verify 2FA code and complete authentication
+ *
+ * Auth: Session token required
+ * Body: { code: string, session: string, username: string }
+ */
+router.post('/verify-2fa', requireSession, async (req, res, next) => {
+  try {
+    const { code, session, username } = req.body;
+    const demoMode = req.demoMode || false;
+
+    logger.debug('Verifying Hive 2FA', { username, demoMode });
+
+    if (!code || !session || !username) {
+      return res.status(400).json({
+        error: 'Code, session, and username are required',
+      });
+    }
+
+    const result = await hiveService.verify2fa(code, session, username, demoMode);
+
+    if (!result.success) {
+      return res.status(401).json({
+        error: result.error || 'Invalid verification code',
+      });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('Failed to verify 2FA', { error: error.message });
     next(error);
   }
 });

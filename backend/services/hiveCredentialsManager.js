@@ -10,6 +10,14 @@ const logger = createLogger('HiveCredentials');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Demo mode credentials (shared across Hive services)
+// Real Hive always requires SMS 2FA via Cognito
+export const HIVE_DEMO_CREDENTIALS = {
+  username: 'demo@hive.com',
+  password: 'demo',
+  code: '123456',
+};
+
 /**
  * HiveCredentialsManager - Manages Hive heating system credentials
  * Stores credentials globally (shared by all clients) with encrypted password
@@ -23,6 +31,11 @@ class HiveCredentialsManager {
     // Session token cache (Hive API session)
     this.sessionToken = null;
     this.sessionExpiresAt = null;
+
+    // Device credentials for skipping 2FA
+    this.deviceKey = null;
+    this.deviceGroupKey = null;
+    this.devicePassword = null;
 
     // Default path for credentials file
     this.credentialsFilePath = path.join(__dirname, '..', 'data', 'hive-credentials.json');
@@ -151,6 +164,53 @@ class HiveCredentialsManager {
   }
 
   /**
+   * Store device credentials for skipping 2FA
+   * @param {object} deviceCreds - Device credentials object
+   * @param {string} deviceCreds.deviceKey - Cognito device key
+   * @param {string} deviceCreds.deviceGroupKey - Device group key
+   * @param {string} deviceCreds.devicePassword - Device password
+   */
+  setDeviceCredentials(deviceCreds) {
+    if (!deviceCreds) {
+      return;
+    }
+
+    this.deviceKey = deviceCreds.deviceKey || null;
+    this.deviceGroupKey = deviceCreds.deviceGroupKey || null;
+    this.devicePassword = deviceCreds.devicePassword || null;
+
+    this._saveCredentials();
+    logger.debug('Stored device credentials');
+  }
+
+  /**
+   * Get stored device credentials
+   * @returns {object|null} Device credentials or null if not stored
+   */
+  getDeviceCredentials() {
+    if (!this.deviceKey || !this.deviceGroupKey || !this.devicePassword) {
+      return null;
+    }
+
+    return {
+      deviceKey: this.deviceKey,
+      deviceGroupKey: this.deviceGroupKey,
+      devicePassword: this.devicePassword,
+    };
+  }
+
+  /**
+   * Clear device credentials
+   */
+  clearDeviceCredentials() {
+    this.deviceKey = null;
+    this.deviceGroupKey = null;
+    this.devicePassword = null;
+    this._saveCredentials();
+    logger.debug('Cleared device credentials');
+  }
+
+  /**
    * Save credentials to file (encrypted)
    * @private
    */
@@ -180,6 +240,13 @@ class HiveCredentialsManager {
       if (this.sessionToken && this.sessionExpiresAt) {
         data.sessionToken = this.sessionToken;
         data.sessionExpiresAt = this.sessionExpiresAt;
+      }
+
+      // Add device credentials if present
+      if (this.deviceKey && this.deviceGroupKey && this.devicePassword) {
+        data.deviceKey = this.deviceKey;
+        data.deviceGroupKey = this.deviceGroupKey;
+        data.devicePassword = this.devicePassword;
       }
 
       fs.writeFileSync(this.credentialsFilePath, JSON.stringify(data, null, 2), { mode: 0o600 });
@@ -231,6 +298,13 @@ class HiveCredentialsManager {
           this.sessionToken = data.sessionToken;
           this.sessionExpiresAt = data.sessionExpiresAt;
         }
+      }
+
+      // Load device credentials if present
+      if (data.deviceKey && data.deviceGroupKey && data.devicePassword) {
+        this.deviceKey = data.deviceKey;
+        this.deviceGroupKey = data.deviceGroupKey;
+        this.devicePassword = data.devicePassword;
       }
 
       if (this.hasCredentials()) {

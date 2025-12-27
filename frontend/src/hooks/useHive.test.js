@@ -10,6 +10,7 @@ vi.mock('../services/hueApi', () => ({
   getHiveStatus: vi.fn(),
   getHiveSchedules: vi.fn(),
   getHiveConnectionStatus: vi.fn(),
+  verifyHive2fa: vi.fn(),
 }));
 
 describe('useHive', () => {
@@ -326,6 +327,236 @@ describe('useHive', () => {
 
       expect(result.current.isConnected).toBe(true);
       expect(result.current.status).not.toBeNull();
+    });
+  });
+
+  describe('2FA authentication flow', () => {
+    it('should set requires2fa when connect returns SMS_MFA challenge', async () => {
+      hueApi.connectHive.mockResolvedValue({
+        requires2fa: true,
+        session: 'cognito-session-token',
+      });
+
+      const { result } = renderHook(() => useHive());
+
+      await act(async () => {
+        await result.current.connect('user@hive.com', 'password');
+      });
+
+      expect(result.current.requires2fa).toBe(true);
+      expect(result.current.twoFaSession).toBe('cognito-session-token');
+    });
+
+    it('should not set connected when 2FA is required', async () => {
+      hueApi.connectHive.mockResolvedValue({
+        requires2fa: true,
+        session: 'cognito-session-token',
+      });
+
+      const { result } = renderHook(() => useHive());
+
+      await act(async () => {
+        await result.current.connect('user@hive.com', 'password');
+      });
+
+      expect(result.current.isConnected).toBe(false);
+    });
+
+    it('should store username for 2FA verification', async () => {
+      hueApi.connectHive.mockResolvedValue({
+        requires2fa: true,
+        session: 'cognito-session-token',
+      });
+
+      const { result } = renderHook(() => useHive());
+
+      await act(async () => {
+        await result.current.connect('user@hive.com', 'password');
+      });
+
+      expect(result.current.pendingUsername).toBe('user@hive.com');
+    });
+
+    it('should verify 2FA code and complete connection', async () => {
+      hueApi.connectHive.mockResolvedValue({
+        requires2fa: true,
+        session: 'cognito-session-token',
+      });
+      hueApi.verifyHive2fa.mockResolvedValue({
+        success: true,
+        accessToken: 'access-token',
+      });
+      hueApi.getHiveStatus.mockResolvedValue({
+        heating: { currentTemperature: 20, isHeating: false },
+        hotWater: { isOn: false },
+      });
+      hueApi.getHiveSchedules.mockResolvedValue([]);
+
+      const { result } = renderHook(() => useHive());
+
+      await act(async () => {
+        await result.current.connect('user@hive.com', 'password');
+      });
+
+      expect(result.current.requires2fa).toBe(true);
+
+      await act(async () => {
+        await result.current.submit2faCode('123456');
+      });
+
+      expect(result.current.isConnected).toBe(true);
+      expect(result.current.requires2fa).toBe(false);
+    });
+
+    it('should call verifyHive2fa with code and session', async () => {
+      hueApi.connectHive.mockResolvedValue({
+        requires2fa: true,
+        session: 'cognito-session-token',
+      });
+      hueApi.verifyHive2fa.mockResolvedValue({
+        success: true,
+        accessToken: 'access-token',
+      });
+      hueApi.getHiveStatus.mockResolvedValue({
+        heating: { currentTemperature: 20, isHeating: false },
+        hotWater: { isOn: false },
+      });
+      hueApi.getHiveSchedules.mockResolvedValue([]);
+
+      const { result } = renderHook(() => useHive());
+
+      await act(async () => {
+        await result.current.connect('user@hive.com', 'password');
+      });
+
+      await act(async () => {
+        await result.current.submit2faCode('123456');
+      });
+
+      expect(hueApi.verifyHive2fa).toHaveBeenCalledWith(
+        '123456',
+        'cognito-session-token',
+        'user@hive.com'
+      );
+    });
+
+    it('should set error for invalid 2FA code', async () => {
+      hueApi.connectHive.mockResolvedValue({
+        requires2fa: true,
+        session: 'cognito-session-token',
+      });
+      hueApi.verifyHive2fa.mockResolvedValue({
+        success: false,
+        error: 'Invalid code',
+      });
+
+      const { result } = renderHook(() => useHive());
+
+      await act(async () => {
+        await result.current.connect('user@hive.com', 'password');
+      });
+
+      await act(async () => {
+        await result.current.submit2faCode('000000');
+      });
+
+      expect(result.current.isConnected).toBe(false);
+      expect(result.current.error).toContain('Invalid');
+      expect(result.current.requires2fa).toBe(true); // Should stay on 2FA screen
+    });
+
+    it('should set isVerifying while verifying 2FA code', async () => {
+      hueApi.connectHive.mockResolvedValue({
+        requires2fa: true,
+        session: 'cognito-session-token',
+      });
+      hueApi.verifyHive2fa.mockImplementation(() => new Promise(() => {})); // Never resolves
+
+      const { result } = renderHook(() => useHive());
+
+      await act(async () => {
+        await result.current.connect('user@hive.com', 'password');
+      });
+
+      act(() => {
+        result.current.submit2faCode('123456');
+      });
+
+      expect(result.current.isVerifying).toBe(true);
+    });
+
+    it('should cancel 2FA and return to login', async () => {
+      hueApi.connectHive.mockResolvedValue({
+        requires2fa: true,
+        session: 'cognito-session-token',
+      });
+
+      const { result } = renderHook(() => useHive());
+
+      await act(async () => {
+        await result.current.connect('user@hive.com', 'password');
+      });
+
+      expect(result.current.requires2fa).toBe(true);
+
+      act(() => {
+        result.current.cancel2fa();
+      });
+
+      expect(result.current.requires2fa).toBe(false);
+      expect(result.current.twoFaSession).toBeNull();
+    });
+
+    it('should preserve username when canceling 2FA', async () => {
+      hueApi.connectHive.mockResolvedValue({
+        requires2fa: true,
+        session: 'cognito-session-token',
+      });
+
+      const { result } = renderHook(() => useHive());
+
+      await act(async () => {
+        await result.current.connect('user@hive.com', 'password');
+      });
+
+      act(() => {
+        result.current.cancel2fa();
+      });
+
+      expect(result.current.pendingUsername).toBe('user@hive.com');
+    });
+
+    it('should clear error when starting new 2FA verification', async () => {
+      hueApi.connectHive.mockResolvedValue({
+        requires2fa: true,
+        session: 'cognito-session-token',
+      });
+      hueApi.verifyHive2fa
+        .mockResolvedValueOnce({ success: false, error: 'Invalid code' })
+        .mockResolvedValueOnce({ success: true, accessToken: 'token' });
+      hueApi.getHiveStatus.mockResolvedValue({
+        heating: { currentTemperature: 20, isHeating: false },
+        hotWater: { isOn: false },
+      });
+      hueApi.getHiveSchedules.mockResolvedValue([]);
+
+      const { result } = renderHook(() => useHive());
+
+      await act(async () => {
+        await result.current.connect('user@hive.com', 'password');
+      });
+
+      await act(async () => {
+        await result.current.submit2faCode('000000');
+      });
+
+      expect(result.current.error).toContain('Invalid');
+
+      await act(async () => {
+        await result.current.submit2faCode('123456');
+      });
+
+      expect(result.current.error).toBeNull();
     });
   });
 

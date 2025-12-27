@@ -65,9 +65,15 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     status: hiveStatus,
     schedules: hiveSchedules,
     error: hiveError,
+    requires2fa: hiveRequires2fa,
+    pendingUsername: hivePendingUsername,
+    isVerifying: hiveVerifying,
     connect: hiveConnect,
     disconnect: hiveDisconnect,
     refresh: hiveRefresh,
+    submit2faCode: hiveSubmit2fa,
+    cancel2fa: hiveCancel2fa,
+    clearError: hiveClearError,
   } = useHive(isDemoMode);
 
   // Refetch weather when settings change (location or units updated)
@@ -441,11 +447,20 @@ export const LightControl = ({ sessionToken, onLogout }) => {
       <div className="main-panel">
         {selectedId === 'hive' ? (
           <HiveView
+            isConnected={hiveConnected}
             status={hiveStatus}
             schedules={hiveSchedules}
             isLoading={hiveLoading}
             error={hiveError}
             onRetry={hiveRefresh}
+            onConnect={hiveConnect}
+            onVerify2fa={hiveSubmit2fa}
+            onCancel2fa={hiveCancel2fa}
+            onClearError={hiveClearError}
+            requires2fa={hiveRequires2fa}
+            isConnecting={hiveConnecting}
+            isVerifying={hiveVerifying}
+            pendingUsername={hivePendingUsername}
           />
         ) : selectedId === 'automations' ? (
           <AutomationsView
@@ -482,7 +497,6 @@ export const LightControl = ({ sessionToken, onLogout }) => {
         rooms={dashboard?.rooms || []}
         zones={dashboard?.zones || []}
         hasAutomations={true}
-        hasHive={hiveConnected}
         selectedId={selectedId}
         onSelect={setSelectedId}
       />
@@ -497,9 +511,6 @@ export const LightControl = ({ sessionToken, onLogout }) => {
         isDetecting={isDetecting}
         locationError={locationError}
         hiveConnected={hiveConnected}
-        hiveConnecting={hiveConnecting}
-        hiveError={hiveError}
-        onHiveConnect={hiveConnect}
         onHiveDisconnect={hiveDisconnect}
       />
     </div>

@@ -220,6 +220,19 @@ export const connectHive = async (username, password) => {
   }
 };
 
+export const verifyHive2fa = async (code, session, username) => {
+  try {
+    const { data } = await api.post(
+      '/v1/hive/verify-2fa',
+      { code, session, username },
+      authHeader()
+    );
+    return data;
+  } catch (error) {
+    return { success: false, error: error.data?.error || 'Failed to verify code' };
+  }
+};
+
 export const disconnectHive = () =>
   api.post('/v1/hive/disconnect', null, authHeader()).then((r) => r.data);
 
@@ -233,6 +246,7 @@ export const getHiveConnectionStatus = () =>
 
 // Add to hueApi object for consistency
 hueApi.connectHive = connectHive;
+hueApi.verifyHive2fa = verifyHive2fa;
 hueApi.disconnectHive = disconnectHive;
 hueApi.getHiveStatus = getHiveStatus;
 hueApi.getHiveSchedules = getHiveSchedules;
