@@ -139,7 +139,7 @@ Headers returned: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Res
 See `frontend/TESTING.md` for detailed documentation.
 
 ```bash
-npm run test:all         # All unit tests (925 tests)
+npm run test:all         # All unit tests (927 tests)
 npm run test:e2e         # E2E tests (217 tests)
 npm run test:mutation:all # Mutation testing
 ```

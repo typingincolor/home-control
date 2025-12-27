@@ -54,6 +54,33 @@ Specific test scenarios that should pass when complete.
 
 Edge cases, performance concerns, security issues, etc.
 
+## Architectural Principles
+
+### Backend as Facade
+
+The backend acts as a complete facade to the frontend. No implementation details should leak across this boundary:
+
+- **Single authentication point** - Once the frontend authenticates with the backend, downstream authentication (Hive, Hue Bridge, external APIs) is handled transparently by the backend
+- **No token threading** - Frontend code should not pass authentication tokens through multiple layers (hooks → API calls → axios). The API layer should manage session state internally
+- **Stateless HTTP with stateful client** - While HTTP is stateless, the frontend API client can maintain session state and automatically include credentials in requests
+- **Clean interfaces** - Hooks and components should not need authentication parameters; they call API methods that "just work"
+
+Example of what to avoid:
+
+```javascript
+// Bad: threading tokens through every layer
+const { data } = useHive(sessionToken, demoMode);
+await connectHive(token, username, password);
+```
+
+Example of clean design:
+
+```javascript
+// Good: API layer manages authentication internally
+const { data } = useHive(demoMode);
+await connectHive(username, password);
+```
+
 ## Constraints
 
 - DO NOT write implementation code

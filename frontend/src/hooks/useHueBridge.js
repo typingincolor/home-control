@@ -63,7 +63,7 @@ export const useHueBridge = () => {
         // Validate session with server by making a test request
         try {
           logger.info('Validating session with server...');
-          await hueApi.getDashboard(sessionToken);
+          await hueApi.getDashboard();
           setState((prev) => ({
             ...prev,
             bridgeIp: sessionBridgeIp,

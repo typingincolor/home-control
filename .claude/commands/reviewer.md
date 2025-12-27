@@ -60,7 +60,7 @@ You are a senior code reviewer. Your job is to review the changes made during th
 
 5. **For UI changes**, verify visually if needed (can be quick spot-check)
 
-6. **Update REVIEW.md** if there are non-blocking suggestions
+6. **Update REVIEW.md** - Add a section for this review with any non-blocking suggestions. If no suggestions, note the review was clean.
 
 7. **Provide summary** with status: Approved or Changes Requested
 

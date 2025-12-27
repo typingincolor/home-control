@@ -31,7 +31,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
   } = useWebSocket(sessionToken, !isDemoMode);
 
   // Settings from backend (includes location and units)
-  const { settings, updateSettings } = useSettings(sessionToken);
+  const { settings, updateSettings } = useSettings(!!sessionToken);
 
   // Callback for when location is updated
   const handleLocationUpdate = useCallback(
@@ -47,7 +47,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     isDetecting,
     error: locationError,
     detectLocation,
-  } = useLocation(sessionToken, settings.location, handleLocationUpdate);
+  } = useLocation(settings.location, handleLocationUpdate);
 
   // Weather from backend (uses session's location and units)
   const {
@@ -55,7 +55,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     isLoading: weatherLoading,
     error: weatherError,
     refetch: refetchWeather,
-  } = useWeather(sessionToken);
+  } = useWeather(!!sessionToken);
 
   // Hive heating integration
   const {
@@ -68,7 +68,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     connect: hiveConnect,
     disconnect: hiveDisconnect,
     refresh: hiveRefresh,
-  } = useHive(sessionToken, isDemoMode);
+  } = useHive(isDemoMode);
 
   // Refetch weather when settings change (location or units updated)
   useEffect(() => {
@@ -106,7 +106,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     setError(null);
 
     try {
-      const dashboardData = await api.getDashboard(sessionToken);
+      const dashboardData = await api.getDashboard();
       setLocalDashboard(dashboardData);
       logger.info('Fetched dashboard successfully');
     } catch (err) {
@@ -148,7 +148,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
         if (loading && !localDashboard) {
           logger.warn('WebSocket timeout, falling back to REST API');
           try {
-            const dashboardData = await api.getDashboard(sessionToken);
+            const dashboardData = await api.getDashboard();
             setLocalDashboard(dashboardData);
             setLoading(false);
             logger.info('Fetched dashboard via REST fallback');
@@ -199,7 +199,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
       const currentState = light.on ?? false;
       const newState = { on: !currentState };
 
-      const response = await api.updateLight(sessionToken, lightUuid, newState);
+      const response = await api.updateLight(lightUuid, newState);
 
       // Optimistic update - apply immediately for responsive UI
       setLocalDashboard((prev) => ({
@@ -241,7 +241,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
     try {
       const newState = { on: turnOn };
-      const response = await api.updateRoomLights(sessionToken, roomId, newState);
+      const response = await api.updateRoomLights(roomId, newState);
 
       // Optimistic update - apply immediately for responsive UI
       setLocalDashboard((prev) => ({
@@ -284,7 +284,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
     try {
       const newState = { on: turnOn };
-      const response = await api.updateZoneLights(sessionToken, zoneId, newState);
+      const response = await api.updateZoneLights(zoneId, newState);
 
       // Optimistic update - apply immediately for responsive UI
       setLocalDashboard((prev) => ({
@@ -322,7 +322,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
     setActivatingScene(zoneId || sceneUuid);
     try {
-      const response = await api.activateSceneV1(sessionToken, sceneUuid);
+      const response = await api.activateSceneV1(sceneUuid);
       logger.info(
         `Activated scene ${sceneUuid}`,
         response.affectedLights?.length,
@@ -359,7 +359,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     setAutomationsError(null);
 
     try {
-      const result = await api.getAutomations(sessionToken);
+      const result = await api.getAutomations();
       setAutomations(result.automations || []);
     } catch (err) {
       logger.error('Failed to fetch automations:', err);
@@ -381,7 +381,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     setTriggeringId(automationId);
 
     try {
-      await api.triggerAutomation(sessionToken, automationId);
+      await api.triggerAutomation(automationId);
       logger.info('Automation triggered', { automationId });
     } catch (err) {
       logger.error('Failed to trigger automation:', err);
@@ -476,7 +476,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
         )}
       </div>
 
-      <MotionZones sessionToken={sessionToken} motionZones={dashboard?.motionZones} />
+      <MotionZones motionZones={dashboard?.motionZones} />
 
       <BottomNav
         rooms={dashboard?.rooms || []}

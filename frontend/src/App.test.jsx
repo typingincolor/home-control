@@ -16,6 +16,8 @@ vi.mock('./services/hueApi', () => ({
     connect: vi.fn(() => Promise.reject(new Error('PAIRING_REQUIRED'))),
     createSession: vi.fn(() => Promise.resolve({ sessionToken: 'test', expiresIn: 86400 })),
   },
+  setSessionToken: vi.fn(),
+  clearSessionToken: vi.fn(),
 }));
 
 // Mock components to simplify testing

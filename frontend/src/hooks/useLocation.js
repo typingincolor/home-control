@@ -58,12 +58,11 @@ const getGeolocationErrorMessage = (code) => {
 /**
  * Hook for managing user location with geolocation detection
  * Location is stored on the backend via settings API
- * @param {string} sessionToken - Session token for API authentication
  * @param {object|null} currentLocation - Current location from settings
  * @param {function} onLocationUpdate - Callback when location changes (to update settings)
  * @returns {object} { isDetecting, error, detectLocation, clearLocation }
  */
-export const useLocation = (sessionToken, currentLocation, onLocationUpdate) => {
+export const useLocation = (currentLocation, onLocationUpdate) => {
   const [isDetecting, setIsDetecting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -74,11 +73,6 @@ export const useLocation = (sessionToken, currentLocation, onLocationUpdate) => 
   const detectLocation = useCallback(async () => {
     if (!navigator.geolocation) {
       setError('Geolocation not supported');
-      return;
-    }
-
-    if (!sessionToken) {
-      setError('Not authenticated');
       return;
     }
 
@@ -106,7 +100,7 @@ export const useLocation = (sessionToken, currentLocation, onLocationUpdate) => 
       };
 
       // Save to backend
-      await hueApi.updateLocation(sessionToken, newLocation);
+      await hueApi.updateLocation(newLocation);
 
       // Notify parent to update settings
       if (onLocationUpdate) {
@@ -123,16 +117,14 @@ export const useLocation = (sessionToken, currentLocation, onLocationUpdate) => 
     } finally {
       setIsDetecting(false);
     }
-  }, [sessionToken, onLocationUpdate]);
+  }, [onLocationUpdate]);
 
   /**
    * Clear stored location
    */
   const clearLocation = useCallback(async () => {
-    if (!sessionToken) return;
-
     try {
-      await hueApi.clearLocation(sessionToken);
+      await hueApi.clearLocation();
 
       // Notify parent to update settings
       if (onLocationUpdate) {
@@ -141,7 +133,7 @@ export const useLocation = (sessionToken, currentLocation, onLocationUpdate) => 
     } catch (err) {
       setError(err.message || 'Failed to clear location');
     }
-  }, [sessionToken, onLocationUpdate]);
+  }, [onLocationUpdate]);
 
   return {
     location: currentLocation,

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSession } from './useSession';
 import { STORAGE_KEYS } from '../constants/storage';
-import { hueApi } from '../services/hueApi';
+import { hueApi, setSessionToken, clearSessionToken } from '../services/hueApi';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -31,6 +31,8 @@ vi.mock('../services/hueApi', () => ({
   hueApi: {
     refreshSession: vi.fn(),
   },
+  setSessionToken: vi.fn(),
+  clearSessionToken: vi.fn(),
 }));
 
 describe('useSession', () => {
@@ -78,6 +80,7 @@ describe('useSession', () => {
       expect(result.current.isExpired).toBe(false);
       expect(result.current.isValid).toBe(true);
       expect(result.current.timeRemaining).toBeGreaterThan(0);
+      expect(setSessionToken).toHaveBeenCalledWith('test-token');
     });
 
     it('should clear expired session from localStorage', () => {
@@ -93,6 +96,7 @@ describe('useSession', () => {
       expect(result.current.sessionToken).toBeNull();
       expect(result.current.isExpired).toBe(true);
       expect(localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN)).toBeNull();
+      expect(clearSessionToken).toHaveBeenCalled();
     });
 
     it('should not load session if any field is missing', () => {
@@ -124,6 +128,9 @@ describe('useSession', () => {
       expect(localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN)).toBe('new-token');
       expect(localStorage.getItem(STORAGE_KEYS.BRIDGE_IP)).toBe('192.168.1.100');
       expect(localStorage.getItem(STORAGE_KEYS.SESSION_EXPIRES_AT)).toBeTruthy();
+
+      // Check API session token is synced
+      expect(setSessionToken).toHaveBeenCalledWith('new-token');
     });
 
     it('should calculate expiry time correctly', () => {
@@ -153,6 +160,9 @@ describe('useSession', () => {
 
       expect(result.current.sessionToken).toBe('test-token');
 
+      // Clear mocks before testing clearSession
+      vi.clearAllMocks();
+
       // Clear it
       act(() => {
         result.current.clearSession();
@@ -163,6 +173,9 @@ describe('useSession', () => {
       expect(result.current.isExpired).toBe(false);
       expect(localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN)).toBeNull();
       expect(localStorage.getItem(STORAGE_KEYS.SESSION_EXPIRES_AT)).toBeNull();
+
+      // Check API session token is cleared
+      expect(clearSessionToken).toHaveBeenCalled();
     });
 
     it('should not remove bridge IP from localStorage', () => {
@@ -209,6 +222,9 @@ describe('useSession', () => {
       });
 
       expect(result.current.isValid).toBe(true);
+
+      // Clear mocks before testing expiration
+      vi.clearAllMocks();
 
       // Fast-forward past expiration and wait for async operations (auto-refresh)
       await act(async () => {
@@ -322,7 +338,7 @@ describe('useSession', () => {
         await Promise.resolve(); // Flush microtasks
       });
 
-      expect(hueApi.refreshSession).toHaveBeenCalledWith('test-token');
+      expect(hueApi.refreshSession).toHaveBeenCalledWith();
       expect(result.current.sessionToken).toBe('refreshed-token');
     });
 

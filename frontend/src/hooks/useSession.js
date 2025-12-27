@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { STORAGE_KEYS } from '../constants/storage';
-import { hueApi } from '../services/hueApi';
+import {
+  hueApi,
+  setSessionToken as setApiSessionToken,
+  clearSessionToken as clearApiSessionToken,
+} from '../services/hueApi';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('Session');
@@ -21,6 +25,8 @@ const getInitialSessionState = () => {
     const now = Date.now();
 
     if (now < expiryTime) {
+      // Sync token to API layer for automatic header injection
+      setApiSessionToken(storedToken);
       return {
         sessionToken: storedToken,
         bridgeIp: storedBridgeIp,
@@ -31,6 +37,7 @@ const getInitialSessionState = () => {
       // Session expired, clear it
       localStorage.removeItem(STORAGE_KEYS.SESSION_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.SESSION_EXPIRES_AT);
+      clearApiSessionToken();
       return {
         sessionToken: null,
         bridgeIp: null,
@@ -68,6 +75,7 @@ export const useSession = () => {
         setSessionToken(null);
         setBridgeIp(null);
         setExpiresAt(null);
+        clearApiSessionToken();
         localStorage.removeItem(STORAGE_KEYS.SESSION_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.SESSION_EXPIRES_AT);
       }
@@ -101,7 +109,7 @@ export const useSession = () => {
         logger.info('Auto-refreshing token...');
 
         try {
-          const newSession = await hueApi.refreshSession(sessionToken);
+          const newSession = await hueApi.refreshSession();
           createSession(newSession.sessionToken, bridgeIp, newSession.expiresIn);
           logger.info('Auto-refresh successful');
         } catch (error) {
@@ -133,6 +141,9 @@ export const useSession = () => {
     setExpiresAt(expiryTime);
     setIsExpired(false);
 
+    // Sync token to API layer for automatic header injection
+    setApiSessionToken(token);
+
     // Persist to localStorage
     localStorage.setItem(STORAGE_KEYS.SESSION_TOKEN, token);
     localStorage.setItem(STORAGE_KEYS.BRIDGE_IP, ip);
@@ -149,6 +160,9 @@ export const useSession = () => {
     setBridgeIp(null);
     setExpiresAt(null);
     setIsExpired(false);
+
+    // Clear from API layer
+    clearApiSessionToken();
 
     localStorage.removeItem(STORAGE_KEYS.SESSION_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.SESSION_EXPIRES_AT);
