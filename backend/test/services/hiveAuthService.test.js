@@ -129,30 +129,10 @@ describe('HiveAuthService', () => {
       }
     });
 
-    it('should return tokens directly when device credentials exist (skip 2FA)', async () => {
-      hiveCredentialsManager.getDeviceCredentials.mockReturnValue({
-        deviceKey: 'device-key-123',
-        deviceGroupKey: 'device-group-key',
-        devicePassword: 'device-password',
-      });
-
-      const result = await HiveAuthService.initiateAuth('user@hive.com', 'password');
-
-      // Should return tokens directly, no 2FA required
-      if (!result.requires2fa) {
-        expect(result).toHaveProperty('accessToken');
-        expect(result).toHaveProperty('refreshToken');
-        expect(result).toHaveProperty('idToken');
-      }
-    });
-
-    it('should require 2FA for non-device authentication (when getDeviceCredentials returns null)', async () => {
-      // Ensure device credentials mock returns null
-      hiveCredentialsManager.getDeviceCredentials.mockReturnValue(null);
-
+    it('should always require 2FA for authentication', async () => {
       const result = await HiveAuthService.initiateAuth('anyuser@hive.com', 'anypassword');
 
-      // Should require 2FA when no device credentials
+      // Should always require 2FA (device auth not implemented)
       expect(result.requires2fa).toBe(true);
       expect(result.session).toBeTruthy();
     });
@@ -185,18 +165,6 @@ describe('HiveAuthService', () => {
       expect(result).toHaveProperty('accessToken');
       expect(result).toHaveProperty('refreshToken');
       expect(result).toHaveProperty('idToken');
-    });
-
-    it('should register device after successful 2FA', async () => {
-      // First initiate auth to get a session
-      const initResult = await HiveAuthService.initiateAuth('user@hive.com', 'password');
-      const mockCode = '123456';
-
-      const result = await HiveAuthService.verify2fa(mockCode, initResult.session, 'user@hive.com');
-
-      if (result.accessToken) {
-        expect(hiveCredentialsManager.setDeviceCredentials).toHaveBeenCalled();
-      }
     });
 
     it('should return error for invalid 2FA code', async () => {

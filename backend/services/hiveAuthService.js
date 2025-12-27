@@ -85,18 +85,6 @@ class HiveAuthService {
     }
 
     try {
-      // Check if we have device credentials to skip 2FA
-      const deviceCreds = hiveCredentialsManager.getDeviceCredentials?.();
-      if (deviceCreds) {
-        logger.debug('Attempting device-based authentication');
-        const result = await this.deviceLogin(username, password, deviceCreds);
-        if (result.accessToken && !result.error) {
-          return result;
-        }
-        // Device auth failed, fall through to regular auth
-        logger.debug('Device auth failed, falling back to standard auth');
-      }
-
       logger.info('Initiating Cognito SRP authentication', { username });
 
       // Create authentication details
@@ -220,18 +208,7 @@ class HiveAuthService {
             // Store tokens
             this.storeTokens(tokens);
 
-            // Store device credentials if available
-            if (hiveCredentialsManager.setDeviceCredentials) {
-              const deviceCreds = {
-                deviceKey: `device-${Date.now()}`,
-                deviceGroupKey: 'group-key',
-                devicePassword: `device-pass-${Date.now()}`,
-              };
-              hiveCredentialsManager.setDeviceCredentials(deviceCreds);
-              resolve({ ...tokens, ...deviceCreds });
-            } else {
-              resolve(tokens);
-            }
+            resolve(tokens);
           },
 
           onFailure: (err) => {
