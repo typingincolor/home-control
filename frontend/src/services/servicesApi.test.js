@@ -5,6 +5,9 @@ import {
   connectService,
   disconnectService,
   getServiceStatus,
+  pairHue,
+  verifyHive2fa,
+  getHiveSchedules,
 } from './servicesApi';
 
 describe('servicesApi', () => {
@@ -251,6 +254,140 @@ describe('servicesApi', () => {
       });
 
       await expect(getServiceStatus('hive')).rejects.toThrow('HTTP error! status: 401');
+    });
+  });
+
+  describe('pairHue', () => {
+    it('should call pair endpoint with bridgeIp', async () => {
+      const mockResponse = { success: true, username: 'generated-user' };
+
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse),
+      });
+
+      const result = await pairHue('192.168.1.100');
+
+      expect(global.fetch).toHaveBeenCalledWith('/api/v2/services/hue/pair', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bridgeIp: '192.168.1.100' }),
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should include demo mode header when enabled', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ success: true }),
+      });
+
+      await pairHue('192.168.1.100', true);
+
+      expect(global.fetch).toHaveBeenCalledWith('/api/v2/services/hue/pair', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Demo-Mode': 'true',
+        },
+        body: JSON.stringify({ bridgeIp: '192.168.1.100' }),
+      });
+    });
+
+    it('should throw on pairing error', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+      });
+
+      await expect(pairHue('192.168.1.100')).rejects.toThrow('HTTP error! status: 400');
+    });
+  });
+
+  describe('verifyHive2fa', () => {
+    it('should call verify-2fa endpoint with code, session, and username', async () => {
+      const mockResponse = { success: true };
+
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse),
+      });
+
+      const result = await verifyHive2fa('123456', 'session-id', 'user@email.com');
+
+      expect(global.fetch).toHaveBeenCalledWith('/api/v2/services/hive/verify-2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: '123456', session: 'session-id', username: 'user@email.com' }),
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should include demo mode header when enabled', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ success: true }),
+      });
+
+      await verifyHive2fa('123456', 'session-id', 'user@email.com', true);
+
+      expect(global.fetch).toHaveBeenCalledWith('/api/v2/services/hive/verify-2fa', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Demo-Mode': 'true',
+        },
+        body: JSON.stringify({ code: '123456', session: 'session-id', username: 'user@email.com' }),
+      });
+    });
+
+    it('should throw on invalid code', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+      });
+
+      await expect(verifyHive2fa('000000', 'session-id', 'user@email.com')).rejects.toThrow(
+        'HTTP error! status: 401'
+      );
+    });
+  });
+
+  describe('getHiveSchedules', () => {
+    it('should fetch schedules from Hive', async () => {
+      const mockSchedules = [
+        { day: 'Monday', slots: [{ start: '06:00', end: '09:00', temperature: 20 }] },
+      ];
+
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockSchedules),
+      });
+
+      const result = await getHiveSchedules();
+
+      expect(global.fetch).toHaveBeenCalledWith('/api/v2/services/hive/schedules', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      expect(result).toEqual(mockSchedules);
+    });
+
+    it('should include demo mode header when enabled', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve([]),
+      });
+
+      await getHiveSchedules(true);
+
+      expect(global.fetch).toHaveBeenCalledWith('/api/v2/services/hive/schedules', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Demo-Mode': 'true',
+        },
+      });
     });
   });
 });

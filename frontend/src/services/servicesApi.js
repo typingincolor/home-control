@@ -103,3 +103,56 @@ export async function getServiceStatus(serviceId, demoMode = false) {
   });
   return handleResponse(response);
 }
+
+// ============================================================================
+// Hue-specific endpoints
+// ============================================================================
+
+/**
+ * Pair with a Hue bridge (user must press link button first)
+ * @param {string} bridgeIp - Bridge IP address
+ * @param {boolean} demoMode - Whether demo mode is enabled
+ * @returns {Promise<Object>} Result with success and username
+ */
+export async function pairHue(bridgeIp, demoMode = false) {
+  const response = await fetch(`${API_BASE}/hue/pair`, {
+    method: 'POST',
+    headers: getHeaders(demoMode),
+    body: JSON.stringify({ bridgeIp }),
+  });
+  return handleResponse(response);
+}
+
+// ============================================================================
+// Hive-specific endpoints
+// ============================================================================
+
+/**
+ * Verify Hive 2FA code
+ * @param {string} code - SMS verification code
+ * @param {string} session - 2FA session from connect response
+ * @param {string} username - Hive username/email
+ * @param {boolean} demoMode - Whether demo mode is enabled
+ * @returns {Promise<Object>} Result object
+ */
+export async function verifyHive2fa(code, session, username, demoMode = false) {
+  const response = await fetch(`${API_BASE}/hive/verify-2fa`, {
+    method: 'POST',
+    headers: getHeaders(demoMode),
+    body: JSON.stringify({ code, session, username }),
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Get Hive heating schedules
+ * @param {boolean} demoMode - Whether demo mode is enabled
+ * @returns {Promise<Array>} Array of schedule objects
+ */
+export async function getHiveSchedules(demoMode = false) {
+  const response = await fetch(`${API_BASE}/hive/schedules`, {
+    method: 'GET',
+    headers: getHeaders(demoMode),
+  });
+  return handleResponse(response);
+}
