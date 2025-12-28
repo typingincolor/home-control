@@ -4,6 +4,7 @@ import roomService from './roomService.js';
 import statsService from './statsService.js';
 import motionService from './motionService.js';
 import zoneService from './zoneService.js';
+import ServiceRegistry from './ServiceRegistry.js';
 import { createLogger } from '../utils/logger.js';
 import { normalizeDashboardLight } from './deviceNormalizer.js';
 import slugMappingService from './slugMappingService.js';
@@ -136,12 +137,28 @@ class DashboardService {
       zoneCount: zones.length,
     });
 
-    // Step 6: Return unified response with zones and motion zones
+    // Step 6: Fetch status from all connected service plugins
+    const services = {};
+    for (const plugin of ServiceRegistry.getAll()) {
+      const pluginId = plugin.constructor.id;
+      if (pluginId === 'hue') continue; // Hue is core, handled separately
+
+      try {
+        if (plugin.isConnected()) {
+          services[pluginId] = await plugin.getStatus();
+        }
+      } catch {
+        // Plugin not connected or error - skip
+      }
+    }
+
+    // Step 7: Return unified response with zones, motion zones, and services
     return {
       summary,
       rooms,
       zones,
       motionZones: motionZonesResult.zones || [],
+      services,
     };
   }
 

@@ -65,6 +65,13 @@ export const useWebSocket = (sessionToken, enabled = true) => {
               );
             }
             break;
+          case 'service':
+            // Generic service update - store under services.{serviceId}
+            updated.services = {
+              ...updated.services,
+              [change.serviceId]: change.data,
+            };
+            break;
           default:
             logger.warn('Unknown change type:', change.type);
         }

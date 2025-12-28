@@ -118,6 +118,9 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
   // Use local dashboard (synced from WebSocket in real mode, manually fetched in demo mode)
   const dashboard = localDashboard;
 
+  // Merge WebSocket hive status (real-time updates) with useHive status (initial)
+  const effectiveHiveStatus = dashboard?.services?.hive || hiveStatus;
+
   // Fetch dashboard for demo mode (no WebSocket)
   const fetchAllData = async () => {
     setLoading(true);
@@ -530,7 +533,7 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
           <HomeView
             homeDevices={homeDevices}
             hiveConnected={hiveConnected}
-            hiveStatus={hiveStatus}
+            hiveStatus={effectiveHiveStatus}
             hiveSchedules={hiveSchedules}
             hiveLoading={hiveLoading}
             hiveError={hiveError}
@@ -547,7 +550,7 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
         ) : selectedId === 'hive' ? (
           <HiveView
             isConnected={hiveConnected}
-            status={hiveStatus}
+            status={effectiveHiveStatus}
             schedules={hiveSchedules}
             isLoading={hiveLoading}
             error={hiveError}

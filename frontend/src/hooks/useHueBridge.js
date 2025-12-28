@@ -13,18 +13,22 @@ const getInitialStep = () => {
   const savedBridgeIp = localStorage.getItem(STORAGE_KEYS.BRIDGE_IP);
   const savedExpiry = localStorage.getItem(STORAGE_KEYS.SESSION_EXPIRES_AT);
 
-  // Check if we have session data that needs restoration
-  if (savedToken && savedBridgeIp && savedExpiry) {
-    const expiryTime = parseInt(savedExpiry, 10);
-    const isExpired = Date.now() >= expiryTime;
-
-    // If session appears valid, start at 'restoring' (will validate with server)
-    if (!isExpired) {
-      return 'restoring';
+  // If we have a saved bridge IP, try to restore (even if token expired)
+  // The restoration logic will attempt to reconnect using server-side credentials
+  if (savedBridgeIp) {
+    // Check if we have a valid (non-expired) session token
+    if (savedToken && savedExpiry) {
+      const expiryTime = parseInt(savedExpiry, 10);
+      const isExpired = Date.now() >= expiryTime;
+      if (!isExpired) {
+        return 'restoring';
+      }
     }
+    // Token expired or missing, but we have a bridge IP - try to reconnect
+    return 'restoring';
   }
 
-  // Otherwise, start at 'settings' (deferred service activation)
+  // No saved bridge IP, start at 'settings' (deferred service activation)
   return 'settings';
 };
 
@@ -59,6 +63,19 @@ export const useHueBridge = () => {
 
       const savedIp = localStorage.getItem(STORAGE_KEYS.BRIDGE_IP);
 
+      // First, check if backend is available
+      const backendAvailable = await authApi.checkHealth();
+      if (!backendAvailable) {
+        logger.error('Backend unavailable');
+        setState((prev) => ({
+          ...prev,
+          bridgeIp: savedIp,
+          step: 'backend_unavailable',
+          error: 'Cannot connect to backend server. Please ensure the server is running.',
+        }));
+        return;
+      }
+
       // Wait for useSession to load the token
       if (sessionToken && isValid) {
         // Validate session with server by making a test request
@@ -73,6 +90,22 @@ export const useHueBridge = () => {
           logger.info('Session restored successfully');
           return;
         } catch (error) {
+          // Check if this is a network error (backend unavailable)
+          const isNetworkError =
+            error.message === 'Failed to fetch' ||
+            error.name === 'TypeError' ||
+            error.name === 'AggregateError' ||
+            error.message?.includes('ECONNREFUSED');
+          if (isNetworkError) {
+            logger.error('Backend unavailable during session validation');
+            setState((prev) => ({
+              ...prev,
+              bridgeIp: savedIp,
+              step: 'backend_unavailable',
+              error: 'Cannot connect to backend server. Please ensure the server is running.',
+            }));
+            return;
+          }
           logger.warn('Session invalid on server, trying stored credentials...', error.message);
           // Session expired on server, try to reconnect
         }
@@ -93,7 +126,13 @@ export const useHueBridge = () => {
           return;
         } catch (error) {
           // Check if this is a network error (backend unavailable)
-          if (error.message === 'NETWORK_ERROR' || error.message === 'Failed to fetch') {
+          const isNetworkError =
+            error.message === 'NETWORK_ERROR' ||
+            error.message === 'Failed to fetch' ||
+            error.name === 'TypeError' ||
+            error.name === 'AggregateError' ||
+            error.message?.includes('ECONNREFUSED');
+          if (isNetworkError) {
             logger.error('Backend unavailable');
             setState((prev) => ({
               ...prev,

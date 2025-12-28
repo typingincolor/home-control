@@ -50,7 +50,7 @@ function AppContent() {
 
   return (
     <div className="app">
-      {effectiveStep !== 'connected' && effectiveStep !== 'restoring' && (
+      {effectiveStep !== 'connected' && effectiveStep !== 'restoring' && effectiveStep !== 'backend_unavailable' && (
         <header className="app-header">
           <h1>{UI_TEXT.APP_TITLE}</h1>
           <p className="subtitle">{UI_TEXT.APP_SUBTITLE}</p>
@@ -114,7 +114,7 @@ function AppContent() {
         )}
       </main>
 
-      {effectiveStep !== 'connected' && effectiveStep !== 'restoring' && (
+      {effectiveStep !== 'connected' && effectiveStep !== 'restoring' && effectiveStep !== 'backend_unavailable' && (
         <footer className="app-footer">
           <button onClick={reset} className="secondary">
             Start Over

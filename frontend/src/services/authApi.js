@@ -4,6 +4,22 @@
 
 const API_BASE = '/api/v2/auth';
 
+/**
+ * Check if the backend is available
+ * @returns {Promise<boolean>} True if backend is reachable
+ */
+export async function checkHealth() {
+  try {
+    const response = await fetch('/api/health', {
+      method: 'GET',
+      signal: AbortSignal.timeout(5000), // 5 second timeout
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 // Session token management
 let sessionToken = null;
 
