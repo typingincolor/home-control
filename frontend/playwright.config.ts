@@ -28,8 +28,8 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
 
-  /* Use 2 workers for faster execution. Hive tests are isolated to their own project. */
-  workers: 2,
+  /* Use 50% of CPU cores for faster execution. Hive tests are isolated to their own project. */
+  workers: '50%',
 
   /* Reporter to use */
   reporter: [['html', { outputFolder: 'playwright-report' }], ['list']],
