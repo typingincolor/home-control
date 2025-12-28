@@ -20,7 +20,6 @@ describe('SettingsPage', () => {
     isDetecting: false,
     locationError: null,
     hiveConnected: false,
-    onHiveDisconnect: vi.fn(),
   };
 
   beforeEach(() => {
@@ -214,88 +213,6 @@ describe('SettingsPage', () => {
 
       const fahrenheitButton = screen.getByRole('button', { name: UI_TEXT.SETTINGS_FAHRENHEIT });
       expect(fahrenheitButton).toHaveClass('selected');
-    });
-  });
-
-  describe('hive section', () => {
-    it('should display Hive section when Hive service is enabled', () => {
-      const props = {
-        ...defaultProps,
-        settings: {
-          ...defaultProps.settings,
-          services: {
-            hue: { enabled: true },
-            hive: { enabled: true },
-          },
-        },
-      };
-      render(<SettingsPage {...props} />);
-
-      // Use querySelector for the section since SETTINGS_HIVE text appears in toggle too
-      const hiveSection = document.querySelector('.settings-hive-section');
-      expect(hiveSection).toBeInTheDocument();
-    });
-
-    it('should hide Hive section when Hive service is disabled', () => {
-      render(<SettingsPage {...defaultProps} />);
-
-      // Hive section should not be visible when service is disabled
-      const hiveSection = document.querySelector('.settings-hive-section');
-      expect(hiveSection).not.toBeInTheDocument();
-    });
-
-    it('should show Connected status when connected', () => {
-      const props = {
-        ...defaultProps,
-        hiveConnected: true,
-        settings: {
-          ...defaultProps.settings,
-          services: {
-            hue: { enabled: true },
-            hive: { enabled: true },
-          },
-        },
-      };
-      render(<SettingsPage {...props} />);
-
-      expect(screen.getByText(UI_TEXT.HIVE_CONNECTED)).toBeInTheDocument();
-    });
-
-    it('should show Disconnect button when connected', () => {
-      const props = {
-        ...defaultProps,
-        hiveConnected: true,
-        settings: {
-          ...defaultProps.settings,
-          services: {
-            hue: { enabled: true },
-            hive: { enabled: true },
-          },
-        },
-      };
-      render(<SettingsPage {...props} />);
-
-      expect(screen.getByRole('button', { name: UI_TEXT.HIVE_DISCONNECT })).toBeInTheDocument();
-    });
-
-    it('should call onHiveDisconnect when Disconnect clicked', async () => {
-      const user = userEvent.setup();
-      const props = {
-        ...defaultProps,
-        hiveConnected: true,
-        settings: {
-          ...defaultProps.settings,
-          services: {
-            hue: { enabled: true },
-            hive: { enabled: true },
-          },
-        },
-      };
-      render(<SettingsPage {...props} />);
-
-      await user.click(screen.getByRole('button', { name: UI_TEXT.HIVE_DISCONNECT }));
-
-      expect(props.onHiveDisconnect).toHaveBeenCalled();
     });
   });
 

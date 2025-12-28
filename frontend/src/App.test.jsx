@@ -7,18 +7,34 @@ import { STORAGE_KEYS } from './constants/storage';
 // Mock DemoModeContext
 vi.mock('./context/DemoModeContext', () => ({
   DemoModeProvider: ({ children }) => children,
-  useDemoMode: vi.fn(() => ({ isDemoMode: false, api: null })),
+  useDemoMode: vi.fn(() => ({ isDemoMode: false })),
 }));
 
-// Mock hueApi for session validation
+// Mock hueApi
 vi.mock('./services/hueApi', () => ({
   hueApi: {
-    getDashboard: vi.fn(() => Promise.resolve({ summary: {}, rooms: [] })),
-    connect: vi.fn(() => Promise.reject(new Error('PAIRING_REQUIRED'))),
-    createSession: vi.fn(() => Promise.resolve({ sessionToken: 'test', expiresIn: 86400 })),
+    discoverBridge: vi.fn(() => Promise.resolve([])),
   },
+}));
+
+// Mock authApi for session and auth operations
+vi.mock('./services/authApi', () => ({
+  connect: vi.fn(() => Promise.reject(new Error('PAIRING_REQUIRED'))),
+  createSession: vi.fn(() => Promise.resolve({ sessionToken: 'test', expiresIn: 86400 })),
+  pair: vi.fn(() => Promise.resolve('test-username')),
   setSessionToken: vi.fn(),
   clearSessionToken: vi.fn(),
+  getSessionToken: vi.fn(() => 'test-token'),
+  refreshSession: vi.fn(() => Promise.resolve({ sessionToken: 'refreshed', expiresIn: 86400 })),
+}));
+
+// Mock homeAdapter for session validation
+vi.mock('./services/homeAdapter', () => ({
+  getDashboardFromHome: vi.fn(() => Promise.resolve({ summary: {}, rooms: [], zones: [] })),
+  updateLight: vi.fn(),
+  updateRoomLights: vi.fn(),
+  updateZoneLights: vi.fn(),
+  activateSceneV1: vi.fn(),
 }));
 
 // Mock components to simplify testing

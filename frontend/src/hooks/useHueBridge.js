@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { hueApi } from '../services/hueApi';
+import * as authApi from '../services/authApi';
+import { getDashboardFromHome } from '../services/homeAdapter';
 import { STORAGE_KEYS } from '../constants/storage';
 import { useSession } from './useSession';
 import { createLogger } from '../utils/logger';
@@ -63,7 +64,7 @@ export const useHueBridge = () => {
         // Validate session with server by making a test request
         try {
           logger.info('Validating session with server...');
-          await hueApi.getDashboard();
+          await getDashboardFromHome();
           setState((prev) => ({
             ...prev,
             bridgeIp: sessionBridgeIp,
@@ -81,7 +82,7 @@ export const useHueBridge = () => {
       if (savedIp) {
         try {
           logger.info('Trying to connect with stored server credentials', { bridgeIp: savedIp });
-          const sessionInfo = await hueApi.connect(savedIp);
+          const sessionInfo = await authApi.connect(savedIp);
           createSession(sessionInfo.sessionToken, savedIp, sessionInfo.expiresIn);
           setState((prev) => ({
             ...prev,
@@ -91,6 +92,18 @@ export const useHueBridge = () => {
           logger.info('Connected using stored server credentials');
           return;
         } catch (error) {
+          // Check if this is a network error (backend unavailable)
+          if (error.message === 'NETWORK_ERROR' || error.message === 'Failed to fetch') {
+            logger.error('Backend unavailable');
+            setState((prev) => ({
+              ...prev,
+              bridgeIp: savedIp,
+              step: 'backend_unavailable',
+              error: 'Cannot connect to backend server. Please ensure the server is running.',
+            }));
+            return;
+          }
+
           if (error.message === 'PAIRING_REQUIRED') {
             logger.info('No stored server credentials, pairing required');
           } else {
@@ -129,7 +142,7 @@ export const useHueBridge = () => {
     // Try to connect using stored server-side credentials first
     try {
       logger.info('Trying to connect with stored credentials', { bridgeIp: ip });
-      const sessionInfo = await hueApi.connect(ip);
+      const sessionInfo = await authApi.connect(ip);
 
       // Success! Create session and go to connected
       createSession(sessionInfo.sessionToken, ip, sessionInfo.expiresIn);
@@ -167,12 +180,12 @@ export const useHueBridge = () => {
 
     try {
       // Step 1: Pair with bridge (get username)
-      logger.info('Step 1: Calling createUser...');
-      const username = await hueApi.createUser(state.bridgeIp);
+      logger.info('Step 1: Calling pair...');
+      const username = await authApi.pair(state.bridgeIp);
       logger.info('Pairing successful, creating session...', { username });
 
       // Step 2: Create session token
-      const sessionInfo = await hueApi.createSession(state.bridgeIp, username);
+      const sessionInfo = await authApi.createSession(state.bridgeIp, username);
       createSession(sessionInfo.sessionToken, state.bridgeIp, sessionInfo.expiresIn);
 
       setState((prev) => ({

@@ -38,7 +38,6 @@ describe('TopToolbar', () => {
     summary: mockSummary,
     isConnected: true,
     isReconnecting: false,
-    onLogout: vi.fn(),
     weather: mockWeather,
     weatherLoading: false,
     weatherError: null,
@@ -165,14 +164,4 @@ describe('TopToolbar', () => {
     });
   });
 
-  describe('logout button', () => {
-    it('should call onLogout when logout button is clicked', async () => {
-      const user = userEvent.setup();
-      render(<TopToolbar {...defaultProps} />);
-
-      await user.click(document.querySelector('.toolbar-logout'));
-
-      expect(defaultProps.onLogout).toHaveBeenCalledTimes(1);
-    });
-  });
 });

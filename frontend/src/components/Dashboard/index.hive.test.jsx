@@ -329,63 +329,6 @@ describe('Dashboard - Hive Integration', () => {
     });
   });
 
-  describe('Settings Integration', () => {
-    it('should pass Hive state to SettingsPage', async () => {
-      const user = userEvent.setup();
-      render(<Dashboard sessionToken="test-token" />);
-
-      await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
-      });
-
-      // Open settings
-      await user.click(screen.getByLabelText('settings'));
-
-      // Use querySelector for the hive section since text appears multiple times
-      await waitFor(() => {
-        const hiveSection = document.querySelector('.settings-hive-section');
-        expect(hiveSection).toBeInTheDocument();
-      });
-    });
-
-    it('should show link to Hive tab in settings when not connected', async () => {
-      const user = userEvent.setup();
-      render(<Dashboard sessionToken="test-token" />);
-
-      await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
-      });
-
-      await user.click(screen.getByLabelText('settings'));
-
-      await waitFor(() => {
-        expect(screen.getByText(UI_TEXT.HIVE_TAB_LINK)).toBeInTheDocument();
-      });
-    });
-
-    it('should show Disconnect button in settings when connected', async () => {
-      const user = userEvent.setup();
-      mockHiveState = {
-        ...mockHiveState,
-        isConnected: true,
-        status: mockHiveStatus,
-        schedules: mockHiveSchedules,
-      };
-
-      render(<Dashboard sessionToken="test-token" />);
-
-      await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
-      });
-
-      await user.click(screen.getByLabelText('settings'));
-
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: UI_TEXT.HIVE_DISCONNECT })).toBeInTheDocument();
-      });
-    });
-  });
-
   describe('Loading and Error States', () => {
     it('should show loading state in Home view', async () => {
       const user = userEvent.setup();

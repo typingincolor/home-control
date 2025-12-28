@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { UI_TEXT } from '../../constants/uiText';
-import { Logout, LightbulbOn, Home, Grid, Settings } from './Icons';
+import { LightbulbOn, Home, Grid, Settings } from './Icons';
 import { WeatherDisplay } from './WeatherDisplay';
 import { WeatherTooltip } from './WeatherTooltip';
 import { useDemoMode } from '../../context/DemoModeContext';
@@ -10,7 +10,6 @@ export const TopToolbar = ({
   summary = {},
   isConnected = true,
   isReconnecting = false,
-  onLogout,
   // Weather props
   weather = null,
   weatherLoading = false,
@@ -109,9 +108,6 @@ export const TopToolbar = ({
           <span className={`toolbar-status-dot ${connectionStatus.className}`} />
           <span>{connectionStatus.text}</span>
         </div>
-        <button className="toolbar-logout" onClick={onLogout}>
-          <Logout size={16} />
-        </button>
       </div>
     </div>
   );
@@ -125,7 +121,6 @@ TopToolbar.propTypes = {
   }),
   isConnected: PropTypes.bool,
   isReconnecting: PropTypes.bool,
-  onLogout: PropTypes.func.isRequired,
   // Weather props
   weather: PropTypes.shape({
     current: PropTypes.shape({

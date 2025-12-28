@@ -34,18 +34,16 @@ function AppContent() {
   // This is the initial state before any service is enabled
   if (effectiveStep === 'settings') {
     return (
-      <div className="app">
-        <main className="app-main">
-          <SettingsPage
-            onBack={() => {}}
-            onEnableHue={enableHue}
-            hueConnected={false}
-            hiveConnected={false}
-            settings={{ services: { hue: { enabled: false }, hive: { enabled: false } } }}
-            onUpdateSettings={() => {}}
-            onDetectLocation={() => {}}
-          />
-        </main>
+      <div className="app app-fullscreen">
+        <SettingsPage
+          onBack={() => {}}
+          onEnableHue={enableHue}
+          hueConnected={false}
+          hiveConnected={false}
+          settings={{ services: { hue: { enabled: false }, hive: { enabled: false } } }}
+          onUpdateSettings={() => {}}
+          onDetectLocation={() => {}}
+        />
       </div>
     );
   }
@@ -85,6 +83,18 @@ function AppContent() {
           <div className="restoring-session">
             <div className="spinner"></div>
             <p>Restoring session...</p>
+          </div>
+        )}
+
+        {effectiveStep === 'backend_unavailable' && (
+          <div className="backend-unavailable">
+            <div className="error-icon">⚠️</div>
+            <h2>Backend Unavailable</h2>
+            <p>{error || 'Cannot connect to the backend server.'}</p>
+            <p className="hint">Please ensure the backend server is running on port 3001.</p>
+            <button onClick={() => window.location.reload()} className="primary">
+              Retry Connection
+            </button>
           </div>
         )}
 

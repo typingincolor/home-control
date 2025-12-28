@@ -49,14 +49,14 @@ View mutation report: `open reports/mutation/html/index.html`
 
 ## Test Coverage
 
-### Unit Test Results (519 frontend + 881 backend = 1400 tests)
+### Unit Test Results (503 frontend + 881 backend = 1384 tests)
 
-#### Frontend (519 tests)
+#### Frontend (503 tests)
 
 - **Hooks**: useSession (23), useSettings (19), useWeather (11), useWebSocket (19), useLocation (17), useHive (19), useHome (13)
-- **Services**: hueApi (41), authApi (12), settingsApi (10), weatherApi (6), automationsApi (5), homeApi (5), homeAdapter (9), servicesApi (13)
-- **Components**: App (7), MotionZones (8), DashboardSummary (5), SceneSelector (8), SettingsPage (40), BottomNav (5), WeatherDisplay (11), WeatherTooltip (11), HiveView (18), DeviceTile (11), AutomationsView (8), LightControl/index (29), index.zones (9), index.hive (17)
-- **Context**: DemoModeContext (8)
+- **Services**: hueApi (5), authApi (12), settingsApi (10), weatherApi (6), automationsApi (5), homeApi (5), homeAdapter (9), servicesApi (13)
+- **Components**: App (7), MotionZones (7), DashboardSummary (5), SceneSelector (8), SettingsPage (40), BottomNav (5), WeatherDisplay (11), WeatherTooltip (11), HiveView (18), DeviceTile (11), AutomationsView (8), Dashboard/index (29), index.zones (9), index.hive (17)
+- **Context**: DemoModeContext (6)
 - **Utils**: validation (8)
 - **Integration**: integration.test.jsx (12)
 
@@ -129,7 +129,7 @@ Some mutants survive because they don't produce observable differences:
    - Mathematical code has expected survivors
 
 4. **Fast Execution**
-   - 1400 tests run in <5 seconds
+   - 1384 tests run in <5 seconds
    - Mutation testing completes in ~15 minutes
    - Enables rapid development cycles
 
@@ -310,7 +310,7 @@ npm run test:e2e:ui
 npm run test:e2e:headed
 ```
 
-### Test Files (217 tests)
+### Test Files (155+ tests)
 
 ```
 e2e/
@@ -318,12 +318,13 @@ e2e/
 ├── automations.spec.ts     # Automation triggering
 ├── demo-mode.spec.ts       # Dashboard tests in demo mode
 ├── discovery.spec.ts       # Bridge discovery flow
-├── hive.spec.ts            # Hive heating integration
 ├── responsive-layout.spec.ts # Responsive design tests
 ├── session.spec.ts         # Session persistence
 ├── spacing-layout.spec.ts  # Layout spacing tests
 └── weather-settings.spec.ts # Weather settings
 ```
+
+Note: Hive integration tests were converted to manual tests (see `docs/MANUAL_TESTS.md`).
 
 ### Demo Mode Testing
 

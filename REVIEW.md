@@ -176,3 +176,70 @@ Fixed during review:
 - **Frontend hooks now accept demoMode parameter** - Components should pass this through
 
 - **Shared API utilities** in `frontend/src/services/apiUtils.js` - Use for new API clients
+
+## 2025-12-28: Complete V1 to V2 API Migration
+
+**Status:** Approved
+
+**Branch:** feature/hive-integration
+
+### Summary
+
+Completed the migration from V1 to V2 APIs across the frontend. This includes:
+- Renamed `LightControl` component to `Dashboard`
+- Migrated all hooks to use V2 API modules (`authApi`, `homeAdapter`, `automationsApi`)
+- Removed deprecated V1 methods from `hueApi.js` (now only contains `discoverBridge`)
+- Disabled MotionZones feature (to be revisited later)
+- Converted Hive E2E tests to manual tests
+
+### Changes Reviewed
+
+| File | Assessment |
+|------|------------|
+| `frontend/src/services/hueApi.js` | Stripped to minimal - only `discoverBridge()` remains. Good migration note in comments. |
+| `frontend/src/services/apiUtils.js` | Updated to import `getSessionToken` from `authApi` instead of `hueApi`. |
+| `frontend/src/hooks/useSession.js` | Now uses `authApi` for `refreshSession`, `setSessionToken`, `clearSessionToken`. |
+| `frontend/src/hooks/useHueBridge.js` | Uses `authApi.pair/connect/createSession` and `getDashboardFromHome`. |
+| `frontend/src/components/Dashboard/index.jsx` | Uses `automationsApi` directly. MotionZones disabled via comments. |
+| `frontend/src/context/DemoModeContext.jsx` | Simplified - removed unused `api` property. Now only provides `isDemoMode`. |
+| `frontend/src/components/MotionZones.jsx` | Disabled API fetch, kept component for future re-enablement. |
+| `frontend/src/integration.test.jsx` | Updated MSW handlers to use V2 endpoints. |
+| `frontend/e2e/hive.spec.ts`, `hive-2fa.spec.ts` | Deleted - converted to manual tests in `docs/MANUAL_TESTS.md`. |
+| `docs/ARCHITECTURE_REVIEW.md` | New document with comprehensive codebase analysis. |
+| `docs/MANUAL_TESTS.md` | New document with Hive manual test procedures. |
+| All `*.test.*` files | Updated mocks from `hueApi` to `authApi`. |
+
+### Test Results
+
+- **Unit Tests:** 1,384 passed (503 frontend + 881 backend)
+- **E2E Tests:** 155 passed, 38 failed (pre-existing issues with zones view, weather, settings tests), 3 skipped
+- **Lint:** Clean (0 errors, 0 warnings after fixing 2 issues)
+- **Format:** All files formatted
+
+### Issues Found
+
+Fixed during review:
+- Unused import `hueApi` in `useHueBridge.js` (removed)
+- React hooks exhaustive-deps warning in `MotionZones.jsx` (wrapped `zones` in useMemo)
+
+### Non-Blocking Suggestions
+
+1. **E2E test failures are pre-existing** - The 38 failed tests involve zones view layout, weather display, and settings persistence - these were documented in the architecture review as known issues.
+
+2. **MotionZones disabled** - Component and tests kept but feature is commented out. When re-enabled, will need to use a proper V2 API module.
+
+3. **homeAdapter bridge pattern** - Still transforms V2 Home format to V1 Dashboard format. Could be simplified when all consumers fully adopt V2 format.
+
+### Notes for Documentation
+
+- **API Migration Complete** - Frontend now uses V2 APIs exclusively
+- **hueApi.js minimized** - Only `discoverBridge()` remains, all other methods moved to:
+  - `authApi.js` - Authentication (pair, connect, session management)
+  - `homeAdapter.js` - Dashboard/light operations
+  - `settingsApi.js` - Settings CRUD
+  - `weatherApi.js` - Weather data
+  - `automationsApi.js` - Automations
+  - `servicesApi.js` - Service (Hue, Hive) operations
+- **DemoModeContext simplified** - Only provides `isDemoMode` boolean, no `api` property
+- **MotionZones disabled** - Feature temporarily disabled, to be revisited
+- **Hive E2E tests removed** - Converted to manual tests in `docs/MANUAL_TESTS.md`

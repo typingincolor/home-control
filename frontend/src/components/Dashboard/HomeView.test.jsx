@@ -107,13 +107,7 @@ describe('HomeView', () => {
 
   describe('error state', () => {
     it('should show error message when Hive has error', () => {
-      render(
-        <HomeView
-          {...defaultProps}
-          hiveError="Connection failed"
-          hiveStatus={null}
-        />
-      );
+      render(<HomeView {...defaultProps} hiveError="Connection failed" hiveStatus={null} />);
 
       expect(screen.getByText('Connection failed')).toBeInTheDocument();
       expect(screen.getByText(UI_TEXT.RETRY)).toBeInTheDocument();

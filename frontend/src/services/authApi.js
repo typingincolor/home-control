@@ -81,11 +81,20 @@ export async function pair(bridgeIp, appName = 'hue_control_app') {
  * @returns {Promise<Object>} Session info { sessionToken, expiresIn }
  */
 export async function connect(bridgeIp) {
-  const response = await fetch(`${API_BASE}/connect`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify({ bridgeIp }),
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE}/connect`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ bridgeIp }),
+    });
+  } catch (error) {
+    // Network error - backend is unavailable
+    if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+      throw new Error('NETWORK_ERROR');
+    }
+    throw error;
+  }
 
   return handleResponse(response);
 }

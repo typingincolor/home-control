@@ -64,17 +64,11 @@ vi.mock('../../../services/homeService.js', () => ({
   },
 }));
 
-// Mock demo mode middleware
-vi.mock('../../../middleware/demoMode.js', () => ({
-  detectDemoMode: (req, res, next) => {
-    req.demoMode = req.headers['x-demo-mode'] === 'true';
-    next();
-  },
-}));
-
-// Mock auth middleware
+// Mock auth middleware - handles both auth and demo mode
 vi.mock('../../../middleware/auth.js', () => ({
   requireSession: (req, res, next) => {
+    // Check demo mode header
+    req.demoMode = req.headers['x-demo-mode'] === 'true';
     req.hue = { sessionToken: 'test-token', bridgeIp: '192.168.1.100' };
     next();
   },

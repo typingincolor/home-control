@@ -14,6 +14,7 @@ import {
   updateZoneLights,
   activateSceneV1,
 } from '../../services/homeAdapter';
+import * as automationsApi from '../../services/automationsApi';
 import { ERROR_MESSAGES } from '../../constants/messages';
 import { createLogger } from '../../utils/logger';
 import { TopToolbar } from './TopToolbar';
@@ -23,13 +24,14 @@ import { ZonesView } from './ZonesView';
 import { AutomationsView } from './AutomationsView';
 import { HiveView } from './HiveView';
 import { HomeView } from './HomeView';
-import { MotionZones } from '../MotionZones';
+// MotionZones disabled - will be revisited later
+// import { MotionZones } from '../MotionZones';
 import { SettingsPage } from './SettingsPage';
 
 const logger = createLogger('Dashboard');
 
 export const Dashboard = ({ sessionToken, onLogout }) => {
-  const { isDemoMode, api } = useDemoMode();
+  const { isDemoMode } = useDemoMode();
 
   // WebSocket connection (disabled in demo mode)
   const {
@@ -40,7 +42,7 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
   } = useWebSocket(sessionToken, !isDemoMode);
 
   // Settings from backend (includes location and units)
-  const { settings, updateSettings } = useSettings(!!sessionToken);
+  const { settings, updateSettings } = useSettings(!!sessionToken, isDemoMode);
 
   // Callback for when location is updated
   const handleLocationUpdate = useCallback(
@@ -56,7 +58,7 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
     isDetecting,
     error: locationError,
     detectLocation,
-  } = useLocation(settings.location, handleLocationUpdate);
+  } = useLocation(settings.location, handleLocationUpdate, isDemoMode);
 
   // Weather from backend (uses session's location and units)
   const {
@@ -64,7 +66,7 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
     isLoading: weatherLoading,
     error: weatherError,
     refetch: refetchWeather,
-  } = useWeather(!!sessionToken);
+  } = useWeather(!!sessionToken, isDemoMode);
 
   // Hive heating integration
   const {
@@ -180,7 +182,7 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [isDemoMode, sessionToken, loading, localDashboard, api]);
+  }, [isDemoMode, sessionToken, loading, localDashboard]);
 
   // Set default selected room when dashboard loads
   useEffect(() => {
@@ -377,7 +379,7 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
     setAutomationsError(null);
 
     try {
-      const result = await api.getAutomations();
+      const result = await automationsApi.getAutomations(isDemoMode);
       setAutomations(result.automations || []);
     } catch (err) {
       logger.error('Failed to fetch automations:', err);
@@ -408,7 +410,7 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
     setTriggeringId(automationId);
 
     try {
-      await api.triggerAutomation(automationId);
+      await automationsApi.triggerAutomation(automationId, isDemoMode);
       logger.info('Automation triggered', { automationId });
     } catch (err) {
       logger.error('Failed to trigger automation:', err);
@@ -420,7 +422,10 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
 
   // Get the selected room from dashboard
   const selectedRoom =
-    selectedId !== 'zones' && selectedId !== 'automations' && selectedId !== 'hive' && selectedId !== 'home'
+    selectedId !== 'zones' &&
+    selectedId !== 'automations' &&
+    selectedId !== 'hive' &&
+    selectedId !== 'home'
       ? dashboard?.rooms?.find((r) => r.id === selectedId)
       : null;
 
@@ -448,7 +453,7 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
   if (error && !dashboard) {
     return (
       <div className="dark-layout">
-        <TopToolbar summary={{}} isConnected={false} onLogout={onLogout} />
+        <TopToolbar summary={{}} isConnected={false} />
         <div className="main-panel">
           <div className="empty-state-dark">
             <div className="empty-state-dark-icon">⚠️</div>
@@ -465,7 +470,6 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
         summary={dashboard?.summary || {}}
         isConnected={wsConnected || isDemoMode}
         isReconnecting={wsReconnecting}
-        onLogout={onLogout}
         weather={weather}
         weatherLoading={weatherLoading}
         weatherError={weatherError}
@@ -475,6 +479,22 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
       />
 
       <div className="main-panel">
+        {/* Show Hive reconnection message if session expired */}
+        {hiveError && hiveError.includes('expired') && !settingsOpen && (
+          <div className="notification-banner notification-warning">
+            <span>{hiveError}</span>
+            <button
+              className="notification-action"
+              onClick={() => {
+                hiveClearError();
+                setSettingsOpen(true);
+              }}
+            >
+              Open Settings
+            </button>
+          </div>
+        )}
+
         {settingsOpen ? (
           <SettingsPage
             onBack={() => setSettingsOpen(false)}
@@ -486,7 +506,6 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
             locationError={locationError}
             hueConnected={true} // Always true here - Dashboard only renders when Hue is connected
             hiveConnected={hiveConnected}
-            onHiveDisconnect={hiveDisconnect}
             onEnableHive={() => {
               setSettingsOpen(false);
               setSelectedId('hive');
@@ -571,7 +590,8 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
         )}
       </div>
 
-      <MotionZones motionZones={dashboard?.motionZones} />
+      {/* MotionZones disabled - will be revisited later */}
+      {/* <MotionZones motionZones={dashboard?.motionZones} /> */}
 
       <BottomNav
         rooms={dashboard?.rooms || []}

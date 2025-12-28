@@ -4,7 +4,7 @@
 
 **Philips Hue Light Control** - React/Express monorepo for controlling Hue lights locally via the Hue Bridge API. Features true color display, responsive design, room/zone organization, scene management, MotionAware zones, and Socket.IO real-time updates.
 
-**Architecture:** Backend handles all business logic, exposing a v1 REST API with WebSocket. Frontend is a thin presentation layer consuming pre-computed data.
+**Architecture:** Backend handles all business logic, exposing V1 and V2 REST APIs with WebSocket. Frontend uses V2 API clients exclusively, with a thin presentation layer consuming pre-computed data.
 
 ## Quick Start
 
@@ -195,11 +195,10 @@ npm run test:mutation:all # Mutation testing
 2. Register in `backend/routes/v2/index.js`
 3. Create frontend client in `frontend/src/services/` using `apiUtils.js`
 
-**V1 API (legacy):**
+**V1 API (backend only, no frontend changes):**
 
 1. Add route in `backend/routes/v1/`
 2. Add to `backend/routes/v1/index.js`
-3. Add frontend method in `frontend/src/services/hueApi.js`
 
 ### Adding a New Component
 

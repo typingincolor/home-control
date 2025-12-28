@@ -159,7 +159,14 @@ export const useHive = (demoMode = false) => {
       setIsConnected(connectionStatus.connected);
 
       if (connectionStatus.connected) {
-        await fetchData();
+        try {
+          await fetchData();
+        } catch (err) {
+          // If fetching data fails after connection check, session is invalid
+          // This happens when refresh token is expired/invalid
+          setIsConnected(false);
+          setError('Hive session expired. Please reconnect in Settings.');
+        }
       }
     } catch {
       setIsConnected(false);

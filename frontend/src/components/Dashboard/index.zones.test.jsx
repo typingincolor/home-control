@@ -70,7 +70,6 @@ vi.mock('../../services/homeAdapter', () => ({
 vi.mock('../../context/DemoModeContext', () => ({
   useDemoMode: () => ({
     isDemoMode: true,
-    api: {},
   }),
 }));
 

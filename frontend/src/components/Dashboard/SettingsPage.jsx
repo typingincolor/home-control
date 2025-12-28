@@ -19,7 +19,10 @@ const ServiceToggle = ({ label, checked, onChange, connected }) => (
       <span className="service-toggle-thumb" />
     </span>
     {connected !== undefined && (
-      <span className={`service-status ${connected ? 'connected' : 'disconnected'}`} />
+      <span
+        className={`service-status ${connected ? 'connected' : 'disconnected'}`}
+        title={connected ? 'Connected' : 'Disconnected'}
+      />
     )}
   </label>
 );
@@ -44,7 +47,6 @@ export const SettingsPage = ({
   locationError,
   hueConnected,
   hiveConnected,
-  onHiveDisconnect,
   onEnableHue,
   onEnableHive,
   onDisableHue,
@@ -167,24 +169,6 @@ export const SettingsPage = ({
           </div>
         </div>
 
-        {/* Hive Section - Only shown when Hive service is enabled */}
-        {hiveEnabled && (
-          <div className="settings-section settings-hive-section">
-            <div className="settings-section-label">{UI_TEXT.SETTINGS_HIVE}</div>
-            {hiveConnected ? (
-              <div className="settings-hive-connected">
-                <span className="settings-hive-status">{UI_TEXT.HIVE_CONNECTED}</span>
-                <button className="settings-hive-btn" onClick={onHiveDisconnect}>
-                  {UI_TEXT.HIVE_DISCONNECT}
-                </button>
-              </div>
-            ) : (
-              <button className="settings-hive-link" onClick={onEnableHive}>
-                <span>{UI_TEXT.HIVE_TAB_LINK}</span>
-              </button>
-            )}
-          </div>
-        )}
       </div>
 
       <div className="settings-footer">
@@ -214,7 +198,6 @@ SettingsPage.propTypes = {
   locationError: PropTypes.string,
   hueConnected: PropTypes.bool,
   hiveConnected: PropTypes.bool,
-  onHiveDisconnect: PropTypes.func,
   onEnableHue: PropTypes.func,
   onEnableHive: PropTypes.func,
   onDisableHue: PropTypes.func,

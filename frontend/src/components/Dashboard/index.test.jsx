@@ -84,7 +84,6 @@ vi.mock('../../services/homeAdapter', () => ({
 vi.mock('../../context/DemoModeContext', () => ({
   useDemoMode: () => ({
     isDemoMode: mockIsDemoMode,
-    api: {}, // No longer used for control operations
   }),
 }));
 
@@ -166,18 +165,17 @@ describe('Dashboard', () => {
       });
     });
 
-    it('should show TopToolbar in error state with logout option', async () => {
-      const onLogout = vi.fn();
+    it('should show TopToolbar in error state', async () => {
       getDashboardFromHome.mockRejectedValue(new Error('Network error'));
 
-      render(<Dashboard sessionToken="test-token" onLogout={onLogout} />);
+      render(<Dashboard sessionToken="test-token" />);
 
       await waitFor(() => {
         expect(screen.getByText(/Connection failed/)).toBeInTheDocument();
       });
 
-      // TopToolbar should still be present with logout button
-      expect(document.querySelector('.toolbar-logout')).toBeInTheDocument();
+      // TopToolbar should still be present
+      expect(document.querySelector('.top-toolbar')).toBeInTheDocument();
     });
   });
 
@@ -222,7 +220,7 @@ describe('Dashboard', () => {
         error: null,
       };
 
-      render(<Dashboard sessionToken="test-token" onLogout={() => {}} />);
+      render(<Dashboard sessionToken="test-token" />);
 
       await waitFor(() => {
         // Should show 'Connected' status when WebSocket is connected
@@ -442,7 +440,7 @@ describe('Dashboard', () => {
 
   describe('TopToolbar', () => {
     it('should display summary stats', async () => {
-      render(<Dashboard sessionToken="test-token" onLogout={() => {}} />);
+      render(<Dashboard sessionToken="test-token" />);
 
       await waitFor(() => {
         // Check that stats are rendered in toolbar
@@ -451,25 +449,6 @@ describe('Dashboard', () => {
         // First stat should be lightsOn (2)
         expect(statValues[0].textContent).toBe('2');
       });
-    });
-
-    it('should call onLogout when logout clicked', async () => {
-      const user = userEvent.setup();
-      const onLogout = vi.fn();
-
-      render(<Dashboard sessionToken="test-token" onLogout={onLogout} />);
-
-      await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
-      });
-
-      // Find logout button by class
-      const logoutButton = document.querySelector('.toolbar-logout');
-      expect(logoutButton).toBeTruthy();
-
-      await user.click(logoutButton);
-
-      expect(onLogout).toHaveBeenCalled();
     });
   });
 
