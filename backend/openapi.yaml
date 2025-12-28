@@ -1057,6 +1057,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Settings'
+  /settings/reset-demo:
+    post:
+      summary: Reset settings to demo defaults
+      description: Resets all settings to demo defaults. Only available in demo mode. Used for E2E test isolation.
+      tags:
+        - Settings
+      security:
+        - DemoMode: []
+      responses:
+        '200':
+          description: Settings reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Settings reset to demo defaults
+        '403':
+          description: Not in demo mode
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /weather:
     get:
       summary: Get weather data

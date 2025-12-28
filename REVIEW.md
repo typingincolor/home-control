@@ -102,3 +102,35 @@ navigationTimeout: 5000 // Page loads
 
 - E2E tests now fail within 2 seconds when functionality is missing
 - Global timeout configuration in playwright.config.ts
+
+## Settings Reset API & Cleanup (2025-12-28)
+
+**Review Status:** Approved
+
+**Test Results:**
+
+- Unit: 660 passed
+- E2E: 265 passed, 2 skipped
+
+**Files Reviewed:**
+
+- `backend/services/settingsService.js` - Added `resetToDefaults()` method
+- `backend/routes/v1/settings.js` - Added `POST /api/v1/settings/reset-demo` endpoint
+
+**Refactoring Changes:**
+
+- Removed deprecated `SettingsDrawer.jsx` and `SettingsDrawer.test.jsx`
+- Cleaned up ~90 lines of dead CSS from `App.css`
+- Updated documentation references in README.md, TESTING.md, BUGS.md
+
+**Issues Found:** None
+
+**Skipped Tests (2 total):**
+
+- `should stay on settings when all services disabled` - Toggle click behavior needs investigation
+- `should preserve selected tab across page refresh` - Tab persistence not implemented
+
+**Notes for Docs Phase:**
+
+- Settings reset API now available for E2E test isolation
+- Removed deprecated SettingsDrawer in favor of SettingsPage

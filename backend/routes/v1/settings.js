@@ -110,4 +110,27 @@ router.delete('/location', requireSession, async (req, res, next) => {
   }
 });
 
+/**
+ * POST /api/v1/settings/reset-demo
+ * Reset all settings to demo defaults
+ * Used by E2E tests to ensure clean state between tests
+ *
+ * Auth: Demo mode only
+ */
+router.post('/reset-demo', async (req, res, next) => {
+  try {
+    if (!req.demoMode) {
+      return res.status(403).json({ error: 'Reset only available in demo mode' });
+    }
+
+    logger.debug('Resetting settings to demo defaults');
+
+    settingsService.resetToDefaults();
+
+    res.json({ success: true, message: 'Settings reset to demo defaults' });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

@@ -221,6 +221,21 @@ class SettingsService {
   }
 
   /**
+   * Reset all settings to demo defaults
+   * Used by E2E tests to ensure clean state
+   */
+  resetToDefaults() {
+    sessionSettings.clear();
+    const mockSettings = getMockSettings();
+    globalSettings = {
+      location: mockSettings.location,
+      units: mockSettings.units,
+      services: { ...mockSettings.services },
+    };
+    logger.debug('Reset settings to demo defaults');
+  }
+
+  /**
    * Save settings to file
    * @private
    */

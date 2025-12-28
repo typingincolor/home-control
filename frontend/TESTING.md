@@ -49,20 +49,20 @@ View mutation report: `open reports/mutation/html/index.html`
 
 ## Test Coverage
 
-### Unit Test Results (339 frontend + 588 backend = 927 tests)
+### Unit Test Results (401 frontend + 660 backend = 1061 tests)
 
-#### Frontend (339 tests)
+#### Frontend (401 tests)
 
 - **Hooks**: useSession (23), useSettings (10), useWeather (10), useWebSocket (19), useLocation (14), useHive (19)
 - **Services**: hueApi (41)
-- **Components**: App (4), MotionZones (8), DashboardSummary (5), SceneSelector (8), SettingsDrawer (16), WeatherDisplay (11), WeatherTooltip (11), HiveView (18), LightControl/index (25), index.zones (9)
+- **Components**: App (4), MotionZones (8), DashboardSummary (5), SceneSelector (8), SettingsPage (32), WeatherDisplay (11), WeatherTooltip (11), HiveView (18), LightControl/index (25), index.zones (9)
 - **Context**: DemoModeContext (8)
 - **Utils**: validation (8)
 - **Integration**: integration.test.jsx (10)
 
-#### Backend (588 tests)
+#### Backend (660 tests)
 
-Business logic tests including colorConversion (49), roomService, zoneService, automationService (16), sessionManager (53), websocketService (26), and more.
+Business logic tests including colorConversion (49), roomService, zoneService, automationService (16), sessionManager (53), websocketService (31), settingsService (43), and more.
 
 ## Mutation Testing Results
 
@@ -154,7 +154,7 @@ src/
 │   └── LightControl/
 │       ├── DashboardSummary.test.jsx
 │       ├── SceneSelector.test.jsx
-│       ├── SettingsDrawer.test.jsx
+│       ├── SettingsPage.test.jsx
 │       ├── WeatherDisplay.test.jsx
 │       ├── index.test.jsx
 │       └── index.zones.test.jsx

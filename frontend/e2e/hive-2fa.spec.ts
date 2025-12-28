@@ -254,7 +254,7 @@ test.describe('Hive 2FA Authentication', () => {
     });
   });
 
-  test.describe('Settings Drawer Update', () => {
+  test.describe('Settings Page Update', () => {
     test.beforeEach(async ({ page }) => {
       await page.goto('/?demo=true');
       await page.waitForSelector('.main-panel');

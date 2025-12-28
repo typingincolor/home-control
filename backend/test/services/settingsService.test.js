@@ -176,6 +176,48 @@ describe('SettingsService', () => {
     });
   });
 
+  describe('resetToDefaults', () => {
+    it('should reset all settings to demo defaults', () => {
+      // Modify settings first
+      SettingsService.updateSettings('session-1', {
+        units: 'fahrenheit',
+        services: { hue: { enabled: false }, hive: { enabled: false } },
+      });
+
+      SettingsService.resetToDefaults();
+
+      // Should return demo defaults (all services enabled)
+      const result = SettingsService.getSettings('session-1', true);
+      const mockSettings = getMockSettings();
+
+      expect(result.services.hue.enabled).toBe(mockSettings.services.hue.enabled);
+      expect(result.services.hive.enabled).toBe(mockSettings.services.hive.enabled);
+    });
+
+    it('should clear session settings', () => {
+      SettingsService.updateSettings('session-1', { units: 'fahrenheit' });
+
+      SettingsService.resetToDefaults();
+
+      // Session should no longer have stored settings
+      const result = SettingsService.getSettings('session-1', true);
+      const mockSettings = getMockSettings();
+      expect(result.units).toBe(mockSettings.units);
+    });
+
+    it('should reset global settings to demo defaults', () => {
+      SettingsService.updateSettings('session-1', {
+        services: { hive: { enabled: false } },
+      });
+
+      SettingsService.resetToDefaults();
+
+      // New sessions in demo mode should get demo defaults
+      const result = SettingsService.getSettings('new-session', true);
+      expect(result.services.hive.enabled).toBe(true); // Demo mode has both enabled
+    });
+  });
+
   describe('validation', () => {
     it('should validate units value', () => {
       expect(() => {

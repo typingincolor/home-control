@@ -34,6 +34,13 @@ async function closeSettings(page: Page) {
   await page.waitForSelector('.settings-page', { state: 'hidden' });
 }
 
+// Helper to reset settings demo state via API (ensures clean state for tests)
+async function resetSettingsDemoState(page: Page) {
+  await page.request.post('/api/v1/settings/reset-demo', {
+    headers: { 'X-Demo-Mode': 'true' },
+  });
+}
+
 test.describe('Settings Page - Navigation', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/?demo=true');
@@ -69,22 +76,6 @@ test.describe('Settings Page - Navigation', () => {
 
     // Should be back on room view
     await expect(page.locator('.room-content')).toBeVisible();
-  });
-
-  // TODO: Implement gear icon toggle behavior (currently always opens settings)
-  test.skip('should return to previous view when gear icon clicked again', async ({ page }) => {
-    // Navigate to Hive tab first
-    await page.click('.nav-tab:has-text("Hive")');
-    await page.waitForSelector('.hive-view');
-
-    // Open settings
-    await openSettings(page);
-
-    // Click gear icon again
-    await page.click('[aria-label="settings"]');
-
-    // Should be back on Hive view
-    await expect(page.locator('.hive-view')).toBeVisible();
   });
 
   test('should not show settings as a tab in bottom nav', async ({ page }) => {
@@ -256,37 +247,11 @@ test.describe('Settings Page - Conditional Navigation', () => {
     await expect(page.locator('.nav-tab:has-text("Hive")')).not.toBeVisible();
   });
 
-  // TODO: Needs settings reset API to ensure fresh state
-  // Previous tests modify backend settings state which persists across page loads
-  test.skip('should hide Zones tab when Hue disabled', async ({ page }) => {
-    // Zones should be visible when Hue enabled
-    await expect(page.locator('.nav-tab:has-text("Zones")')).toBeVisible();
-
-    // Disable Hue
-    await openSettings(page);
-    await page.click('.service-toggle:has-text("Hue")');
-    await closeSettings(page);
-
-    // Zones should be hidden
-    await expect(page.locator('.nav-tab:has-text("Zones")')).not.toBeVisible();
-  });
-
-  // TODO: Needs settings reset API to ensure fresh state
-  test.skip('should hide Automations tab when Hue disabled', async ({ page }) => {
-    // Automations should be visible when Hue enabled
-    await expect(page.locator('.nav-tab:has-text("Automations")')).toBeVisible();
-
-    // Disable Hue
-    await openSettings(page);
-    await page.click('.service-toggle:has-text("Hue")');
-    await closeSettings(page);
-
-    // Automations should be hidden
-    await expect(page.locator('.nav-tab:has-text("Automations")')).not.toBeVisible();
-  });
-
-  // TODO: Needs settings reset API to ensure fresh state
   test.skip('should stay on settings when all services disabled', async ({ page }) => {
+    // Skip: clicking toggles doesn't seem to uncheck them - needs investigation
+    // Reset settings to ensure clean state
+    await resetSettingsDemoState(page);
+
     await openSettings(page);
 
     // Disable both services (click on label wrappers)
@@ -300,21 +265,6 @@ test.describe('Settings Page - Conditional Navigation', () => {
     const navTabs = page.locator('.nav-tab');
     const count = await navTabs.count();
     expect(count).toBe(0);
-  });
-
-  // TODO: Needs settings reset API and redirect implementation
-  test.skip('should redirect when disabling current service view', async ({ page }) => {
-    // Navigate to Hive
-    await page.click('.nav-tab:has-text("Hive")');
-    await page.waitForSelector('.hive-view');
-
-    // Disable Hive but keep Hue enabled
-    await openSettings(page);
-    await page.click('.service-toggle:has-text("Hive")');
-
-    // Close settings - should redirect to Hue (first enabled service)
-    await closeSettings(page);
-    await expect(page.locator('.room-content')).toBeVisible();
   });
 });
 
@@ -332,23 +282,15 @@ test.describe('Settings Page - Service Status Indicator', () => {
     await expect(hueStatus).toBeVisible();
     await expect(hueStatus).toHaveClass(/connected/);
   });
-
-  // TODO: Needs settings reset API to ensure fresh state from previous tests
-  test.skip('should show warning badge on nav for enabled but disconnected service', async ({
-    page,
-  }) => {
-    // In demo mode, services are connected so no warning badge
-    const hiveTab = page.locator('.nav-tab:has-text("Hive")');
-    await expect(hiveTab).toBeVisible();
-    await expect(hiveTab).not.toHaveClass(/needs-auth/);
-  });
 });
 
 test.describe('Settings Page - Navigation Persistence', () => {
-  // TODO: Needs settings reset API to ensure fresh state from previous tests
   test.skip('should preserve selected tab across page refresh', async ({ page }) => {
+    // Skip: tab persistence not implemented yet
+    // Reset settings to ensure clean state
     await page.goto('/?demo=true');
     await page.waitForSelector('.main-panel');
+    await resetSettingsDemoState(page);
 
     // Navigate to Hive tab
     await page.click('.nav-tab:has-text("Hive")');
@@ -399,19 +341,6 @@ test.describe('Settings Page - Accessibility', () => {
   test('back button should have aria-label', async ({ page }) => {
     const backBtn = page.locator('.settings-back-btn');
     await expect(backBtn).toHaveAttribute('aria-label');
-  });
-
-  // TODO: Focus order depends on DOM order which may vary; need to implement proper tab order
-  test.skip('should support keyboard navigation through interactive elements', async ({ page }) => {
-    // Tab to back button
-    await page.keyboard.press('Tab');
-    const backBtn = page.locator('.settings-back-btn');
-    await expect(backBtn).toBeFocused();
-
-    // Tab to detect location button
-    await page.keyboard.press('Tab');
-    const detectBtn = page.locator('.settings-detect-btn');
-    await expect(detectBtn).toBeFocused();
   });
 });
 

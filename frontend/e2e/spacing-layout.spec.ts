@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 /**
  * Layout Spacing E2E Tests
@@ -17,6 +17,13 @@ const VIEWPORTS = {
 
 const MIN_EDGE_SPACING = 16;
 const MIN_COMPONENT_GAP = 8;
+
+// Helper to reset settings demo state via API (ensures clean state for tests)
+async function resetSettingsDemoState(page: Page) {
+  await page.request.post('/api/v1/settings/reset-demo', {
+    headers: { 'X-Demo-Mode': 'true' },
+  });
+}
 
 // Note: E2E tests run on port 5174 (separate from dev server on 5173)
 
@@ -130,8 +137,12 @@ test.describe('Layout Spacing - Desktop', () => {
     }
   });
 
-  // TODO: Needs settings reset API - previous tests may disable services, removing nav tabs
-  test.skip('bottom nav tabs should have spacing from edges', async ({ page }) => {
+  test('bottom nav tabs should have spacing from edges', async ({ page }) => {
+    // Reset settings to ensure all services are enabled
+    await resetSettingsDemoState(page);
+    await page.reload();
+    await page.waitForSelector('.top-toolbar');
+
     const bottomNav = page.locator('.bottom-nav');
     const firstTab = page.locator('.nav-tab').first();
 
