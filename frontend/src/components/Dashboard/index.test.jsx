@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Dashboard } from './index';
+import { STORAGE_KEYS } from '../../constants/storage';
 import {
   getDashboardFromHome,
   updateLight,
@@ -620,6 +621,148 @@ describe('Dashboard', () => {
 
       await waitFor(() => {
         expect(document.querySelector('.settings-page')).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Tab persistence', () => {
+    beforeEach(() => {
+      // Clear the specific key we're testing (global cleanup is in setup.js)
+      localStorage.removeItem(STORAGE_KEYS.SELECTED_TAB);
+    });
+
+    it('should save selected room to localStorage when navigating', async () => {
+      const user = userEvent.setup();
+      render(<Dashboard sessionToken="test-token" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Living Room')).toBeInTheDocument();
+      });
+
+      // Click on Bedroom tab
+      await user.click(screen.getByText('Bedroom'));
+
+      await waitFor(() => {
+        expect(localStorage.getItem(STORAGE_KEYS.SELECTED_TAB)).toBe('room-2');
+      });
+    });
+
+    it('should restore selected room from localStorage on mount', async () => {
+      // Pre-set localStorage to Bedroom
+      localStorage.setItem(STORAGE_KEYS.SELECTED_TAB, 'room-2');
+
+      render(<Dashboard sessionToken="test-token" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Bedroom')).toBeInTheDocument();
+      });
+
+      // Bedroom tab should be active (has room content showing Bedroom lights)
+      await waitFor(() => {
+        expect(screen.getByText('Bedside')).toBeInTheDocument();
+      });
+    });
+
+    it('should fall back to first room if persisted room no longer exists', async () => {
+      // Pre-set localStorage to a room that doesn't exist
+      localStorage.setItem(STORAGE_KEYS.SELECTED_TAB, 'room-deleted');
+
+      render(<Dashboard sessionToken="test-token" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Living Room')).toBeInTheDocument();
+      });
+
+      // Should show first room's lights (Living Room)
+      await waitFor(() => {
+        expect(screen.getByText('Lamp')).toBeInTheDocument();
+      });
+    });
+
+    it('should persist zones view selection', async () => {
+      // Add zones to dashboard
+      mockDashboardData = {
+        ...baseDashboard,
+        zones: [
+          {
+            id: 'zone-1',
+            name: 'Upstairs',
+            stats: { lightsOnCount: 1, totalLights: 2 },
+            lights: [],
+            scenes: [],
+          },
+        ],
+      };
+
+      const user = userEvent.setup();
+      render(<Dashboard sessionToken="test-token" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Zones')).toBeInTheDocument();
+      });
+
+      // Click on Zones tab
+      await user.click(screen.getByText('Zones'));
+
+      await waitFor(() => {
+        expect(localStorage.getItem(STORAGE_KEYS.SELECTED_TAB)).toBe('zones');
+      });
+    });
+
+    it('should NOT persist settings page selection', async () => {
+      const user = userEvent.setup();
+      render(<Dashboard sessionToken="test-token" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Living Room')).toBeInTheDocument();
+      });
+
+      // Navigate to Bedroom first
+      await user.click(screen.getByText('Bedroom'));
+
+      await waitFor(() => {
+        expect(localStorage.getItem(STORAGE_KEYS.SELECTED_TAB)).toBe('room-2');
+      });
+
+      // Open settings
+      await user.click(screen.getByRole('button', { name: /settings/i }));
+
+      await waitFor(() => {
+        expect(document.querySelector('.settings-page')).toBeInTheDocument();
+      });
+
+      // localStorage should still have the room, not settings
+      expect(localStorage.getItem(STORAGE_KEYS.SELECTED_TAB)).toBe('room-2');
+    });
+
+    it('should restore tab after unmount and remount', async () => {
+      const user = userEvent.setup();
+      const { unmount } = render(<Dashboard sessionToken="test-token" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Living Room')).toBeInTheDocument();
+      });
+
+      // Navigate to Bedroom
+      await user.click(screen.getByText('Bedroom'));
+
+      await waitFor(() => {
+        expect(localStorage.getItem(STORAGE_KEYS.SELECTED_TAB)).toBe('room-2');
+      });
+
+      // Unmount (simulates page refresh)
+      unmount();
+
+      // Remount
+      render(<Dashboard sessionToken="test-token" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Bedroom')).toBeInTheDocument();
+      });
+
+      // Should show Bedroom's lights
+      await waitFor(() => {
+        expect(screen.getByText('Bedside')).toBeInTheDocument();
       });
     });
   });

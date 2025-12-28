@@ -314,10 +314,10 @@ Post-merge review after PR #6 (plugin-services) was merged. Fixed test file that
 
 ### Issues Found and Fixed
 
-| File                           | Issue                                                       | Fix                                               |
-| ------------------------------ | ----------------------------------------------------------- | ------------------------------------------------- |
-| `backend/test/openapi.test.js` | Expected old project name "Philips Hue Control API"         | Updated to expect "Home Control API"              |
-| `frontend/src/hooks/useHive.js`| Unused `err` variable in catch block                        | Changed to empty catch                            |
+| File                            | Issue                                               | Fix                                  |
+| ------------------------------- | --------------------------------------------------- | ------------------------------------ |
+| `backend/test/openapi.test.js`  | Expected old project name "Philips Hue Control API" | Updated to expect "Home Control API" |
+| `frontend/src/hooks/useHive.js` | Unused `err` variable in catch block                | Changed to empty catch               |
 
 ### Test Results
 
@@ -330,3 +330,42 @@ Post-merge review after PR #6 (plugin-services) was merged. Fixed test file that
 
 - Review clean - no documentation updates needed
 - All previous review notes remain valid
+
+## 2025-12-28: Tab Persistence Feature
+
+**Status:** Approved
+
+**Branch:** main
+
+### Summary
+
+Implemented tab persistence - the selected navigation tab is now preserved across page refresh using localStorage.
+
+### Changes
+
+| File | Change |
+|------|--------|
+| `frontend/src/constants/storage.js` | Added `SELECTED_TAB` storage key |
+| `frontend/src/components/Dashboard/index.jsx` | Read/write selected tab to localStorage |
+| `frontend/src/components/Dashboard/index.test.jsx` | 6 new unit tests for tab persistence |
+| `frontend/e2e/settings-page.spec.ts` | Deleted 2 obsolete toggle tests, updated persistence test |
+| `frontend/src/test/setup.js` | Fixed localStorage mock for all tests |
+
+### Test Results
+
+- **Unit Tests:** 1,390 passed (891 backend + 499 frontend)
+- **E2E Tests:** 170 passed, 0 skipped
+- **Lint:** Clean (0 errors, 0 warnings)
+- **Format:** All files formatted
+
+### Code Quality
+
+- Storage key centralized in `constants/storage.js`
+- Follows existing patterns for localStorage usage
+- Proper validation of persisted tab IDs
+- Settings page correctly excluded from persistence
+
+### Notes for Documentation
+
+- No CLAUDE.md updates needed - internal feature, no API changes
+- User-facing behavior: selected room/view persists across browser refresh

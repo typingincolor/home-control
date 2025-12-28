@@ -29,25 +29,26 @@ vi.mock('../hooks/useWeather', () => ({
   }),
 }));
 
-// Setup localStorage mock if not available (jsdom should provide it)
-if (typeof global.localStorage === 'undefined') {
-  const localStorageMock = (() => {
-    let store = {};
-    return {
-      getItem: (key) => store[key] || null,
-      setItem: (key, value) => {
-        store[key] = value.toString();
-      },
-      removeItem: (key) => {
-        delete store[key];
-      },
-      clear: () => {
-        store = {};
-      },
-    };
-  })();
-  global.localStorage = localStorageMock;
-}
+// Setup localStorage mock (jsdom's localStorage doesn't have all methods)
+const localStorageMock = (() => {
+  let store = {};
+  return {
+    getItem: (key) => store[key] || null,
+    setItem: (key, value) => {
+      store[key] = value ? value.toString() : '';
+    },
+    removeItem: (key) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+  };
+})();
+Object.defineProperty(global, 'localStorage', {
+  value: localStorageMock,
+  writable: true,
+});
 
 // Cleanup after each test
 afterEach(() => {

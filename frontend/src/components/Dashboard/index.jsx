@@ -16,6 +16,7 @@ import {
 } from '../../services/homeAdapter';
 import * as automationsApi from '../../services/automationsApi';
 import { ERROR_MESSAGES } from '../../constants/messages';
+import { STORAGE_KEYS } from '../../constants/storage';
 import { createLogger } from '../../utils/logger';
 import { TopToolbar } from './TopToolbar';
 import { BottomNav } from './BottomNav';
@@ -187,12 +188,33 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
     }
   }, [isDemoMode, sessionToken, loading, localDashboard]);
 
-  // Set default selected room when dashboard loads
+  // Set default selected room when dashboard loads (check localStorage first)
   useEffect(() => {
     if (dashboard?.rooms?.length > 0 && selectedId === null) {
-      setSelectedId(dashboard.rooms[0].id);
+      const persistedId = localStorage.getItem(STORAGE_KEYS.SELECTED_TAB);
+
+      // Check if persisted ID is valid (exists in rooms, zones, or special views)
+      const isValidRoomId = dashboard.rooms.some((r) => r.id === persistedId);
+      const isValidSpecialView =
+        persistedId === 'zones' ||
+        persistedId === 'automations' ||
+        persistedId === 'home' ||
+        persistedId === 'hive';
+
+      if (persistedId && (isValidRoomId || isValidSpecialView)) {
+        setSelectedId(persistedId);
+      } else {
+        setSelectedId(dashboard.rooms[0].id);
+      }
     }
   }, [dashboard, selectedId]);
+
+  // Persist selected tab to localStorage (but not settings)
+  useEffect(() => {
+    if (selectedId && selectedId !== 'settings') {
+      localStorage.setItem(STORAGE_KEYS.SELECTED_TAB, selectedId);
+    }
+  }, [selectedId]);
 
   // Apply dark theme to body when component mounts
   useEffect(() => {
