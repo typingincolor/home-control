@@ -6,7 +6,7 @@ import { createLogger } from '../utils/logger';
 
 const logger = createLogger('MotionZones');
 
-export const MotionZones = ({ sessionToken, motionZones }) => {
+export const MotionZones = ({ motionZones }) => {
   const { api } = useDemoMode();
 
   const [fetchedZones, setFetchedZones] = useState([]);
@@ -18,10 +18,10 @@ export const MotionZones = ({ sessionToken, motionZones }) => {
 
   // Fetch from API only when no WebSocket data is provided
   useEffect(() => {
-    if (!motionZones && sessionToken) {
+    if (!motionZones) {
       const fetchSensors = async () => {
         try {
-          const motionData = await api.getMotionZones(sessionToken);
+          const motionData = await api.getMotionZones();
           setFetchedZones(motionData.zones || []);
         } catch (err) {
           logger.error('Failed to fetch MotionAware data:', err);
@@ -29,7 +29,7 @@ export const MotionZones = ({ sessionToken, motionZones }) => {
       };
       fetchSensors();
     }
-  }, [sessionToken, motionZones, api]);
+  }, [motionZones, api]);
 
   // Detect motion changes and trigger alerts
   useEffect(() => {
@@ -70,6 +70,5 @@ export const MotionZones = ({ sessionToken, motionZones }) => {
 };
 
 MotionZones.propTypes = {
-  sessionToken: PropTypes.string.isRequired,
   motionZones: PropTypes.arrayOf(MotionZoneShape),
 };

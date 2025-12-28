@@ -313,6 +313,39 @@ router.get('/session', requireSession, (req, res) => {
 });
 
 /**
+ * POST /api/v1/auth/disconnect
+ * Disconnect from a bridge completely (revokes session AND clears stored credentials)
+ * Use this when user wants to disable the Hue service and forget the bridge
+ *
+ * Headers:
+ *   Authorization: Bearer <sessionToken>
+ *
+ * Returns:
+ *   {
+ *     "success": true,
+ *     "message": "Disconnected from bridge"
+ *   }
+ */
+router.post('/disconnect', requireSession, (req, res) => {
+  const { sessionToken, bridgeIp } = req.hue;
+
+  logger.info('Disconnect request', { bridgeIp });
+
+  // Revoke the session
+  sessionManager.revokeSession(sessionToken);
+
+  // Clear stored bridge credentials
+  sessionManager.clearBridgeCredentials(bridgeIp);
+
+  logger.info('Disconnected from bridge', { bridgeIp });
+
+  res.json({
+    success: true,
+    message: 'Disconnected from bridge',
+  });
+});
+
+/**
  * POST /api/v1/auth/refresh
  * Refresh an existing session token (extends expiration)
  *

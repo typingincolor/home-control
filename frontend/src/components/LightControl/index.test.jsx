@@ -100,12 +100,12 @@ describe('LightControl', () => {
     };
     mockApi = {
       getDashboard: vi.fn().mockImplementation(() => Promise.resolve(mockDashboardData)),
-      updateLight: vi.fn().mockImplementation((token, lightId, state) =>
+      updateLight: vi.fn().mockImplementation((lightId, state) =>
         Promise.resolve({
           light: { id: lightId, on: state.on, brightness: state.on ? 100 : 0 },
         })
       ),
-      updateRoomLights: vi.fn().mockImplementation((token, roomId, state) =>
+      updateRoomLights: vi.fn().mockImplementation((roomId, state) =>
         Promise.resolve({
           updatedLights:
             mockDashboardData.rooms
@@ -181,7 +181,7 @@ describe('LightControl', () => {
       render(<LightControl sessionToken="test-token" />);
 
       await waitFor(() => {
-        expect(mockApi.getDashboard).toHaveBeenCalledWith('test-token');
+        expect(mockApi.getDashboard).toHaveBeenCalledWith();
       });
     });
   });
@@ -290,7 +290,6 @@ describe('LightControl', () => {
       await user.click(lampTile);
 
       expect(mockApi.updateLight).toHaveBeenCalledWith(
-        'test-token',
         'light-1',
         { on: false } // Light was on, so turning off
       );
@@ -337,7 +336,6 @@ describe('LightControl', () => {
       await user.click(toggleButton);
 
       expect(mockApi.updateRoomLights).toHaveBeenCalledWith(
-        'test-token',
         'room-1',
         { on: false } // Room has lights on, so turning off
       );
@@ -386,7 +384,7 @@ describe('LightControl', () => {
       // Click first scene
       await user.click(sceneItems[0]);
 
-      expect(mockApi.activateSceneV1).toHaveBeenCalledWith('test-token', 'scene-1');
+      expect(mockApi.activateSceneV1).toHaveBeenCalledWith('scene-1');
     });
 
     it('should update lights after scene activation', async () => {
@@ -543,6 +541,96 @@ describe('LightControl', () => {
       // Should show loading since dashboard is null
       await waitFor(() => {
         expect(screen.getByText('Connecting to bridge...')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Settings navigation', () => {
+    it('should open settings page when gear icon clicked', async () => {
+      const user = userEvent.setup();
+      render(<LightControl sessionToken="test-token" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Living Room')).toBeInTheDocument();
+      });
+
+      // Click gear icon to open settings
+      await user.click(screen.getByRole('button', { name: /settings/i }));
+
+      await waitFor(() => {
+        expect(document.querySelector('.settings-page')).toBeInTheDocument();
+      });
+    });
+
+    it('should close settings page when gear icon clicked while settings is open', async () => {
+      const user = userEvent.setup();
+      render(<LightControl sessionToken="test-token" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Living Room')).toBeInTheDocument();
+      });
+
+      // Open settings
+      await user.click(screen.getByRole('button', { name: /settings/i }));
+
+      await waitFor(() => {
+        expect(document.querySelector('.settings-page')).toBeInTheDocument();
+      });
+
+      // Click gear icon again to close settings
+      await user.click(screen.getByRole('button', { name: /settings/i }));
+
+      await waitFor(() => {
+        expect(document.querySelector('.settings-page')).not.toBeInTheDocument();
+      });
+    });
+
+    it('should close settings page when nav tab clicked', async () => {
+      const user = userEvent.setup();
+      render(<LightControl sessionToken="test-token" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Living Room')).toBeInTheDocument();
+      });
+
+      // Open settings
+      await user.click(screen.getByRole('button', { name: /settings/i }));
+
+      await waitFor(() => {
+        expect(document.querySelector('.settings-page')).toBeInTheDocument();
+      });
+
+      // Click a room tab in bottom nav
+      await user.click(screen.getByText('Bedroom'));
+
+      await waitFor(() => {
+        // Settings should be closed
+        expect(document.querySelector('.settings-page')).not.toBeInTheDocument();
+        // And Bedroom content should be visible
+        expect(screen.getByText('Bedside')).toBeInTheDocument();
+      });
+    });
+
+    it('should close settings page when back button clicked', async () => {
+      const user = userEvent.setup();
+      render(<LightControl sessionToken="test-token" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Living Room')).toBeInTheDocument();
+      });
+
+      // Open settings
+      await user.click(screen.getByRole('button', { name: /settings/i }));
+
+      await waitFor(() => {
+        expect(document.querySelector('.settings-page')).toBeInTheDocument();
+      });
+
+      // Click back button
+      await user.click(screen.getByRole('button', { name: /back/i }));
+
+      await waitFor(() => {
+        expect(document.querySelector('.settings-page')).not.toBeInTheDocument();
       });
     });
   });

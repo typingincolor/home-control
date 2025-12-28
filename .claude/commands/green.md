@@ -6,85 +6,116 @@ description: Write minimal code to make failing tests pass
 
 You are a TDD developer in the GREEN phase. Your ONLY job is to make the failing tests pass.
 
+## Context from Previous Phases
+
+Review notes from the red phase carefully:
+
+- **Implementation notes** - Follow these exactly to avoid rework
+- **File locations** - Create files where specified
+- **API formats** - Match expected response structures
+- **What didn't work** - Don't retry approaches that already failed
+
 ## Your Responsibilities
 
-1. **Run the tests** - See what's currently failing
-2. **Implement backend first** - Make backend tests pass before touching frontend
-3. **Implement frontend second** - Make frontend tests pass after backend is complete
-4. **Run tests again** - Verify all tests now pass
+1. **Read implementation notes** - Follow the notes from red phase exactly
+2. **Implement backend first** - Make backend tests pass
+3. **Implement frontend second** - Make frontend tests pass
+4. **Verify all pass** - Run tests once at the end
+
+## CRITICAL: Follow Implementation Notes
+
+The red phase provides implementation notes that describe exactly what the tests expect. **Read and follow these notes carefully** to avoid rework.
+
+Look for notes covering:
+
+- File locations and naming
+- API response formats
+- Mock data structures
+- CSS class names and aria-labels
+- Wiring instructions
+- Non-obvious test expectations
+- Approaches that didn't work (don't retry these)
+
+If notes are missing, check the test files directly to understand expected behavior.
+
+## Learning from Attempts
+
+Track what works and what doesn't:
+
+- **If an implementation doesn't pass tests**, check the test file to see what's expected
+- **If a pattern causes errors**, note it and try a different approach
+- **Don't retry failed approaches** - If something didn't work (including from red phase notes), move on
+- **Check existing code first** - Before writing new patterns, see how similar features are implemented
 
 ## Order of Operations
-
-Always implement in this order:
 
 1. **Backend** (`backend/`) - Services, routes, utilities, register routes
 2. **Frontend** (`frontend/`) - Components, hooks, API calls, wire into app
 
-This ensures APIs are available before the UI tries to use them.
-
 ## Complete Implementation Checklist
-
-Implementation is NOT complete until everything is wired up:
 
 ### Backend
 
-- [ ] Create service files
+- [ ] Create service files (follow exact response formats from notes)
 - [ ] Create route files
 - [ ] **Register routes in `routes/v1/index.js`**
-- [ ] Add mock data for demo mode (if applicable)
-- [ ] Update mock client methods (if applicable)
+- [ ] Add mock data for demo mode (match structure in notes)
 
 ### Frontend
 
-- [ ] Create component files
+- [ ] Create component files (use exact class names from notes)
 - [ ] Add API methods to `hueApi.js`
-- [ ] Add UI text constants to `uiText.js`
-- [ ] Add CSS styles to `App.css`
+- [ ] Add UI text constants to `uiText.js` (use exact keys from notes)
+- [ ] Add aria-labels exactly as specified in notes
 - [ ] **Wire components into parent (e.g., `LightControl/index.jsx`)**
-- [ ] **Add navigation (e.g., BottomNav tab, route)**
-- [ ] **Connect state management and event handlers**
-
-The feature must be fully integrated and functional, not just individual pieces.
+- [ ] **Add navigation if needed**
 
 ## Rules
 
 - ONLY write implementation code - NO new tests
 - Write the SIMPLEST code that makes tests pass
-- Don't optimize or refactor yet - that's the next phase
-- Don't add features beyond what tests require
-- Follow existing code patterns and style in the codebase
+- Don't optimize - that's the next phase
+- Follow existing code patterns
+- **Match test expectations exactly** (class names, response formats, etc.)
 
 ## Process
 
-1. Run unit tests to see failures:
+**Skip initial test run** - Tests were just run in `/red` and we know what's failing.
+
+1. Review implementation notes from red phase
+
+2. Implement backend code (services, routes, register routes, mock data)
+
+3. Implement frontend code (components, API methods, wire into app)
+
+4. **Run all unit tests once at the end:**
 
    ```bash
    npm run test:all
    ```
 
-2. Implement backend code first (services, routes, register routes, mock data)
+5. If any tests fail, fix and re-run until all pass
 
-3. Run backend tests to verify they pass
+**Skip E2E tests** - They will be run in `/reviewer` as final verification.
 
-4. Implement frontend code (components, API methods, styles, wire into app)
+## Notes for Next Phase
 
-5. Run frontend tests to verify they pass
+After all tests pass, provide notes for the refactor phase:
 
-6. Run E2E tests to verify full integration:
-
-   ```bash
-   npm run test:e2e
-   ```
-
-7. If any tests fail, iterate until ALL tests are green
+- **Code smells noticed** - Things that work but could be cleaner
+- **Duplication introduced** - Intentional duplication that could be extracted
+- **Shortcuts taken** - Quick fixes that should be revisited
 
 ## Output
 
-Show the passing test output for unit tests AND E2E tests, then tell the user to run `/refactor` to clean up the code.
+1. Show the passing test output
+2. Provide notes for refactor phase
+3. Tell the user to run `/refactor` to clean up the code
 
 ## Constraints
 
 - DO NOT write new tests
+- DO NOT run E2E tests (save time for reviewer phase)
 - DO NOT optimize prematurely
-- DO NOT add unrequested features
-- Focus ONLY on making existing tests pass
+- DO NOT deviate from implementation notes without good reason
+- DO NOT retry approaches marked as "didn't work" in red phase notes

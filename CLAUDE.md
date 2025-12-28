@@ -88,12 +88,15 @@ Backend-based demo allows testing without Hue Bridge:
 | `automationService.js`              | Smart scene automations     |
 | `sessionManager.js`                 | Session token management    |
 | `websocketService.js`               | Socket.IO real-time updates |
+| `hiveService.js`                    | UK Hive heating integration |
+| `hiveAuthService.js`                | Hive AWS Cognito auth + 2FA |
+| `hiveCredentialsManager.js`         | Encrypted Hive credentials  |
 
 ## Frontend Structure
 
 **Main Flow:** App.jsx (auth) → LightControl/index.jsx → TopToolbar + BottomNav + MainPanel
 
-**Key Hooks:** `useHueBridge` (connection), `useWebSocket` (real-time), `useSettings` (preferences)
+**Key Hooks:** `useHueBridge` (connection), `useWebSocket` (real-time), `useSettings` (preferences), `useHive` (Hive heating)
 
 **UI Text:** All user-facing text in `constants/uiText.js` - tests use these constants.
 
@@ -111,6 +114,12 @@ Backend-based demo allows testing without Hue Bridge:
 | POST    | `/api/v1/automations/:id/trigger` | Trigger automation     |
 | GET/PUT | `/api/v1/settings`                | User settings          |
 | GET     | `/api/v1/weather`                 | Weather data           |
+| POST    | `/api/v1/hive/connect`            | Connect to Hive (→2FA) |
+| POST    | `/api/v1/hive/verify-2fa`         | Verify SMS 2FA code    |
+| POST    | `/api/v1/hive/disconnect`         | Disconnect from Hive   |
+| GET     | `/api/v1/hive/connection`         | Hive connection status |
+| GET     | `/api/v1/hive/status`             | Hive thermostat status |
+| GET     | `/api/v1/hive/schedules`          | Hive heating schedules |
 
 **WebSocket:** Connect to `/api/v1/ws`, auth with `{ sessionToken }` or `{ demoMode: true }`
 
@@ -132,8 +141,8 @@ Headers returned: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Res
 See `frontend/TESTING.md` for detailed documentation.
 
 ```bash
-npm run test:all         # All unit tests (758 tests)
-npm run test:e2e         # E2E tests (179 tests)
+npm run test:all          # All unit tests
+npm run test:e2e          # E2E tests
 npm run test:mutation:all # Mutation testing
 ```
 

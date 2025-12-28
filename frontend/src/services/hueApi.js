@@ -18,6 +18,21 @@ export const resetDemoModeCache = () => {
   demoModeCache = null;
 };
 
+// Session token management
+let sessionToken = null;
+
+export const setSessionToken = (token) => {
+  sessionToken = token;
+};
+
+export const getSessionToken = () => {
+  return sessionToken;
+};
+
+export const clearSessionToken = () => {
+  sessionToken = null;
+};
+
 // Create axios instance with defaults
 const api = axios.create({
   baseURL: '/api',
@@ -73,8 +88,11 @@ api.interceptors.response.use(
   }
 );
 
-// Helper to set auth header
-const authHeader = (token) => ({ headers: { Authorization: `Bearer ${token}` } });
+// Helper to set auth header (uses stored session token)
+const authHeader = () => {
+  const token = getSessionToken();
+  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+};
 
 export const hueApi = {
   // Discovery
@@ -135,57 +153,57 @@ export const hueApi = {
   },
 
   // Dashboard
-  getDashboard: (token) => api.get('/v1/dashboard', authHeader(token)).then((r) => r.data),
+  getDashboard: () => api.get('/v1/dashboard', authHeader()).then((r) => r.data),
 
   // Motion zones
-  getMotionZones: (token) => api.get('/v1/motion-zones', authHeader(token)).then((r) => r.data),
+  getMotionZones: () => api.get('/v1/motion-zones', authHeader()).then((r) => r.data),
 
   // Light control
-  updateLight: (token, lightId, state) =>
-    api.put(`/v1/lights/${lightId}`, state, authHeader(token)).then((r) => r.data),
+  updateLight: (lightId, state) =>
+    api.put(`/v1/lights/${lightId}`, state, authHeader()).then((r) => r.data),
 
   // Room control
-  updateRoomLights: (token, roomId, state) =>
-    api.put(`/v1/rooms/${roomId}/lights`, state, authHeader(token)).then((r) => r.data),
+  updateRoomLights: (roomId, state) =>
+    api.put(`/v1/rooms/${roomId}/lights`, state, authHeader()).then((r) => r.data),
 
   // Zone control
-  updateZoneLights: (token, zoneId, state) =>
-    api.put(`/v1/zones/${zoneId}/lights`, state, authHeader(token)).then((r) => r.data),
+  updateZoneLights: (zoneId, state) =>
+    api.put(`/v1/zones/${zoneId}/lights`, state, authHeader()).then((r) => r.data),
 
   // Scene activation
-  activateSceneV1: (token, sceneId) =>
-    api.post(`/v1/scenes/${sceneId}/activate`, null, authHeader(token)).then((r) => r.data),
+  activateSceneV1: (sceneId) =>
+    api.post(`/v1/scenes/${sceneId}/activate`, null, authHeader()).then((r) => r.data),
 
   // Session management
-  refreshSession: (token) =>
-    api.post('/v1/auth/refresh', null, authHeader(token)).then((r) => r.data),
+  refreshSession: () => api.post('/v1/auth/refresh', null, authHeader()).then((r) => r.data),
 
-  revokeSession: (token) => api.delete('/v1/auth/session', authHeader(token)).then((r) => r.data),
+  revokeSession: () => api.delete('/v1/auth/session', authHeader()).then((r) => r.data),
+
+  // Disconnect from bridge completely (revokes session AND clears stored credentials)
+  disconnect: () => api.post('/v1/auth/disconnect', null, authHeader()).then((r) => r.data),
 
   // Settings
-  getSettings: (token) => api.get('/v1/settings', authHeader(token)).then((r) => r.data),
+  getSettings: () => api.get('/v1/settings', authHeader()).then((r) => r.data),
 
-  updateSettings: (token, settings) =>
-    api.put('/v1/settings', settings, authHeader(token)).then((r) => r.data),
+  updateSettings: (settings) => api.put('/v1/settings', settings, authHeader()).then((r) => r.data),
 
-  updateLocation: (token, location) =>
-    api.put('/v1/settings/location', location, authHeader(token)).then((r) => r.data),
+  updateLocation: (location) =>
+    api.put('/v1/settings/location', location, authHeader()).then((r) => r.data),
 
-  clearLocation: (token) =>
-    api.delete('/v1/settings/location', authHeader(token)).then((r) => r.data),
+  clearLocation: () => api.delete('/v1/settings/location', authHeader()).then((r) => r.data),
 
   // Weather
-  getWeather: (token) => api.get('/v1/weather', authHeader(token)).then((r) => r.data),
+  getWeather: () => api.get('/v1/weather', authHeader()).then((r) => r.data),
 
   // Automations
-  getAutomations: (token) => api.get('/v1/automations', authHeader(token)).then((r) => r.data),
+  getAutomations: () => api.get('/v1/automations', authHeader()).then((r) => r.data),
 
-  async triggerAutomation(token, automationId) {
+  async triggerAutomation(automationId) {
     try {
       const { data } = await api.post(
         `/v1/automations/${automationId}/trigger`,
         null,
-        authHeader(token)
+        authHeader()
       );
       return data;
     } catch (error) {
@@ -193,3 +211,46 @@ export const hueApi = {
     }
   },
 };
+
+// Hive integration - exported separately for hook consumption
+// Note: These also exist on hueApi object for consistency
+export const connectHive = async (username, password) => {
+  try {
+    const { data } = await api.post('/v1/hive/connect', { username, password }, authHeader());
+    return data;
+  } catch (error) {
+    return { success: false, error: error.data?.error || 'Failed to connect to Hive' };
+  }
+};
+
+export const verifyHive2fa = async (code, session, username) => {
+  try {
+    const { data } = await api.post(
+      '/v1/hive/verify-2fa',
+      { code, session, username },
+      authHeader()
+    );
+    return data;
+  } catch (error) {
+    return { success: false, error: error.data?.error || 'Failed to verify code' };
+  }
+};
+
+export const disconnectHive = () =>
+  api.post('/v1/hive/disconnect', null, authHeader()).then((r) => r.data);
+
+export const getHiveStatus = () => api.get('/v1/hive/status', authHeader()).then((r) => r.data);
+
+export const getHiveSchedules = () =>
+  api.get('/v1/hive/schedules', authHeader()).then((r) => r.data);
+
+export const getHiveConnectionStatus = () =>
+  api.get('/v1/hive/connection', authHeader()).then((r) => r.data);
+
+// Add to hueApi object for consistency
+hueApi.connectHive = connectHive;
+hueApi.verifyHive2fa = verifyHive2fa;
+hueApi.disconnectHive = disconnectHive;
+hueApi.getHiveStatus = getHiveStatus;
+hueApi.getHiveSchedules = getHiveSchedules;
+hueApi.getHiveConnectionStatus = getHiveConnectionStatus;

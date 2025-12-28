@@ -217,7 +217,7 @@ describe('LightControl - Zones (Navigation)', () => {
 
     await user.click(offButton);
 
-    expect(mockApi.updateZoneLights).toHaveBeenCalledWith('test-token', 'zone-1', { on: false });
+    expect(mockApi.updateZoneLights).toHaveBeenCalledWith('zone-1', { on: false });
   });
 
   it('should show zone count badge on Zones tab', async () => {

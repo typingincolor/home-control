@@ -5,6 +5,8 @@ import { useWebSocket } from '../../hooks/useWebSocket';
 import { useSettings } from '../../hooks/useSettings';
 import { useLocation } from '../../hooks/useLocation';
 import { useWeather } from '../../hooks/useWeather';
+import { useHive } from '../../hooks/useHive';
+import { hueApi } from '../../services/hueApi';
 import { ERROR_MESSAGES } from '../../constants/messages';
 import { createLogger } from '../../utils/logger';
 import { TopToolbar } from './TopToolbar';
@@ -12,8 +14,9 @@ import { BottomNav } from './BottomNav';
 import { RoomContent } from './RoomContent';
 import { ZonesView } from './ZonesView';
 import { AutomationsView } from './AutomationsView';
+import { HiveView } from './HiveView';
 import { MotionZones } from '../MotionZones';
-import { SettingsDrawer } from './SettingsDrawer';
+import { SettingsPage } from './SettingsPage';
 
 const logger = createLogger('Dashboard');
 
@@ -29,7 +32,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
   } = useWebSocket(sessionToken, !isDemoMode);
 
   // Settings from backend (includes location and units)
-  const { settings, updateSettings } = useSettings(sessionToken);
+  const { settings, updateSettings } = useSettings(!!sessionToken);
 
   // Callback for when location is updated
   const handleLocationUpdate = useCallback(
@@ -45,7 +48,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     isDetecting,
     error: locationError,
     detectLocation,
-  } = useLocation(sessionToken, settings.location, handleLocationUpdate);
+  } = useLocation(settings.location, handleLocationUpdate);
 
   // Weather from backend (uses session's location and units)
   const {
@@ -53,7 +56,27 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     isLoading: weatherLoading,
     error: weatherError,
     refetch: refetchWeather,
-  } = useWeather(sessionToken);
+  } = useWeather(!!sessionToken);
+
+  // Hive heating integration
+  const {
+    isConnected: hiveConnected,
+    isConnecting: hiveConnecting,
+    isLoading: hiveLoading,
+    status: hiveStatus,
+    schedules: hiveSchedules,
+    error: hiveError,
+    requires2fa: hiveRequires2fa,
+    pendingUsername: hivePendingUsername,
+    isVerifying: hiveVerifying,
+    connect: hiveConnect,
+    disconnect: hiveDisconnect,
+    refresh: hiveRefresh,
+    checkConnection: hiveCheckConnection,
+    submit2faCode: hiveSubmit2fa,
+    cancel2fa: hiveCancel2fa,
+    clearError: hiveClearError,
+  } = useHive(isDemoMode);
 
   // Refetch weather when settings change (location or units updated)
   useEffect(() => {
@@ -91,7 +114,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     setError(null);
 
     try {
-      const dashboardData = await api.getDashboard(sessionToken);
+      const dashboardData = await api.getDashboard();
       setLocalDashboard(dashboardData);
       logger.info('Fetched dashboard successfully');
     } catch (err) {
@@ -133,7 +156,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
         if (loading && !localDashboard) {
           logger.warn('WebSocket timeout, falling back to REST API');
           try {
-            const dashboardData = await api.getDashboard(sessionToken);
+            const dashboardData = await api.getDashboard();
             setLocalDashboard(dashboardData);
             setLoading(false);
             logger.info('Fetched dashboard via REST fallback');
@@ -184,7 +207,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
       const currentState = light.on ?? false;
       const newState = { on: !currentState };
 
-      const response = await api.updateLight(sessionToken, lightUuid, newState);
+      const response = await api.updateLight(lightUuid, newState);
 
       // Optimistic update - apply immediately for responsive UI
       setLocalDashboard((prev) => ({
@@ -226,7 +249,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
     try {
       const newState = { on: turnOn };
-      const response = await api.updateRoomLights(sessionToken, roomId, newState);
+      const response = await api.updateRoomLights(roomId, newState);
 
       // Optimistic update - apply immediately for responsive UI
       setLocalDashboard((prev) => ({
@@ -269,7 +292,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
     try {
       const newState = { on: turnOn };
-      const response = await api.updateZoneLights(sessionToken, zoneId, newState);
+      const response = await api.updateZoneLights(zoneId, newState);
 
       // Optimistic update - apply immediately for responsive UI
       setLocalDashboard((prev) => ({
@@ -307,7 +330,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
     setActivatingScene(zoneId || sceneUuid);
     try {
-      const response = await api.activateSceneV1(sessionToken, sceneUuid);
+      const response = await api.activateSceneV1(sceneUuid);
       logger.info(
         `Activated scene ${sceneUuid}`,
         response.affectedLights?.length,
@@ -344,7 +367,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     setAutomationsError(null);
 
     try {
-      const result = await api.getAutomations(sessionToken);
+      const result = await api.getAutomations();
       setAutomations(result.automations || []);
     } catch (err) {
       logger.error('Failed to fetch automations:', err);
@@ -362,11 +385,19 @@ export const LightControl = ({ sessionToken, onLogout }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Only fetch when navigating to automations
   }, [selectedId]);
 
+  // Check Hive connection when navigating to hive tab
+  useEffect(() => {
+    if (selectedId === 'hive' && !hiveConnected && !hiveConnecting && !hiveRequires2fa) {
+      hiveCheckConnection();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Only check when navigating to hive
+  }, [selectedId]);
+
   const handleTriggerAutomation = async (automationId) => {
     setTriggeringId(automationId);
 
     try {
-      await api.triggerAutomation(sessionToken, automationId);
+      await api.triggerAutomation(automationId);
       logger.info('Automation triggered', { automationId });
     } catch (err) {
       logger.error('Failed to trigger automation:', err);
@@ -378,7 +409,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
 
   // Get the selected room from dashboard
   const selectedRoom =
-    selectedId !== 'zones' && selectedId !== 'automations'
+    selectedId !== 'zones' && selectedId !== 'automations' && selectedId !== 'hive'
       ? dashboard?.rooms?.find((r) => r.id === selectedId)
       : null;
 
@@ -420,11 +451,60 @@ export const LightControl = ({ sessionToken, onLogout }) => {
         weatherError={weatherError}
         location={settings.location}
         units={settings.units}
-        onOpenSettings={() => setSettingsOpen(true)}
+        onOpenSettings={() => setSettingsOpen((prev) => !prev)}
       />
 
       <div className="main-panel">
-        {selectedId === 'automations' ? (
+        {settingsOpen ? (
+          <SettingsPage
+            onBack={() => setSettingsOpen(false)}
+            location={settings.location}
+            settings={settings}
+            onUpdateSettings={updateSettings}
+            onDetectLocation={detectLocation}
+            isDetecting={isDetecting}
+            locationError={locationError}
+            hueConnected={true} // Always true here - LightControl only renders when Hue is connected
+            hiveConnected={hiveConnected}
+            onHiveDisconnect={hiveDisconnect}
+            onEnableHive={() => {
+              setSettingsOpen(false);
+              setSelectedId('hive');
+            }}
+            onDisableHue={async () => {
+              // Clear Hue credentials on backend and return to settings step
+              try {
+                await hueApi.disconnect();
+              } catch {
+                // Ignore errors - we're disconnecting anyway
+              }
+              onLogout();
+            }}
+            onDisableHive={async () => {
+              // Clear Hive credentials
+              await hiveDisconnect();
+              // Update settings to mark as disabled
+              updateSettings({ services: { hive: { enabled: false } } });
+            }}
+          />
+        ) : selectedId === 'hive' ? (
+          <HiveView
+            isConnected={hiveConnected}
+            status={hiveStatus}
+            schedules={hiveSchedules}
+            isLoading={hiveLoading}
+            error={hiveError}
+            onRetry={hiveRefresh}
+            onConnect={hiveConnect}
+            onVerify2fa={hiveSubmit2fa}
+            onCancel2fa={hiveCancel2fa}
+            onClearError={hiveClearError}
+            requires2fa={hiveRequires2fa}
+            isConnecting={hiveConnecting}
+            isVerifying={hiveVerifying}
+            pendingUsername={hivePendingUsername}
+          />
+        ) : selectedId === 'automations' ? (
           <AutomationsView
             automations={automations}
             onTrigger={handleTriggerAutomation}
@@ -453,25 +533,20 @@ export const LightControl = ({ sessionToken, onLogout }) => {
         )}
       </div>
 
-      <MotionZones sessionToken={sessionToken} motionZones={dashboard?.motionZones} />
+      <MotionZones motionZones={dashboard?.motionZones} />
 
       <BottomNav
         rooms={dashboard?.rooms || []}
         zones={dashboard?.zones || []}
         hasAutomations={true}
         selectedId={selectedId}
-        onSelect={setSelectedId}
-      />
-
-      <SettingsDrawer
-        isOpen={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        location={settings.location}
-        settings={settings}
-        onUpdateSettings={updateSettings}
-        onDetectLocation={detectLocation}
-        isDetecting={isDetecting}
-        locationError={locationError}
+        onSelect={(id) => {
+          setSelectedId(id);
+          setSettingsOpen(false);
+        }}
+        services={settings.services}
+        hueConnected={true} // Always true here - LightControl only renders when Hue is connected
+        hiveConnected={hiveConnected}
       />
     </div>
   );

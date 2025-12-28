@@ -99,4 +99,39 @@ export const UI_TEXT = {
   SETTINGS_DETECTING: 'Detecting...',
   SETTINGS_WEATHER_ENABLED: 'Show Weather',
   SETTINGS_AUTO_SAVED: 'Changes saved automatically',
+  SETTINGS_SERVICES: 'Services',
+  SETTINGS_HUE_SERVICE: 'Philips Hue',
+  SETTINGS_HIVE_SERVICE: 'Hive Heating',
+
+  // Hive Heating
+  HIVE_HEATING_STATUS: 'Heating status',
+  HIVE_HOT_WATER_STATUS: 'Hot water status',
+  HIVE_CURRENT_TEMP: 'Current temperature',
+  HIVE_SCHEDULES: 'Heating schedules',
+  HIVE_NO_SCHEDULES: 'No schedules configured',
+  HIVE_LOADING: 'Loading Hive data...',
+
+  // Hive Settings & Navigation
+  NAV_HIVE: 'Hive',
+  SETTINGS_HIVE: 'Hive Heating',
+  HIVE_USERNAME_PLACEHOLDER: 'Email / Username',
+  HIVE_PASSWORD_PLACEHOLDER: 'Password',
+  HIVE_CONNECT: 'Connect',
+  HIVE_CONNECTING: 'Connecting...',
+  HIVE_CONNECTED: 'Connected',
+  HIVE_DISCONNECT: 'Disconnect',
+
+  // Hive Login
+  HIVE_LOGIN_TITLE: 'Connect to Hive',
+  HIVE_INVALID_CREDENTIALS: 'Invalid email or password',
+
+  // Hive 2FA
+  HIVE_2FA_TITLE: 'Verify Your Identity',
+  HIVE_2FA_DESCRIPTION: 'Enter the 6-digit code sent to your phone',
+  HIVE_2FA_PLACEHOLDER: 'Enter verification code',
+  HIVE_VERIFY: 'Verify',
+  HIVE_VERIFYING: 'Verifying...',
+  HIVE_BACK_TO_LOGIN: 'Back to login',
+  HIVE_INVALID_CODE: 'Invalid verification code',
+  HIVE_TAB_LINK: 'Use the Hive tab to connect',
 };

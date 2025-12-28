@@ -33,18 +33,18 @@ describe('useWeather', () => {
   });
 
   describe('initialization', () => {
-    it('should return null weather when no sessionToken provided', () => {
-      const { result } = renderHook(() => useWeather(null));
+    it('should return null weather when not enabled', () => {
+      const { result } = renderHook(() => useWeather(false));
 
       expect(result.current.weather).toBeNull();
       expect(result.current.isLoading).toBe(false);
       expect(result.current.error).toBeNull();
     });
 
-    it('should start loading when sessionToken is provided', async () => {
+    it('should start loading when enabled', async () => {
       hueApi.getWeather.mockReturnValue(new Promise(() => {})); // Never resolves
 
-      const { result } = renderHook(() => useWeather('test-token'));
+      const { result } = renderHook(() => useWeather(true));
 
       // Wait for useEffect to run
       await waitFor(() => {
@@ -54,23 +54,23 @@ describe('useWeather', () => {
   });
 
   describe('fetching weather', () => {
-    it('should fetch weather data when sessionToken is provided', async () => {
+    it('should fetch weather data when enabled', async () => {
       hueApi.getWeather.mockResolvedValue(mockWeatherResponse);
 
-      const { result } = renderHook(() => useWeather('test-token'));
+      const { result } = renderHook(() => useWeather(true));
 
       await waitFor(() => {
         expect(result.current.weather).toEqual(mockWeatherResponse);
       });
 
-      expect(hueApi.getWeather).toHaveBeenCalledWith('test-token');
+      expect(hueApi.getWeather).toHaveBeenCalledWith();
       expect(result.current.isLoading).toBe(false);
     });
 
     it('should set error on API failure', async () => {
       hueApi.getWeather.mockRejectedValue(new Error('Network error'));
 
-      const { result } = renderHook(() => useWeather('test-token'));
+      const { result } = renderHook(() => useWeather(true));
 
       await waitFor(() => {
         expect(result.current.error).toBe('Failed to fetch weather data');
@@ -82,7 +82,7 @@ describe('useWeather', () => {
     it('should not set error when no location is set (404)', async () => {
       hueApi.getWeather.mockRejectedValue(new Error('404: No location set'));
 
-      const { result } = renderHook(() => useWeather('test-token'));
+      const { result } = renderHook(() => useWeather(true));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -97,7 +97,7 @@ describe('useWeather', () => {
     it('should provide refetch function', async () => {
       hueApi.getWeather.mockResolvedValue(mockWeatherResponse);
 
-      const { result } = renderHook(() => useWeather('test-token'));
+      const { result } = renderHook(() => useWeather(true));
 
       await waitFor(() => {
         expect(result.current.weather).not.toBeNull();
@@ -113,39 +113,45 @@ describe('useWeather', () => {
     });
   });
 
-  describe('sessionToken changes', () => {
-    it('should refetch when sessionToken changes', async () => {
+  describe('enabled changes', () => {
+    it('should refetch when enabled changes', async () => {
       hueApi.getWeather.mockResolvedValue(mockWeatherResponse);
 
-      const { result, rerender } = renderHook(({ token }) => useWeather(token), {
-        initialProps: { token: 'token-1' },
+      const { result, rerender } = renderHook(({ enabled }) => useWeather(enabled), {
+        initialProps: { enabled: true },
       });
 
       await waitFor(() => {
         expect(result.current.weather).not.toBeNull();
       });
 
-      expect(hueApi.getWeather).toHaveBeenCalledWith('token-1');
+      expect(hueApi.getWeather).toHaveBeenCalledWith();
 
-      rerender({ token: 'token-2' });
+      rerender({ enabled: false });
 
       await waitFor(() => {
-        expect(hueApi.getWeather).toHaveBeenCalledWith('token-2');
+        expect(result.current.weather).toBeNull();
+      });
+
+      rerender({ enabled: true });
+
+      await waitFor(() => {
+        expect(hueApi.getWeather).toHaveBeenCalledTimes(2);
       });
     });
 
-    it('should clear weather when sessionToken becomes null', async () => {
+    it('should clear weather when enabled becomes false', async () => {
       hueApi.getWeather.mockResolvedValue(mockWeatherResponse);
 
-      const { result, rerender } = renderHook(({ token }) => useWeather(token), {
-        initialProps: { token: 'test-token' },
+      const { result, rerender } = renderHook(({ enabled }) => useWeather(enabled), {
+        initialProps: { enabled: true },
       });
 
       await waitFor(() => {
         expect(result.current.weather).not.toBeNull();
       });
 
-      rerender({ token: null });
+      rerender({ enabled: false });
 
       await waitFor(() => {
         expect(result.current.weather).toBeNull();
@@ -158,7 +164,7 @@ describe('useWeather', () => {
       const setIntervalSpy = vi.spyOn(global, 'setInterval');
       hueApi.getWeather.mockResolvedValue(mockWeatherResponse);
 
-      const { result } = renderHook(() => useWeather('test-token'));
+      const { result } = renderHook(() => useWeather(true));
 
       await waitFor(() => {
         expect(result.current.weather).not.toBeNull();
@@ -173,7 +179,7 @@ describe('useWeather', () => {
       const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
       hueApi.getWeather.mockResolvedValue(mockWeatherResponse);
 
-      const { result, unmount } = renderHook(() => useWeather('test-token'));
+      const { result, unmount } = renderHook(() => useWeather(true));
 
       await waitFor(() => {
         expect(result.current.weather).not.toBeNull();

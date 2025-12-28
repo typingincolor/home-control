@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import fs from 'fs';
 import SettingsService from '../../services/settingsService.js';
 import { getMockSettings } from '../../services/mockData.js';
 
@@ -12,9 +13,28 @@ vi.mock('../../utils/logger.js', () => ({
   }),
 }));
 
+const testSettingsPath = '/tmp/test-settings.json';
+
 describe('SettingsService', () => {
   beforeEach(() => {
     SettingsService.clearAll();
+    // Redirect all file writes to test file to avoid polluting real settings
+    SettingsService.settingsFilePath = testSettingsPath;
+    // Clean up test file
+    try {
+      fs.unlinkSync(testSettingsPath);
+    } catch {
+      // File doesn't exist, that's fine
+    }
+  });
+
+  afterEach(() => {
+    // Clean up test file
+    try {
+      fs.unlinkSync(testSettingsPath);
+    } catch {
+      // File doesn't exist, that's fine
+    }
   });
 
   describe('getSettings', () => {
@@ -39,7 +59,8 @@ describe('SettingsService', () => {
 
       const result = SettingsService.getSettings('session-1');
 
-      expect(result).toEqual(settings);
+      expect(result.location).toEqual(settings.location);
+      expect(result.units).toBe(settings.units);
     });
 
     it('should return separate settings per session', () => {
@@ -155,6 +176,48 @@ describe('SettingsService', () => {
     });
   });
 
+  describe('resetToDefaults', () => {
+    it('should reset all settings to demo defaults', () => {
+      // Modify settings first
+      SettingsService.updateSettings('session-1', {
+        units: 'fahrenheit',
+        services: { hue: { enabled: false }, hive: { enabled: false } },
+      });
+
+      SettingsService.resetToDefaults();
+
+      // Should return demo defaults (all services enabled)
+      const result = SettingsService.getSettings('session-1', true);
+      const mockSettings = getMockSettings();
+
+      expect(result.services.hue.enabled).toBe(mockSettings.services.hue.enabled);
+      expect(result.services.hive.enabled).toBe(mockSettings.services.hive.enabled);
+    });
+
+    it('should clear session settings', () => {
+      SettingsService.updateSettings('session-1', { units: 'fahrenheit' });
+
+      SettingsService.resetToDefaults();
+
+      // Session should no longer have stored settings
+      const result = SettingsService.getSettings('session-1', true);
+      const mockSettings = getMockSettings();
+      expect(result.units).toBe(mockSettings.units);
+    });
+
+    it('should reset global settings to demo defaults', () => {
+      SettingsService.updateSettings('session-1', {
+        services: { hive: { enabled: false } },
+      });
+
+      SettingsService.resetToDefaults();
+
+      // New sessions in demo mode should get demo defaults
+      const result = SettingsService.getSettings('new-session', true);
+      expect(result.services.hive.enabled).toBe(true); // Demo mode has both enabled
+    });
+  });
+
   describe('validation', () => {
     it('should validate units value', () => {
       expect(() => {
@@ -192,6 +255,280 @@ describe('SettingsService', () => {
           name: 'NYC',
         });
       }).not.toThrow();
+    });
+  });
+
+  describe('Service Activation', () => {
+    it('should return default services with hue enabled and hive disabled', () => {
+      const result = SettingsService.getSettings('session-1');
+
+      expect(result).toHaveProperty('services');
+      expect(result.services).toHaveProperty('hue');
+      expect(result.services).toHaveProperty('hive');
+      expect(result.services.hue.enabled).toBe(true);
+      expect(result.services.hive.enabled).toBe(false);
+    });
+
+    it('should update hive service enabled state', () => {
+      SettingsService.updateSettings('session-1', {
+        services: { hive: { enabled: true } },
+      });
+
+      const result = SettingsService.getSettings('session-1');
+      expect(result.services.hive.enabled).toBe(true);
+    });
+
+    it('should update hue service enabled state', () => {
+      SettingsService.updateSettings('session-1', {
+        services: { hue: { enabled: false } },
+      });
+
+      const result = SettingsService.getSettings('session-1');
+      expect(result.services.hue.enabled).toBe(false);
+    });
+
+    it('should preserve other service states when updating one', () => {
+      SettingsService.updateSettings('session-1', {
+        services: { hive: { enabled: true } },
+      });
+      SettingsService.updateSettings('session-1', {
+        services: { hue: { enabled: false } },
+      });
+
+      const result = SettingsService.getSettings('session-1');
+      expect(result.services.hue.enabled).toBe(false);
+      expect(result.services.hive.enabled).toBe(true);
+    });
+
+    it('should preserve other settings when updating services', () => {
+      SettingsService.updateSettings('session-1', { units: 'fahrenheit' });
+      SettingsService.updateSettings('session-1', {
+        services: { hive: { enabled: true } },
+      });
+
+      const result = SettingsService.getSettings('session-1');
+      expect(result.units).toBe('fahrenheit');
+      expect(result.services.hive.enabled).toBe(true);
+    });
+
+    it('should validate services enabled must be boolean', () => {
+      expect(() => {
+        SettingsService.updateSettings('session-1', {
+          services: { hue: { enabled: 'yes' } },
+        });
+      }).toThrow();
+    });
+
+    it('should validate services structure', () => {
+      expect(() => {
+        SettingsService.updateSettings('session-1', {
+          services: { invalidService: { enabled: true } },
+        });
+      }).toThrow();
+    });
+
+    it('should return services in demo mode', () => {
+      const result = SettingsService.getSettings('demo-session', true);
+
+      expect(result).toHaveProperty('services');
+      expect(result.services).toHaveProperty('hue');
+      expect(result.services).toHaveProperty('hive');
+    });
+  });
+
+  describe('Service Activation Persistence', () => {
+    beforeEach(async () => {
+      vi.resetModules();
+    });
+
+    it('should persist services to file when updated', async () => {
+      const module = await import('../../services/settingsService.js');
+      const service = module.default;
+      service.settingsFilePath = testSettingsPath;
+
+      service.updateSettings('session-1', {
+        services: { hive: { enabled: true } },
+      });
+
+      const fileContents = fs.readFileSync(testSettingsPath, 'utf8');
+      const saved = JSON.parse(fileContents);
+
+      expect(saved.services).toBeDefined();
+      expect(saved.services.hive.enabled).toBe(true);
+    });
+
+    it('should load services from file on startup', async () => {
+      // Write settings file directly
+      const savedSettings = {
+        location: null,
+        units: 'celsius',
+        services: {
+          hue: { enabled: true },
+          hive: { enabled: true },
+        },
+      };
+      fs.writeFileSync(testSettingsPath, JSON.stringify(savedSettings));
+
+      // Reset modules and import fresh
+      vi.resetModules();
+      const module = await import('../../services/settingsService.js');
+      const service = module.default;
+      service.settingsFilePath = testSettingsPath;
+      service._loadSettings();
+
+      const settings = service.getSettings('any-session');
+      expect(settings.services.hive.enabled).toBe(true);
+    });
+
+    it('should persist services across service instances', async () => {
+      // First instance: enable hive
+      const module1 = await import('../../services/settingsService.js');
+      const service1 = module1.default;
+      service1.settingsFilePath = testSettingsPath;
+      service1.updateSettings('session-1', {
+        services: { hive: { enabled: true } },
+      });
+
+      // Reset and create new instance
+      vi.resetModules();
+      const module2 = await import('../../services/settingsService.js');
+      const service2 = module2.default;
+      service2.settingsFilePath = testSettingsPath;
+      service2._loadSettings();
+
+      const settings = service2.getSettings('any-session');
+      expect(settings.services.hive.enabled).toBe(true);
+    });
+  });
+
+  describe('Location Persistence', () => {
+    beforeEach(async () => {
+      vi.resetModules();
+    });
+
+    it('should save location in settings file', async () => {
+      const module = await import('../../services/settingsService.js');
+      const service = module.default;
+      service.settingsFilePath = testSettingsPath;
+
+      const location = { lat: 51.5074, lon: -0.1278, name: 'London' };
+      service.updateLocation('session-1', location);
+
+      const fileContents = fs.readFileSync(testSettingsPath, 'utf8');
+      const saved = JSON.parse(fileContents);
+
+      expect(saved.location).toEqual(location);
+    });
+
+    it('should persist units to file when updated', async () => {
+      const module = await import('../../services/settingsService.js');
+      const service = module.default;
+      service.settingsFilePath = testSettingsPath;
+
+      service.updateSettings('session-1', { units: 'fahrenheit' });
+
+      const fileContents = fs.readFileSync(testSettingsPath, 'utf8');
+      const saved = JSON.parse(fileContents);
+
+      expect(saved.units).toBe('fahrenheit');
+    });
+
+    it('should load location from file on startup', async () => {
+      // Write settings file directly
+      const savedSettings = {
+        location: { lat: 48.8566, lon: 2.3522, name: 'Paris' },
+        units: 'celsius',
+      };
+      fs.writeFileSync(testSettingsPath, JSON.stringify(savedSettings));
+
+      // Reset modules and import fresh
+      vi.resetModules();
+      const module = await import('../../services/settingsService.js');
+      const service = module.default;
+      service.settingsFilePath = testSettingsPath;
+      service._loadSettings();
+
+      const settings = service.getSettings('any-session');
+      expect(settings.location).toEqual(savedSettings.location);
+    });
+
+    it('should load units from file on startup', async () => {
+      const savedSettings = {
+        location: null,
+        units: 'fahrenheit',
+      };
+      fs.writeFileSync(testSettingsPath, JSON.stringify(savedSettings));
+
+      vi.resetModules();
+      const module = await import('../../services/settingsService.js');
+      const service = module.default;
+      service.settingsFilePath = testSettingsPath;
+      service._loadSettings();
+
+      const settings = service.getSettings('any-session');
+      expect(settings.units).toBe('fahrenheit');
+    });
+
+    it('should handle missing settings file gracefully', async () => {
+      vi.resetModules();
+      const module = await import('../../services/settingsService.js');
+      const service = module.default;
+      service.settingsFilePath = '/tmp/nonexistent-settings.json';
+
+      expect(() => service._loadSettings()).not.toThrow();
+    });
+
+    it('should handle corrupted JSON file gracefully', async () => {
+      fs.writeFileSync(testSettingsPath, 'not valid json {{{');
+
+      vi.resetModules();
+      const module = await import('../../services/settingsService.js');
+      const service = module.default;
+      service.settingsFilePath = testSettingsPath;
+
+      expect(() => service._loadSettings()).not.toThrow();
+    });
+
+    it('should clear location from file when cleared', async () => {
+      const module = await import('../../services/settingsService.js');
+      const service = module.default;
+      service.settingsFilePath = testSettingsPath;
+
+      // Set then clear location
+      service.updateLocation('session-1', { lat: 40, lon: -74, name: 'NYC' });
+      service.clearLocation('session-1');
+
+      const fileContents = fs.readFileSync(testSettingsPath, 'utf8');
+      const saved = JSON.parse(fileContents);
+
+      expect(saved.location).toBeNull();
+    });
+
+    it('should persist settings across service instances', async () => {
+      // First instance: save location
+      const module1 = await import('../../services/settingsService.js');
+      const service1 = module1.default;
+      service1.settingsFilePath = testSettingsPath;
+      service1.updateLocation('session-1', { lat: 35.6762, lon: 139.6503, name: 'Tokyo' });
+
+      // Reset and create new instance
+      vi.resetModules();
+      const module2 = await import('../../services/settingsService.js');
+      const service2 = module2.default;
+      service2.settingsFilePath = testSettingsPath;
+      service2._loadSettings();
+
+      const settings = service2.getSettings('any-session');
+      expect(settings.location.name).toBe('Tokyo');
+    });
+
+    it('should have default settings file path', async () => {
+      vi.resetModules();
+      const module = await import('../../services/settingsService.js');
+      const service = module.default;
+
+      expect(service.settingsFilePath).toBeDefined();
+      expect(service.settingsFilePath).toContain('settings.json');
     });
   });
 });

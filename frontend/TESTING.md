@@ -49,20 +49,20 @@ View mutation report: `open reports/mutation/html/index.html`
 
 ## Test Coverage
 
-### Unit Test Results (261 frontend + 497 backend = 758 tests)
+### Unit Test Results (411 frontend + 660 backend = 1071 tests)
 
-#### Frontend (261 tests)
+#### Frontend (411 tests)
 
-- **Hooks**: useSession (23), useSettings (10), useWeather (10), useWebSocket (19), useLocation (16)
-- **Services**: hueApi (24)
-- **Components**: App (4), MotionZones (9), DashboardSummary (5), SceneSelector (8), SettingsDrawer (16), WeatherDisplay (11), WeatherTooltip (11), LightControl/index (25), index.zones (9)
+- **Hooks**: useSession (23), useSettings (18), useWeather (10), useWebSocket (19), useLocation (14), useHive (19)
+- **Services**: hueApi (41)
+- **Components**: App (7), MotionZones (8), DashboardSummary (5), SceneSelector (8), SettingsPage (38), BottomNav (5), WeatherDisplay (11), WeatherTooltip (11), HiveView (18), LightControl/index (29), index.zones (9), index.hive (17)
 - **Context**: DemoModeContext (8)
 - **Utils**: validation (8)
-- **Integration**: integration.test.jsx (10)
+- **Integration**: integration.test.jsx (12)
 
-#### Backend (497 tests)
+#### Backend (660 tests)
 
-Business logic tests including colorConversion (49), roomService, zoneService, automationService (16), sessionManager (53), websocketService (26), and more.
+Business logic tests including colorConversion (49), roomService, zoneService, automationService (16), sessionManager (53), websocketService (31), settingsService (43), and more.
 
 ## Mutation Testing Results
 
@@ -129,7 +129,7 @@ Some mutants survive because they don't produce observable differences:
    - Mathematical code has expected survivors
 
 4. **Fast Execution**
-   - 758 tests run in <5 seconds
+   - 1071 tests run in <5 seconds
    - Mutation testing completes in ~15 minutes
    - Enables rapid development cycles
 
@@ -154,7 +154,7 @@ src/
 │   └── LightControl/
 │       ├── DashboardSummary.test.jsx
 │       ├── SceneSelector.test.jsx
-│       ├── SettingsDrawer.test.jsx
+│       ├── SettingsPage.test.jsx
 │       ├── WeatherDisplay.test.jsx
 │       ├── index.test.jsx
 │       └── index.zones.test.jsx
@@ -310,19 +310,19 @@ npm run test:e2e:ui
 npm run test:e2e:headed
 ```
 
-### Test Files (179 tests)
+### Test Files (217 tests)
 
 ```
 e2e/
-├── demo-mode.spec.ts    # Dashboard tests in demo mode
-├── discovery.spec.ts    # Bridge discovery flow
-├── auth.spec.ts         # Authentication flow
-├── rooms.spec.ts        # Room navigation and controls
-├── zones.spec.ts        # Zone display and controls
-├── automations.spec.ts  # Automation triggering (21 tests)
-├── scenes.spec.ts       # Scene activation
-├── settings.spec.ts     # Settings persistence
-└── session.spec.ts      # Session persistence
+├── auth.spec.ts            # Authentication flow
+├── automations.spec.ts     # Automation triggering
+├── demo-mode.spec.ts       # Dashboard tests in demo mode
+├── discovery.spec.ts       # Bridge discovery flow
+├── hive.spec.ts            # Hive heating integration
+├── responsive-layout.spec.ts # Responsive design tests
+├── session.spec.ts         # Session persistence
+├── spacing-layout.spec.ts  # Layout spacing tests
+└── weather-settings.spec.ts # Weather settings
 ```
 
 ### Demo Mode Testing

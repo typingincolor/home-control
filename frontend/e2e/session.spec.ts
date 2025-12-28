@@ -18,7 +18,12 @@ test.describe('Session Persistence', () => {
   test('should store bridge IP in localStorage', async ({ page }) => {
     await page.goto('/');
 
-    // Enter a bridge IP
+    // Enable Hue from settings page first (deferred service activation)
+    await expect(page.getByText(/Settings/i)).toBeVisible();
+    await page.getByText('Philips Hue').click();
+
+    // Now on discovery page - enter a bridge IP
+    await expect(page.getByRole('heading', { name: 'Auto-Discovery' })).toBeVisible();
     const ipInput = page.getByPlaceholder(/192\.168/i);
     await ipInput.fill('192.168.1.100');
 
@@ -26,7 +31,6 @@ test.describe('Session Persistence', () => {
     const connectButton = page.getByRole('button', { name: /connect|next|continue/i });
     if (await connectButton.isVisible()) {
       await connectButton.click();
-      await page.waitForTimeout(500);
     }
 
     // Verify localStorage has the bridge IP
@@ -90,9 +94,6 @@ test.describe('Session Expiration', () => {
     await page.reload();
 
     // App should handle gracefully - either show login or recovery
-    // Wait for any redirect/recovery
-    await page.waitForTimeout(2000);
-
     // App should still be functional
     await expect(page.locator('body')).toBeVisible();
   });
@@ -108,9 +109,6 @@ test.describe('Session Expiration', () => {
 
     // Reload and check for restoring indicator
     await page.reload();
-
-    // Either shows restoring message or proceeds to dashboard/login
-    await page.waitForTimeout(1000);
 
     // App should be in a valid state
     await expect(page.locator('body')).toBeVisible();

@@ -44,7 +44,7 @@ describe('useLocation', () => {
 
   describe('initialization', () => {
     it('should return provided location', () => {
-      const { result } = renderHook(() => useLocation('token', mockLocation, vi.fn()));
+      const { result } = renderHook(() => useLocation(mockLocation, vi.fn()));
 
       expect(result.current.location).toEqual(mockLocation);
       expect(result.current.isDetecting).toBe(false);
@@ -52,7 +52,7 @@ describe('useLocation', () => {
     });
 
     it('should return null location when none provided', () => {
-      const { result } = renderHook(() => useLocation('token', null, vi.fn()));
+      const { result } = renderHook(() => useLocation(null, vi.fn()));
 
       expect(result.current.location).toBeNull();
     });
@@ -79,13 +79,13 @@ describe('useLocation', () => {
       hueApi.updateLocation.mockResolvedValue({});
 
       const onLocationUpdate = vi.fn();
-      const { result } = renderHook(() => useLocation('token', null, onLocationUpdate));
+      const { result } = renderHook(() => useLocation(null, onLocationUpdate));
 
       await act(async () => {
         await result.current.detectLocation();
       });
 
-      expect(hueApi.updateLocation).toHaveBeenCalledWith('token', {
+      expect(hueApi.updateLocation).toHaveBeenCalledWith({
         lat: 40.7128,
         lon: -74.006,
         name: 'New York',
@@ -105,7 +105,7 @@ describe('useLocation', () => {
         writable: true,
       });
 
-      const { result } = renderHook(() => useLocation('token', null, vi.fn()));
+      const { result } = renderHook(() => useLocation(null, vi.fn()));
 
       await act(async () => {
         await result.current.detectLocation();
@@ -119,22 +119,12 @@ describe('useLocation', () => {
       });
     });
 
-    it('should set error when no sessionToken', async () => {
-      const { result } = renderHook(() => useLocation(null, null, vi.fn()));
-
-      await act(async () => {
-        await result.current.detectLocation();
-      });
-
-      expect(result.current.error).toBe('Not authenticated');
-    });
-
     it('should set error on geolocation permission denied', async () => {
       mockGeolocation.getCurrentPosition.mockImplementation((_, reject) => {
         reject({ code: 1 });
       });
 
-      const { result } = renderHook(() => useLocation('token', null, vi.fn()));
+      const { result } = renderHook(() => useLocation(null, vi.fn()));
 
       await act(async () => {
         await result.current.detectLocation();
@@ -148,7 +138,7 @@ describe('useLocation', () => {
         reject({ code: 2 });
       });
 
-      const { result } = renderHook(() => useLocation('token', null, vi.fn()));
+      const { result } = renderHook(() => useLocation(null, vi.fn()));
 
       await act(async () => {
         await result.current.detectLocation();
@@ -162,7 +152,7 @@ describe('useLocation', () => {
         reject({ code: 3 });
       });
 
-      const { result } = renderHook(() => useLocation('token', null, vi.fn()));
+      const { result } = renderHook(() => useLocation(null, vi.fn()));
 
       await act(async () => {
         await result.current.detectLocation();
@@ -186,7 +176,7 @@ describe('useLocation', () => {
 
       hueApi.updateLocation.mockResolvedValue({});
 
-      const { result } = renderHook(() => useLocation('token', null, vi.fn()));
+      const { result } = renderHook(() => useLocation(null, vi.fn()));
 
       // Start detection (don't await yet)
       let detectPromise;
@@ -212,31 +202,21 @@ describe('useLocation', () => {
       hueApi.clearLocation.mockResolvedValue({});
       const onLocationUpdate = vi.fn();
 
-      const { result } = renderHook(() => useLocation('token', mockLocation, onLocationUpdate));
+      const { result } = renderHook(() => useLocation(mockLocation, onLocationUpdate));
 
       await act(async () => {
         await result.current.clearLocation();
       });
 
-      expect(hueApi.clearLocation).toHaveBeenCalledWith('token');
+      expect(hueApi.clearLocation).toHaveBeenCalled();
       expect(onLocationUpdate).toHaveBeenCalledWith(null);
-    });
-
-    it('should not call API when no sessionToken', async () => {
-      const { result } = renderHook(() => useLocation(null, mockLocation, vi.fn()));
-
-      await act(async () => {
-        await result.current.clearLocation();
-      });
-
-      expect(hueApi.clearLocation).not.toHaveBeenCalled();
     });
 
     it('should set error on API failure', async () => {
       hueApi.clearLocation.mockRejectedValue(new Error('API error'));
       const onLocationUpdate = vi.fn();
 
-      const { result } = renderHook(() => useLocation('token', mockLocation, onLocationUpdate));
+      const { result } = renderHook(() => useLocation(mockLocation, onLocationUpdate));
 
       await act(async () => {
         await result.current.clearLocation();
@@ -264,7 +244,7 @@ describe('useLocation', () => {
       hueApi.updateLocation.mockResolvedValue({});
       const onLocationUpdate = vi.fn();
 
-      const { result } = renderHook(() => useLocation('token', null, onLocationUpdate));
+      const { result } = renderHook(() => useLocation(null, onLocationUpdate));
 
       await act(async () => {
         await result.current.detectLocation();
@@ -294,7 +274,7 @@ describe('useLocation', () => {
       hueApi.updateLocation.mockResolvedValue({});
       const onLocationUpdate = vi.fn();
 
-      const { result } = renderHook(() => useLocation('token', null, onLocationUpdate));
+      const { result } = renderHook(() => useLocation(null, onLocationUpdate));
 
       await act(async () => {
         await result.current.detectLocation();
@@ -324,7 +304,7 @@ describe('useLocation', () => {
       hueApi.updateLocation.mockResolvedValue({});
       const onLocationUpdate = vi.fn();
 
-      const { result } = renderHook(() => useLocation('token', null, onLocationUpdate));
+      const { result } = renderHook(() => useLocation(null, onLocationUpdate));
 
       await act(async () => {
         await result.current.detectLocation();
@@ -351,7 +331,7 @@ describe('useLocation', () => {
       hueApi.updateLocation.mockResolvedValue({});
       const onLocationUpdate = vi.fn();
 
-      const { result } = renderHook(() => useLocation('token', null, onLocationUpdate));
+      const { result } = renderHook(() => useLocation(null, onLocationUpdate));
 
       await act(async () => {
         await result.current.detectLocation();

@@ -33,17 +33,13 @@ describe('MotionZones', () => {
   it('should return null when no zones have motion', () => {
     const zones = [{ id: 'zone-1', name: 'Kitchen', motionDetected: false, reachable: true }];
 
-    const { container } = render(
-      <MotionZones sessionToken="test-session-token" motionZones={zones} />
-    );
+    const { container } = render(<MotionZones motionZones={zones} />);
 
     expect(container.firstChild).toBeNull();
   });
 
   it('should return null when zones array is empty', () => {
-    const { container } = render(
-      <MotionZones sessionToken="test-session-token" motionZones={[]} />
-    );
+    const { container } = render(<MotionZones motionZones={[]} />);
 
     expect(container.firstChild).toBeNull();
   });
@@ -51,7 +47,7 @@ describe('MotionZones', () => {
   it('should show alert when motion is detected', () => {
     const zones = [{ id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }];
 
-    render(<MotionZones sessionToken="test-session-token" motionZones={zones} />);
+    render(<MotionZones motionZones={zones} />);
 
     expect(screen.getByText(/Motion: Kitchen/)).toBeInTheDocument();
     expect(screen.getByText('🔴')).toBeInTheDocument();
@@ -63,7 +59,7 @@ describe('MotionZones', () => {
       { id: 'zone-2', name: 'Living Room', motionDetected: true, reachable: true },
     ];
 
-    render(<MotionZones sessionToken="test-session-token" motionZones={zones} />);
+    render(<MotionZones motionZones={zones} />);
 
     expect(screen.getByText(/Motion: Kitchen/)).toBeInTheDocument();
     expect(screen.getByText(/Motion: Living Room/)).toBeInTheDocument();
@@ -74,7 +70,7 @@ describe('MotionZones', () => {
 
     const zones = [{ id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }];
 
-    render(<MotionZones sessionToken="test-session-token" motionZones={zones} />);
+    render(<MotionZones motionZones={zones} />);
 
     expect(screen.getByText(/Motion: Kitchen/)).toBeInTheDocument();
 
@@ -91,9 +87,7 @@ describe('MotionZones', () => {
   it('should not show alert for unreachable zones', () => {
     const zones = [{ id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: false }];
 
-    const { container } = render(
-      <MotionZones sessionToken="test-session-token" motionZones={zones} />
-    );
+    const { container } = render(<MotionZones motionZones={zones} />);
 
     expect(container.firstChild).toBeNull();
   });
@@ -103,10 +97,10 @@ describe('MotionZones', () => {
       zones: [{ id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }],
     });
 
-    render(<MotionZones sessionToken="test-session-token" />);
+    render(<MotionZones />);
 
     await waitFor(() => {
-      expect(mockGetMotionZones).toHaveBeenCalledWith('test-session-token');
+      expect(mockGetMotionZones).toHaveBeenCalledWith();
     });
 
     await waitFor(() => {
@@ -114,18 +108,10 @@ describe('MotionZones', () => {
     });
   });
 
-  it('should not fetch when sessionToken is empty', () => {
-    render(<MotionZones sessionToken="" />);
-
-    expect(mockGetMotionZones).not.toHaveBeenCalled();
-  });
-
   it('should have correct alert structure', () => {
     const zones = [{ id: 'zone-1', name: 'Kitchen', motionDetected: true, reachable: true }];
 
-    const { container } = render(
-      <MotionZones sessionToken="test-session-token" motionZones={zones} />
-    );
+    const { container } = render(<MotionZones motionZones={zones} />);
 
     expect(container.querySelector('.motion-alert-container')).toBeInTheDocument();
     expect(container.querySelector('.motion-alert')).toBeInTheDocument();

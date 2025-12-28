@@ -229,6 +229,22 @@ components:
             - fahrenheit
           example: celsius
           description: Temperature unit preference
+        services:
+          type: object
+          description: Service enable/disable settings
+          properties:
+            hue:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                  description: Whether Hue service is enabled
+            hive:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                  description: Whether Hive service is enabled
     WeatherCurrent:
       type: object
       description: Current weather conditions
@@ -972,6 +988,19 @@ paths:
                   enum:
                     - celsius
                     - fahrenheit
+                services:
+                  type: object
+                  properties:
+                    hue:
+                      type: object
+                      properties:
+                        enabled:
+                          type: boolean
+                    hive:
+                      type: object
+                      properties:
+                        enabled:
+                          type: boolean
       responses:
         '200':
           description: Settings updated
@@ -1028,6 +1057,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Settings'
+  /settings/reset-demo:
+    post:
+      summary: Reset settings to demo defaults
+      description: Resets all settings to demo defaults. Only available in demo mode. Used for E2E test isolation.
+      tags:
+        - Settings
+      security:
+        - DemoMode: []
+      responses:
+        '200':
+          description: Settings reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Settings reset to demo defaults
+        '403':
+          description: Not in demo mode
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /weather:
     get:
       summary: Get weather data
@@ -1114,6 +1171,213 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /hive/connect:
+    post:
+      summary: Connect to Hive
+      description: Initiate Hive authentication. Returns requires2fa=true for SMS verification.
+      tags:
+        - Hive
+      security:
+        - BearerAuth: []
+        - DemoMode: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  description: Hive account email
+                password:
+                  type: string
+                  description: Hive account password
+      responses:
+        '200':
+          description: 2FA required or connected successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requires2fa:
+                    type: boolean
+                    description: True if SMS verification needed
+                    example: true
+                  session:
+                    type: string
+                    description: Session token for verify-2fa call
+                  success:
+                    type: boolean
+                    description: True if connected without 2FA (device auth)
+        '400':
+          description: Missing credentials
+        '401':
+          description: Invalid credentials
+  /hive/verify-2fa:
+    post:
+      summary: Verify Hive 2FA code
+      description: Complete Hive authentication by verifying SMS code
+      tags:
+        - Hive
+      security:
+        - BearerAuth: []
+        - DemoMode: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - session
+              properties:
+                code:
+                  type: string
+                  description: 6-digit SMS verification code
+                  example: '123456'
+                session:
+                  type: string
+                  description: Session token from connect response
+                username:
+                  type: string
+                  description: Hive account email (for device registration)
+      responses:
+        '200':
+          description: Verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '400':
+          description: Invalid verification code
+        '401':
+          description: Session expired
+  /hive/disconnect:
+    post:
+      summary: Disconnect from Hive
+      description: Clear Hive session
+      tags:
+        - Hive
+      security:
+        - BearerAuth: []
+        - DemoMode: []
+      responses:
+        '200':
+          description: Disconnected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+  /hive/connection:
+    get:
+      summary: Get Hive connection status
+      description: Check if connected to Hive (in demo mode or with real credentials)
+      tags:
+        - Hive
+      security:
+        - BearerAuth: []
+        - DemoMode: []
+      responses:
+        '200':
+          description: Connection status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connected:
+                    type: boolean
+                    example: true
+  /hive/status:
+    get:
+      summary: Get Hive status
+      description: Get current thermostat and hot water status
+      tags:
+        - Hive
+      security:
+        - BearerAuth: []
+        - DemoMode: []
+      responses:
+        '200':
+          description: Hive status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  heating:
+                    type: object
+                    properties:
+                      currentTemperature:
+                        type: number
+                        example: 19.5
+                      targetTemperature:
+                        type: number
+                        example: 21
+                      isHeating:
+                        type: boolean
+                        example: true
+                      mode:
+                        type: string
+                        example: schedule
+                  hotWater:
+                    type: object
+                    properties:
+                      isOn:
+                        type: boolean
+                        example: false
+                      mode:
+                        type: string
+                        example: schedule
+  /hive/schedules:
+    get:
+      summary: Get Hive schedules
+      description: Get heating and hot water schedules
+      tags:
+        - Hive
+      security:
+        - BearerAuth: []
+        - DemoMode: []
+      responses:
+        '200':
+          description: List of schedules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - heating
+                        - hotWater
+                    time:
+                      type: string
+                      example: '06:00'
+                    days:
+                      type: array
+                      items:
+                        type: string
 tags:
   - name: Authentication
     description: Session management
@@ -1135,3 +1399,5 @@ tags:
     description: User settings (location and units)
   - name: Weather
     description: Weather data for the stored location
+  - name: Hive
+    description: UK Hive heating system integration

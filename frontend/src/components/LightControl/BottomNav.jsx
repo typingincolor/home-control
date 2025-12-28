@@ -14,6 +14,7 @@ import {
   Tree,
   Door,
   Clock,
+  Thermometer,
 } from './Icons';
 
 // Icon size for nav tabs
@@ -56,31 +57,47 @@ export const BottomNav = ({
   hasAutomations = false,
   selectedId,
   onSelect,
+  services,
+  hueConnected = false,
+  hiveConnected = false,
 }) => {
   const isZonesSelected = selectedId === 'zones';
   const isAutomationsSelected = selectedId === 'automations';
+  const isHiveSelected = selectedId === 'hive';
   const navRef = useDragScroll();
+
+  // Enabled + connected visibility: tabs only show when service is BOTH enabled AND connected
+  // (defaults to true for Hue if services prop is missing for backwards compatibility)
+  const hueEnabled = services?.hue?.enabled ?? true;
+  const hiveEnabled = services?.hive?.enabled ?? false;
+
+  // Combined visibility: must be both enabled in settings AND connected
+  const showHueTabs = hueEnabled && hueConnected;
+  const showHiveTab = hiveEnabled && hiveConnected;
 
   return (
     <nav className="bottom-nav" ref={navRef}>
-      {rooms.map((room) => {
-        const isActive = selectedId === room.id;
-        const lightsOn = room.stats?.lightsOnCount || 0;
+      {/* Rooms - only shown when Hue is enabled AND connected */}
+      {showHueTabs &&
+        rooms.map((room) => {
+          const isActive = selectedId === room.id;
+          const lightsOn = room.stats?.lightsOnCount || 0;
 
-        return (
-          <button
-            key={room.id}
-            className={`nav-tab ${isActive ? 'active' : ''}`}
-            onClick={() => onSelect(room.id)}
-          >
-            {getRoomIcon(room.name)}
-            <span className="nav-tab-label">{room.name}</span>
-            {lightsOn > 0 && <span className="nav-tab-badge">{lightsOn}</span>}
-          </button>
-        );
-      })}
+          return (
+            <button
+              key={room.id}
+              className={`nav-tab ${isActive ? 'active' : ''}`}
+              onClick={() => onSelect(room.id)}
+            >
+              {getRoomIcon(room.name)}
+              <span className="nav-tab-label">{room.name}</span>
+              {lightsOn > 0 && <span className="nav-tab-badge">{lightsOn}</span>}
+            </button>
+          );
+        })}
 
-      {zones.length > 0 && (
+      {/* Zones - only shown when Hue is enabled AND connected */}
+      {showHueTabs && zones.length > 0 && (
         <button
           className={`nav-tab ${isZonesSelected ? 'active' : ''}`}
           onClick={() => onSelect('zones')}
@@ -91,13 +108,25 @@ export const BottomNav = ({
         </button>
       )}
 
-      {hasAutomations && (
+      {/* Automations - only shown when Hue is enabled AND connected */}
+      {showHueTabs && hasAutomations && (
         <button
           className={`nav-tab ${isAutomationsSelected ? 'active' : ''}`}
           onClick={() => onSelect('automations')}
         >
           <Clock size={NAV_ICON_SIZE} className="nav-tab-icon" />
           <span className="nav-tab-label">{UI_TEXT.NAV_AUTOMATIONS}</span>
+        </button>
+      )}
+
+      {/* Hive tab - only shown when Hive is enabled AND connected */}
+      {showHiveTab && (
+        <button
+          className={`nav-tab ${isHiveSelected ? 'active' : ''}`}
+          onClick={() => onSelect('hive')}
+        >
+          <Thermometer size={NAV_ICON_SIZE} className="nav-tab-icon" />
+          <span className="nav-tab-label">{UI_TEXT.NAV_HIVE}</span>
         </button>
       )}
     </nav>
@@ -118,4 +147,10 @@ BottomNav.propTypes = {
   hasAutomations: PropTypes.bool,
   selectedId: PropTypes.string,
   onSelect: PropTypes.func.isRequired,
+  services: PropTypes.shape({
+    hue: PropTypes.shape({ enabled: PropTypes.bool }),
+    hive: PropTypes.shape({ enabled: PropTypes.bool }),
+  }),
+  hueConnected: PropTypes.bool,
+  hiveConnected: PropTypes.bool,
 };

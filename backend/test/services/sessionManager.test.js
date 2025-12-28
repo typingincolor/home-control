@@ -27,13 +27,24 @@ describe('SessionManager', () => {
     // Stop automatic cleanup to prevent test interference
     sessionManager.stopCleanup();
 
-    // Clear any existing sessions
+    // Clear any existing sessions and credentials loaded from production file
     sessionManager.sessions.clear();
+    sessionManager.bridgeCredentials.clear();
+
+    // Use test path to avoid touching production credentials
+    sessionManager.credentialsFilePath = '/tmp/test-session-credentials.json';
   });
 
   afterEach(() => {
     sessionManager.stopCleanup();
     vi.restoreAllMocks();
+
+    // Clean up test credentials file
+    try {
+      fs.unlinkSync('/tmp/test-session-credentials.json');
+    } catch {
+      // File doesn't exist, that's fine
+    }
   });
 
   describe('createSession', () => {
@@ -476,6 +487,52 @@ describe('SessionManager', () => {
         expect(sessionManager.hasBridgeCredentials(bridgeIp)).toBe(false);
       });
     });
+
+    describe('clearBridgeCredentials', () => {
+      it('should remove stored credentials for a bridge', () => {
+        sessionManager.storeBridgeCredentials(bridgeIp, username);
+        expect(sessionManager.hasBridgeCredentials(bridgeIp)).toBe(true);
+
+        const result = sessionManager.clearBridgeCredentials(bridgeIp);
+
+        expect(result).toBe(true);
+        expect(sessionManager.hasBridgeCredentials(bridgeIp)).toBe(false);
+        expect(sessionManager.getBridgeCredentials(bridgeIp)).toBeNull();
+      });
+
+      it('should return false for unknown bridge', () => {
+        const result = sessionManager.clearBridgeCredentials('192.168.1.200');
+
+        expect(result).toBe(false);
+      });
+
+      it('should not affect other bridges', () => {
+        sessionManager.storeBridgeCredentials('192.168.1.100', 'user1');
+        sessionManager.storeBridgeCredentials('192.168.1.101', 'user2');
+
+        sessionManager.clearBridgeCredentials('192.168.1.100');
+
+        expect(sessionManager.hasBridgeCredentials('192.168.1.100')).toBe(false);
+        expect(sessionManager.hasBridgeCredentials('192.168.1.101')).toBe(true);
+        expect(sessionManager.getBridgeCredentials('192.168.1.101')).toBe('user2');
+      });
+
+      it('should persist the removal to file', () => {
+        const testCredentialsPath = '/tmp/test-clear-credentials.json';
+        sessionManager.credentialsFilePath = testCredentialsPath;
+
+        sessionManager.storeBridgeCredentials(bridgeIp, username);
+        sessionManager.clearBridgeCredentials(bridgeIp);
+
+        const contents = fs.readFileSync(testCredentialsPath, 'utf8');
+        const credentials = JSON.parse(contents);
+
+        expect(credentials[bridgeIp]).toBeUndefined();
+
+        // Cleanup
+        fs.unlinkSync(testCredentialsPath);
+      });
+    });
   });
 
   describe('Credential Persistence', () => {
@@ -611,9 +668,15 @@ describe('SessionManager', () => {
     });
 
     describe('constructor with persistence', () => {
-      it('should have default credentials file path', () => {
-        expect(sessionManager.credentialsFilePath).toBeDefined();
-        expect(sessionManager.credentialsFilePath).toContain('bridge-credentials.json');
+      it('should have default credentials file path', async () => {
+        // Import fresh to check default path before test override
+        vi.resetModules();
+        const freshModule = await import('../../services/sessionManager.js');
+        const freshManager = freshModule.default;
+        freshManager.stopCleanup();
+
+        expect(freshManager.credentialsFilePath).toBeDefined();
+        expect(freshManager.credentialsFilePath).toContain('bridge-credentials.json');
       });
     });
   });

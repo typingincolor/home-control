@@ -68,6 +68,23 @@ class SessionManager {
   }
 
   /**
+   * Clear stored credentials for a bridge
+   * @param {string} bridgeIp - Bridge IP address
+   * @returns {boolean} True if credentials were found and cleared
+   */
+  clearBridgeCredentials(bridgeIp) {
+    const existed = this.bridgeCredentials.has(bridgeIp);
+    this.bridgeCredentials.delete(bridgeIp);
+    this._saveCredentials();
+
+    if (existed) {
+      logger.info('Cleared bridge credentials', { bridgeIp });
+    }
+
+    return existed;
+  }
+
+  /**
    * Create a new session
    * @param {string} bridgeIp - Bridge IP address
    * @param {string} username - Hue username/API key

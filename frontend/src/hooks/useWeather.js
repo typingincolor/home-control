@@ -9,17 +9,17 @@ const WEATHER_POLLING_INTERVAL = 15 * 60 * 1000;
 /**
  * Hook for fetching weather data from backend
  * Backend uses session's stored location and units
- * @param {string} sessionToken - Session token for API authentication
+ * @param {boolean} enabled - Whether to fetch weather (controlled by parent)
  * @returns {object} { weather, isLoading, error, refetch }
  */
-export const useWeather = (sessionToken) => {
+export const useWeather = (enabled = true) => {
   const [weather, setWeather] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const intervalRef = useRef(null);
 
   const fetchWeather = useCallback(async () => {
-    if (!sessionToken) {
+    if (!enabled) {
       setWeather(null);
       return;
     }
@@ -28,7 +28,7 @@ export const useWeather = (sessionToken) => {
     setError(null);
 
     try {
-      const data = await hueApi.getWeather(sessionToken);
+      const data = await hueApi.getWeather();
       setWeather(data);
     } catch (err) {
       // 404 means no location set - not an error, just no weather
@@ -41,11 +41,11 @@ export const useWeather = (sessionToken) => {
     } finally {
       setIsLoading(false);
     }
-  }, [sessionToken]);
+  }, [enabled]);
 
-  // Fetch on mount and when sessionToken changes
+  // Fetch on mount and when enabled changes
   useEffect(() => {
-    if (!sessionToken) {
+    if (!enabled) {
       setWeather(null);
       setError(null);
       return;
@@ -65,7 +65,7 @@ export const useWeather = (sessionToken) => {
         intervalRef.current = null;
       }
     };
-  }, [fetchWeather, sessionToken]);
+  }, [fetchWeather, enabled]);
 
   return {
     weather,

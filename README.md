@@ -181,7 +181,7 @@ philips-hue-connector/
 │       │       ├── ZonesView.jsx      # Zones list
 │       │       ├── SceneDrawer.jsx    # Slide-out drawer for scenes
 │       │       ├── SceneSelector.jsx  # Scene icons
-│       │       ├── SettingsDrawer.jsx # Weather settings
+│       │       ├── SettingsPage.jsx   # Settings page
 │       │       ├── WeatherDisplay.jsx # Toolbar weather
 │       │       └── DashboardSummary.jsx
 │       ├── utils/             # Utility functions
@@ -457,7 +457,7 @@ frontend/src/
 │   └── LightControl/
 │       ├── DashboardSummary.test.jsx   # 5 tests - Summary statistics
 │       ├── SceneSelector.test.jsx      # 8 tests - Scene icon buttons
-│       ├── SettingsDrawer.test.jsx     # 16 tests - Settings drawer
+│       ├── SettingsPage.test.jsx       # 32 tests - Settings page
 │       ├── WeatherDisplay.test.jsx     # 11 tests - Weather display
 │       ├── index.test.jsx              # 18 tests - Main control component
 │       └── index.zones.test.jsx        # 9 tests - Zone integration tests
