@@ -152,11 +152,17 @@ class HueDemoPluginClass extends ServicePlugin {
   /**
    * Update a device state
    * @param {string} deviceId - Device ID
-   * @param {Object} state - New state to apply
-   * @returns {Promise<Object>} Result object
+   * @param {Object} state - New state to apply (simple format: { on, brightness })
+   * @returns {Promise<Object>} Result object with success and applied state
    */
   async updateDevice(deviceId, state) {
-    return mockHueClient.updateLight(DEMO_BRIDGE_IP, DEMO_USERNAME, deviceId, state);
+    await mockHueClient.updateLight(DEMO_BRIDGE_IP, DEMO_USERNAME, deviceId, state);
+
+    return {
+      success: true,
+      deviceId,
+      appliedState: state,
+    };
   }
 
   /**
@@ -191,7 +197,13 @@ class HueDemoPluginClass extends ServicePlugin {
 
     await mockHueClient.updateLights(DEMO_BRIDGE_IP, DEMO_USERNAME, lightUpdates);
 
-    return { success: true, updatedLights: room.lights };
+    // Return lights with applied state merged in for optimistic updates
+    const updatedLights = room.lights.map((light) => ({
+      ...light,
+      ...state,
+    }));
+
+    return { success: true, updatedLights };
   }
 
   /**
@@ -217,7 +229,13 @@ class HueDemoPluginClass extends ServicePlugin {
 
     await mockHueClient.updateLights(DEMO_BRIDGE_IP, DEMO_USERNAME, lightUpdates);
 
-    return { success: true, updatedLights: zone.lights };
+    // Return lights with applied state merged in for optimistic updates
+    const updatedLights = zone.lights.map((light) => ({
+      ...light,
+      ...state,
+    }));
+
+    return { success: true, updatedLights };
   }
 
   /**

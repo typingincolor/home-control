@@ -129,19 +129,21 @@ function ensureServicePrefix(id) {
  * @param {string} lightId - Light ID (V1 format, without service prefix)
  * @param {Object} state - New state to apply
  * @param {boolean} demoMode - Whether demo mode is enabled
- * @returns {Promise<Object>} Result object with light property
+ * @param {Object} existingLight - Optional existing light data for merging
+ * @returns {Promise<Object>} Result object with light property containing merged state
  */
-export async function updateLight(lightId, state, demoMode = false) {
+export async function updateLight(lightId, state, demoMode = false, existingLight = null) {
   const fullId = ensureServicePrefix(lightId);
   const result = await homeApi.updateDevice(fullId, state, demoMode);
 
-  // Transform response to V1 format
+  // Merge applied state with existing light data for optimistic update
+  const mergedLight = existingLight
+    ? { ...existingLight, ...state }
+    : { id: lightId, ...state };
+
   return {
-    light: {
-      id: lightId,
-      ...state,
-    },
-    ...result,
+    success: result.success,
+    light: mergedLight,
   };
 }
 

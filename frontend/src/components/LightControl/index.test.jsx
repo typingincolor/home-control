@@ -299,7 +299,8 @@ describe('LightControl', () => {
       expect(updateLight).toHaveBeenCalledWith(
         'light-1',
         { on: false }, // Light was on, so turning off
-        true // isDemoMode
+        true, // isDemoMode
+        expect.objectContaining({ id: 'light-1', name: 'Lamp' }) // existing light for merging
       );
     });
 

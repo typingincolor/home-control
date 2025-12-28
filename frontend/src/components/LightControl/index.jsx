@@ -216,7 +216,7 @@ export const LightControl = ({ sessionToken, onLogout }) => {
       const currentState = light.on ?? false;
       const newState = { on: !currentState };
 
-      const response = await updateLight(lightUuid, newState, isDemoMode);
+      const response = await updateLight(lightUuid, newState, isDemoMode, light);
 
       // Optimistic update - apply immediately for responsive UI
       setLocalDashboard((prev) => ({

@@ -265,8 +265,8 @@ class HuePluginClass extends ServicePlugin {
   /**
    * Update a device state
    * @param {string} deviceId - Device ID (without service prefix)
-   * @param {Object} state - New state to apply
-   * @returns {Promise<Object>} Result object
+   * @param {Object} state - New state to apply (simple format: { on, brightness })
+   * @returns {Promise<Object>} Result object with success and applied state
    */
   async updateDevice(deviceId, state) {
     const bridgeIp = this._bridgeIp || sessionManager.getDefaultBridgeIp();
@@ -276,9 +276,16 @@ class HuePluginClass extends ServicePlugin {
     const username = sessionManager.getBridgeCredentials(bridgeIp);
     const client = getHueClientForBridge(bridgeIp);
 
-    // Convert simplified state to Hue API v2 format
+    // Convert simplified state to Hue API v2 format internally
     const hueState = convertToHueState(state);
-    return client.updateLight(bridgeIp, username, deviceId, hueState);
+    await client.updateLight(bridgeIp, username, deviceId, hueState);
+
+    // Return normalized response (not raw Hue format)
+    return {
+      success: true,
+      deviceId,
+      appliedState: state,
+    };
   }
 
   /**
@@ -328,7 +335,13 @@ class HuePluginClass extends ServicePlugin {
 
     await client.updateLights(bridgeIp, username, lightUpdates);
 
-    return { success: true, updatedLights: room.lights };
+    // Return lights with applied state merged in for optimistic updates
+    const updatedLights = room.lights.map((light) => ({
+      ...light,
+      ...state,
+    }));
+
+    return { success: true, updatedLights };
   }
 
   /**
@@ -362,7 +375,13 @@ class HuePluginClass extends ServicePlugin {
 
     await client.updateLights(bridgeIp, username, lightUpdates);
 
-    return { success: true, updatedLights: zone.lights };
+    // Return lights with applied state merged in for optimistic updates
+    const updatedLights = zone.lights.map((light) => ({
+      ...light,
+      ...state,
+    }));
+
+    return { success: true, updatedLights };
   }
 
   /**
