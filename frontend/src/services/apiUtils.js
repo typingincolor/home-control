@@ -2,7 +2,7 @@
  * Shared API utilities for V2 API clients
  */
 
-import { getSessionToken } from './authApi';
+import { getSessionToken } from './hueApi';
 
 /**
  * Get request headers with optional auth and demo mode

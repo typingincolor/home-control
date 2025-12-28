@@ -10,8 +10,8 @@ import * as automationsApi from './automationsApi';
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
-// Mock authApi for session token
-vi.mock('./authApi', () => ({
+// Mock hueApi for session token (apiUtils imports from hueApi)
+vi.mock('./hueApi', () => ({
   getSessionToken: vi.fn(() => 'test-token'),
 }));
 
