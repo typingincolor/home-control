@@ -259,7 +259,9 @@ test.describe('Layout Spacing - iPhone 14 (390x844)', () => {
       expect(settingsBox.x).toBeLessThan(VIEWPORTS.iphone14.width / 2);
 
       // Right toolbar section should be fully visible (not cut off)
-      expect(toolbarRightBox.x + toolbarRightBox.width).toBeLessThanOrEqual(VIEWPORTS.iphone14.width);
+      expect(toolbarRightBox.x + toolbarRightBox.width).toBeLessThanOrEqual(
+        VIEWPORTS.iphone14.width
+      );
     }
   });
 

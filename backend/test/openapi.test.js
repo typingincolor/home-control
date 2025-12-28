@@ -4,7 +4,7 @@ import { openApiSpec } from '../openapi.js';
 describe('OpenAPI Specification', () => {
   it('should export a valid OpenAPI 3.0 specification with required structure', () => {
     expect(openApiSpec.openapi).toBe('3.0.0');
-    expect(openApiSpec.info.title).toBe('Philips Hue Control API');
+    expect(openApiSpec.info.title).toBe('Home Control API');
     expect(openApiSpec.info.version).toBe('2.0.0');
     expect(openApiSpec.servers.length).toBeGreaterThan(0);
     expect(openApiSpec.components.securitySchemes.BearerAuth).toBeDefined();
@@ -44,6 +44,6 @@ describe('OpenAPI Specification', () => {
     const parsed = yaml.load(content);
 
     expect(parsed.openapi).toBe('3.0.0');
-    expect(parsed.info.title).toBe('Philips Hue Control API');
+    expect(parsed.info.title).toBe('Home Control API');
   });
 });

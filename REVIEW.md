@@ -301,3 +301,32 @@ Fixed during review:
 - **Hue auth endpoints moved** - Use `/api/v2/services/hue/pair` and `/api/v2/services/hue/connect` instead of generic auth routes
 - **OpenAPI docs at** `/api/v2/docs` (was `/api/v1/docs`)
 - **1,395 lines removed** - Significant code cleanup
+
+## 2025-12-28: Post-Merge Cleanup
+
+**Status:** Approved
+
+**Branch:** main (post-merge of PR #6)
+
+### Summary
+
+Post-merge review after PR #6 (plugin-services) was merged. Fixed test file that wasn't updated during the project rename from "Philips Hue Control" to "Home Control".
+
+### Issues Found and Fixed
+
+| File                           | Issue                                                       | Fix                                               |
+| ------------------------------ | ----------------------------------------------------------- | ------------------------------------------------- |
+| `backend/test/openapi.test.js` | Expected old project name "Philips Hue Control API"         | Updated to expect "Home Control API"              |
+| `frontend/src/hooks/useHive.js`| Unused `err` variable in catch block                        | Changed to empty catch                            |
+
+### Test Results
+
+- **Unit Tests:** 891 passed
+- **E2E Tests:** 170 passed, 3 skipped
+- **Lint:** Clean (0 errors, 0 warnings)
+- **Format:** All files formatted
+
+### Notes for Documentation
+
+- Review clean - no documentation updates needed
+- All previous review notes remain valid
