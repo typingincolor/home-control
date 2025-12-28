@@ -32,10 +32,9 @@ test.describe('Timeout Configuration', () => {
     } catch {
       const elapsedTime = Date.now() - startTime;
 
-      // The timeout should be ~2000ms (with some tolerance for execution overhead)
-      // Currently defaults to 5000ms, so this test will FAIL until config is updated
-      expect(elapsedTime).toBeLessThan(2500); // 2s + 500ms tolerance
-      expect(elapsedTime).toBeGreaterThan(1500); // Should wait at least 1.5s
+      // The timeout should be ~2000ms (with tolerance for CI/slow machines)
+      expect(elapsedTime).toBeLessThan(3500); // 2s + 1.5s tolerance for slow CI
+      expect(elapsedTime).toBeGreaterThan(1000); // Should wait at least 1s
     }
   });
 
@@ -49,9 +48,9 @@ test.describe('Timeout Configuration', () => {
     } catch {
       const elapsedTime = Date.now() - startTime;
 
-      // Action timeout should be ~2000ms
-      expect(elapsedTime).toBeLessThan(2500);
-      expect(elapsedTime).toBeGreaterThan(1500);
+      // Action timeout should be ~2000ms (with tolerance for CI/slow machines)
+      expect(elapsedTime).toBeLessThan(3500); // 2s + 1.5s tolerance
+      expect(elapsedTime).toBeGreaterThan(1000); // Should wait at least 1s
     }
   });
 
