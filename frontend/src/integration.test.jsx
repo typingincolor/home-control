@@ -136,13 +136,18 @@ const mockDashboard = {
 
 // Setup MSW server
 const server = setupServer(
+  // Health check endpoint
+  http.get('/health', () => {
+    return HttpResponse.json({ status: 'ok', version: '2.0.0' });
+  }),
+
   // Discovery endpoint
   http.get('/api/discovery', () => {
     return HttpResponse.json([{ id: 'bridge-1', internalipaddress: mockBridgeIp }]);
   }),
 
-  // Pairing endpoint (V2 API)
-  http.post('/api/v2/auth/pair', async ({ request }) => {
+  // Pairing endpoint (V2 API - via Hue service)
+  http.post('/api/v2/services/hue/pair', async ({ request }) => {
     const body = await request.json();
 
     // Verify Content-Type header (regression test for bug)
@@ -155,11 +160,11 @@ const server = setupServer(
       return new HttpResponse(null, { status: 400 });
     }
 
-    return HttpResponse.json({ username: mockUsername });
+    return HttpResponse.json({ success: true, username: mockUsername });
   }),
 
-  // Connect with stored credentials (V2 API)
-  http.post('/api/v2/auth/connect', async ({ request }) => {
+  // Connect with stored credentials (V2 API - via Hue service)
+  http.post('/api/v2/services/hue/connect', async ({ request }) => {
     const body = await request.json();
 
     if (!body.bridgeIp) {
@@ -167,10 +172,7 @@ const server = setupServer(
     }
 
     // Simulate no stored credentials - requires pairing
-    return HttpResponse.json(
-      { requiresPairing: true, error: 'No stored credentials' },
-      { status: 401 }
-    );
+    return HttpResponse.json({ requiresPairing: true });
   }),
 
   // Session creation endpoint (V2 API)
@@ -396,9 +398,9 @@ describe('Integration Tests', () => {
 
       // Intercept pairing request to check headers
       server.use(
-        http.post('/api/v2/auth/pair', async ({ request }) => {
+        http.post('/api/v2/services/hue/pair', async ({ request }) => {
           pairRequestHeaders = Object.fromEntries(request.headers.entries());
-          return HttpResponse.json({ username: mockUsername });
+          return HttpResponse.json({ success: true, username: mockUsername });
         })
       );
 
@@ -650,9 +652,9 @@ describe('Integration Tests', () => {
 
       // Count pairing requests
       server.use(
-        http.post('/api/v2/auth/pair', async () => {
+        http.post('/api/v2/services/hue/pair', async () => {
           pairCallCount++;
-          return HttpResponse.json({ username: mockUsername });
+          return HttpResponse.json({ success: true, username: mockUsername });
         })
       );
 

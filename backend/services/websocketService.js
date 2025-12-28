@@ -41,7 +41,7 @@ class WebSocketService {
 
   initialize(server) {
     this.io = new Server(server, {
-      path: '/api/v1/ws',
+      path: '/api/v2/ws',
       pingInterval: 25000,
       pingTimeout: 60000,
     });
@@ -55,7 +55,7 @@ class WebSocketService {
       socket.on('error', (err) => logger.error('Connection error', { error: err.message }));
     });
 
-    logger.info('Server initialized', { path: '/api/v1/ws' });
+    logger.info('Server initialized', { path: '/api/v2/ws' });
   }
 
   async handleAuth(socket, data) {

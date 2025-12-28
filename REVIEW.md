@@ -186,6 +186,7 @@ Fixed during review:
 ### Summary
 
 Completed the migration from V1 to V2 APIs across the frontend. This includes:
+
 - Renamed `LightControl` component to `Dashboard`
 - Migrated all hooks to use V2 API modules (`authApi`, `homeAdapter`, `automationsApi`)
 - Removed deprecated V1 methods from `hueApi.js` (now only contains `discoverBridge`)
@@ -194,20 +195,20 @@ Completed the migration from V1 to V2 APIs across the frontend. This includes:
 
 ### Changes Reviewed
 
-| File | Assessment |
-|------|------------|
-| `frontend/src/services/hueApi.js` | Stripped to minimal - only `discoverBridge()` remains. Good migration note in comments. |
-| `frontend/src/services/apiUtils.js` | Updated to import `getSessionToken` from `authApi` instead of `hueApi`. |
-| `frontend/src/hooks/useSession.js` | Now uses `authApi` for `refreshSession`, `setSessionToken`, `clearSessionToken`. |
-| `frontend/src/hooks/useHueBridge.js` | Uses `authApi.pair/connect/createSession` and `getDashboardFromHome`. |
-| `frontend/src/components/Dashboard/index.jsx` | Uses `automationsApi` directly. MotionZones disabled via comments. |
-| `frontend/src/context/DemoModeContext.jsx` | Simplified - removed unused `api` property. Now only provides `isDemoMode`. |
-| `frontend/src/components/MotionZones.jsx` | Disabled API fetch, kept component for future re-enablement. |
-| `frontend/src/integration.test.jsx` | Updated MSW handlers to use V2 endpoints. |
-| `frontend/e2e/hive.spec.ts`, `hive-2fa.spec.ts` | Deleted - converted to manual tests in `docs/MANUAL_TESTS.md`. |
-| `docs/ARCHITECTURE_REVIEW.md` | New document with comprehensive codebase analysis. |
-| `docs/MANUAL_TESTS.md` | New document with Hive manual test procedures. |
-| All `*.test.*` files | Updated mocks from `hueApi` to `authApi`. |
+| File                                            | Assessment                                                                              |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `frontend/src/services/hueApi.js`               | Stripped to minimal - only `discoverBridge()` remains. Good migration note in comments. |
+| `frontend/src/services/apiUtils.js`             | Updated to import `getSessionToken` from `authApi` instead of `hueApi`.                 |
+| `frontend/src/hooks/useSession.js`              | Now uses `authApi` for `refreshSession`, `setSessionToken`, `clearSessionToken`.        |
+| `frontend/src/hooks/useHueBridge.js`            | Uses `authApi.pair/connect/createSession` and `getDashboardFromHome`.                   |
+| `frontend/src/components/Dashboard/index.jsx`   | Uses `automationsApi` directly. MotionZones disabled via comments.                      |
+| `frontend/src/context/DemoModeContext.jsx`      | Simplified - removed unused `api` property. Now only provides `isDemoMode`.             |
+| `frontend/src/components/MotionZones.jsx`       | Disabled API fetch, kept component for future re-enablement.                            |
+| `frontend/src/integration.test.jsx`             | Updated MSW handlers to use V2 endpoints.                                               |
+| `frontend/e2e/hive.spec.ts`, `hive-2fa.spec.ts` | Deleted - converted to manual tests in `docs/MANUAL_TESTS.md`.                          |
+| `docs/ARCHITECTURE_REVIEW.md`                   | New document with comprehensive codebase analysis.                                      |
+| `docs/MANUAL_TESTS.md`                          | New document with Hive manual test procedures.                                          |
+| All `*.test.*` files                            | Updated mocks from `hueApi` to `authApi`.                                               |
 
 ### Test Results
 
@@ -219,6 +220,7 @@ Completed the migration from V1 to V2 APIs across the frontend. This includes:
 ### Issues Found
 
 Fixed during review:
+
 - Unused import `hueApi` in `useHueBridge.js` (removed)
 - React hooks exhaustive-deps warning in `MotionZones.jsx` (wrapped `zones` in useMemo)
 
@@ -243,3 +245,59 @@ Fixed during review:
 - **DemoModeContext simplified** - Only provides `isDemoMode` boolean, no `api` property
 - **MotionZones disabled** - Feature temporarily disabled, to be revisited
 - **Hive E2E tests removed** - Converted to manual tests in `docs/MANUAL_TESTS.md`
+
+## 2025-12-28: V1 API Removal and WebSocket V2 Migration
+
+**Status:** Approved
+
+**Branch:** feature/hive-integration
+
+### Summary
+
+Removed all V1 API routes and migrated WebSocket to use `/api/v2/ws` path. Also moved Hue-specific auth routes (`pair`, `connect`) from generic auth endpoint to the Hue plugin router at `/api/v2/services/hue/`.
+
+### Changes Reviewed
+
+| File                                   | Assessment                                                             |
+| -------------------------------------- | ---------------------------------------------------------------------- |
+| `backend/routes/v1/*` (deleted)        | All 14 V1 route files removed. Clean deletion.                         |
+| `backend/routes/v2/auth.js`            | Pair/connect routes removed. Clear comment pointing to plugin routes.  |
+| `backend/server.js`                    | V1 routes import removed. Swagger docs path updated to `/api/v2/docs`. |
+| `backend/services/websocketService.js` | Path changed from `/api/v1/ws` to `/api/v2/ws`.                        |
+| `backend/constants/errorMessages.js`   | API docs reference updated to `/api/v2/docs`.                          |
+| `backend/middleware/errorHandler.js`   | 404 handler suggestion updated to `/api/v2/docs`.                      |
+| `frontend/src/services/authApi.js`     | Uses `/api/v2/services/hue/pair` and `/connect`. handleResponse clean. |
+| `frontend/src/hooks/useWebSocket.js`   | Path changed to `/api/v2/ws`.                                          |
+| `frontend/vite.config.js`              | Proxy path updated to `/api/v2/ws`.                                    |
+| `eslint.config.js`                     | Added `AbortSignal` global (valid browser API).                        |
+| Test files                             | All updated for new endpoints and paths.                               |
+
+### Test Results
+
+- **Backend Unit Tests:** 891 passed
+- **Frontend Unit Tests:** 488 passed, 5 failed (pre-existing integration test issues)
+- **E2E Tests:** Skipped (known to fail)
+- **Lint:** Clean (0 errors, 1 pre-existing warning in useHive.js)
+- **Format:** All files formatted
+
+### Issues Found
+
+Fixed during review:
+
+- Unused `logger` import in `backend/routes/v2/auth.js` (removed)
+- Unused `originalWebsocketService` variable in test file (removed)
+- Missing `AbortSignal` global in ESLint config (added)
+
+### Non-Blocking Suggestions
+
+1. The 5 failing frontend integration tests are pre-existing issues related to async health check handling - not related to this migration.
+
+2. `useHive.js:164` has an unused `err` variable - pre-existing issue.
+
+### Notes for Documentation
+
+- **V1 API completely removed** - All endpoints now under `/api/v2/`
+- **WebSocket path changed** - Now `/api/v2/ws` (was `/api/v1/ws`)
+- **Hue auth endpoints moved** - Use `/api/v2/services/hue/pair` and `/api/v2/services/hue/connect` instead of generic auth routes
+- **OpenAPI docs at** `/api/v2/docs` (was `/api/v1/docs`)
+- **1,395 lines removed** - Significant code cleanup

@@ -6,7 +6,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { load } from 'js-yaml';
 import swaggerUi from 'swagger-ui-express';
-import v1Routes from './routes/v1/index.js';
 import v2Routes from './routes/v2/index.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { detectDemoMode } from './middleware/demoMode.js';
@@ -39,22 +38,13 @@ app.use(express.json());
 
 // API Documentation (Swagger UI)
 app.use(
-  '/api/v1/docs',
+  '/api/v2/docs',
   swaggerUi.serve,
   swaggerUi.setup(openApiSpec, {
     customSiteTitle: 'Hue Control API Docs',
     customCss: '.swagger-ui .topbar { display: none }',
   })
 );
-
-// Demo mode detection (before v1 routes)
-app.use('/api/v1', detectDemoMode);
-
-// Rate limiting for API routes (after demo mode, so demo bypasses limits)
-app.use('/api/v1', rateLimit);
-
-// Mount v1 API routes
-app.use('/api/v1', v1Routes);
 
 // Demo mode detection for v2 routes
 app.use('/api/v2', detectDemoMode);
@@ -87,7 +77,7 @@ app.get('/health', (req, res) => {
     status: 'ok',
     message: 'Hue API server is running',
     version: API_VERSION,
-    docs: '/api/v1/docs',
+    docs: '/api/v2/docs',
     capabilities: [
       'dashboard',
       'motion-zones',
@@ -133,7 +123,7 @@ app.use((req, res) => {
 });
 
 const server = app.listen(PORT, HOST, () => {
-  logger.info('Server started', { host: HOST, port: PORT, websocket: '/api/v1/ws' });
+  logger.info('Server started', { host: HOST, port: PORT, websocket: '/api/v2/ws' });
 });
 
 // Initialize WebSocket server

@@ -24,12 +24,12 @@ describe('authApi', () => {
     it('should pair with bridge and return username', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ username: 'test-user-123' }),
+        json: () => Promise.resolve({ success: true, username: 'test-user-123' }),
       });
 
       const result = await authApi.pair('192.168.1.100', 'my-app');
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/v2/auth/pair', {
+      expect(mockFetch).toHaveBeenCalledWith('/api/v2/services/hue/pair', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bridgeIp: '192.168.1.100', appName: 'my-app' }),
@@ -57,7 +57,7 @@ describe('authApi', () => {
 
       const result = await authApi.connect('192.168.1.100');
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/v2/auth/connect', {
+      expect(mockFetch).toHaveBeenCalledWith('/api/v2/services/hue/connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bridgeIp: '192.168.1.100' }),

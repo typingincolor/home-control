@@ -3,6 +3,7 @@
  */
 
 const API_BASE = '/api/v2/auth';
+const HUE_SERVICE_BASE = '/api/v2/services/hue';
 
 /**
  * Check if the backend is available
@@ -60,13 +61,14 @@ function getHeaders(includeAuth = false) {
 async function handleResponse(response) {
   const data = await response.json();
 
+  // Handle requiresPairing (can come as 200 from plugin or 401 from legacy)
+  if (data.requiresPairing) {
+    throw new Error('PAIRING_REQUIRED');
+  }
+
   if (!response.ok) {
-    // Handle specific error cases
     if (response.status === 424 && data.requiresLinkButton) {
       throw new Error('Please press the link button on the bridge');
-    }
-    if (response.status === 401 && data.requiresPairing) {
-      throw new Error('PAIRING_REQUIRED');
     }
     throw new Error(data.error || `HTTP error! status: ${response.status}`);
   }
@@ -81,7 +83,7 @@ async function handleResponse(response) {
  * @returns {Promise<string>} Username from pairing
  */
 export async function pair(bridgeIp, appName = 'hue_control_app') {
-  const response = await fetch(`${API_BASE}/pair`, {
+  const response = await fetch(`${HUE_SERVICE_BASE}/pair`, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify({ bridgeIp, appName }),
@@ -99,7 +101,7 @@ export async function pair(bridgeIp, appName = 'hue_control_app') {
 export async function connect(bridgeIp) {
   let response;
   try {
-    response = await fetch(`${API_BASE}/connect`, {
+    response = await fetch(`${HUE_SERVICE_BASE}/connect`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify({ bridgeIp }),

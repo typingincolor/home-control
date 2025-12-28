@@ -50,33 +50,35 @@ function AppContent() {
 
   return (
     <div className="app">
-      {effectiveStep !== 'connected' && effectiveStep !== 'restoring' && effectiveStep !== 'backend_unavailable' && (
-        <header className="app-header">
-          <h1>{UI_TEXT.APP_TITLE}</h1>
-          <p className="subtitle">{UI_TEXT.APP_SUBTITLE}</p>
+      {effectiveStep !== 'connected' &&
+        effectiveStep !== 'restoring' &&
+        effectiveStep !== 'backend_unavailable' && (
+          <header className="app-header">
+            <h1>{UI_TEXT.APP_TITLE}</h1>
+            <p className="subtitle">{UI_TEXT.APP_SUBTITLE}</p>
 
-          <div className="progress-indicator">
-            <div
-              className={`step ${effectiveStep === 'discovery' ? 'active' : effectiveStep !== 'discovery' ? 'completed' : ''}`}
-            >
-              <div className="step-number">1</div>
-              <div className="step-label">Discovery</div>
+            <div className="progress-indicator">
+              <div
+                className={`step ${effectiveStep === 'discovery' ? 'active' : effectiveStep !== 'discovery' ? 'completed' : ''}`}
+              >
+                <div className="step-number">1</div>
+                <div className="step-label">Discovery</div>
+              </div>
+              <div className="progress-line"></div>
+              <div
+                className={`step ${effectiveStep === 'authentication' ? 'active' : effectiveStep === 'connected' ? 'completed' : ''}`}
+              >
+                <div className="step-number">2</div>
+                <div className="step-label">Authentication</div>
+              </div>
+              <div className="progress-line"></div>
+              <div className={`step ${effectiveStep === 'connected' ? 'active' : ''}`}>
+                <div className="step-number">3</div>
+                <div className="step-label">Connected</div>
+              </div>
             </div>
-            <div className="progress-line"></div>
-            <div
-              className={`step ${effectiveStep === 'authentication' ? 'active' : effectiveStep === 'connected' ? 'completed' : ''}`}
-            >
-              <div className="step-number">2</div>
-              <div className="step-label">Authentication</div>
-            </div>
-            <div className="progress-line"></div>
-            <div className={`step ${effectiveStep === 'connected' ? 'active' : ''}`}>
-              <div className="step-number">3</div>
-              <div className="step-label">Connected</div>
-            </div>
-          </div>
-        </header>
-      )}
+          </header>
+        )}
 
       <main className="app-main">
         {effectiveStep === 'restoring' && (
@@ -114,17 +116,19 @@ function AppContent() {
         )}
       </main>
 
-      {effectiveStep !== 'connected' && effectiveStep !== 'restoring' && effectiveStep !== 'backend_unavailable' && (
-        <footer className="app-footer">
-          <button onClick={reset} className="secondary">
-            Start Over
-          </button>
+      {effectiveStep !== 'connected' &&
+        effectiveStep !== 'restoring' &&
+        effectiveStep !== 'backend_unavailable' && (
+          <footer className="app-footer">
+            <button onClick={reset} className="secondary">
+              Start Over
+            </button>
 
-          <div className="footer-info">
-            <p>Using Philips Hue Local API v2</p>
-          </div>
-        </footer>
-      )}
+            <div className="footer-info">
+              <p>Using Philips Hue Local API v2</p>
+            </div>
+          </footer>
+        )}
     </div>
   );
 }

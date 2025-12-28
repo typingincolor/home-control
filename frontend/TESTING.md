@@ -49,9 +49,9 @@ View mutation report: `open reports/mutation/html/index.html`
 
 ## Test Coverage
 
-### Unit Test Results (503 frontend + 881 backend = 1384 tests)
+### Unit Test Results (488 frontend + 891 backend = 1379 tests)
 
-#### Frontend (503 tests)
+#### Frontend (488 tests)
 
 - **Hooks**: useSession (23), useSettings (19), useWeather (11), useWebSocket (19), useLocation (17), useHive (19), useHome (13)
 - **Services**: hueApi (5), authApi (12), settingsApi (10), weatherApi (6), automationsApi (5), homeApi (5), homeAdapter (9), servicesApi (13)
@@ -60,7 +60,7 @@ View mutation report: `open reports/mutation/html/index.html`
 - **Utils**: validation (8)
 - **Integration**: integration.test.jsx (12)
 
-#### Backend (881 tests)
+#### Backend (891 tests)
 
 Business logic tests including colorConversion (52), roomService, zoneService, automationService (16), sessionManager (53), websocketService (31), settingsService (43), homeService (13), deviceNormalizer (15), ServicePlugin (20), plugins (40+), and more.
 

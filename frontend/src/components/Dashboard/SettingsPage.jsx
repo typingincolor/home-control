@@ -168,7 +168,6 @@ export const SettingsPage = ({
             </button>
           </div>
         </div>
-
       </div>
 
       <div className="settings-footer">

@@ -163,5 +163,4 @@ describe('TopToolbar', () => {
       expect(defaultProps.onOpenSettings).toHaveBeenCalledTimes(1);
     });
   });
-
 });

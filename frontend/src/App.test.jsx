@@ -26,6 +26,7 @@ vi.mock('./services/authApi', () => ({
   clearSessionToken: vi.fn(),
   getSessionToken: vi.fn(() => 'test-token'),
   refreshSession: vi.fn(() => Promise.resolve({ sessionToken: 'refreshed', expiresIn: 86400 })),
+  checkHealth: vi.fn(() => Promise.resolve(true)),
 }));
 
 // Mock homeAdapter for session validation
@@ -172,7 +173,7 @@ describe('App - Login Page Flicker Fix', () => {
     expect(screen.queryByTestId('dashboard')).not.toBeInTheDocument();
   });
 
-  it('should show settings page when session is EXPIRED', () => {
+  it('should show settings page when session is EXPIRED', async () => {
     // Setup: Store an expired session
     const now = Date.now();
     const expiresAt = now - 1000; // Expired 1 second ago
@@ -183,12 +184,15 @@ describe('App - Login Page Flicker Fix', () => {
 
     render(<App />);
 
-    // Should show settings page (deferred service activation)
-    expect(screen.getByTestId('settings-page')).toBeInTheDocument();
+    // Wait for async session restoration to complete
+    await waitFor(() => {
+      // Should show settings page (deferred service activation)
+      expect(screen.getByTestId('settings-page')).toBeInTheDocument();
+    });
     expect(screen.queryByTestId('dashboard')).not.toBeInTheDocument();
   });
 
-  it('should handle missing session fields gracefully', () => {
+  it('should handle missing session fields gracefully', async () => {
     // Setup: Partial session data (missing token)
     localStorage.setItem(STORAGE_KEYS.BRIDGE_IP, '192.168.1.100');
     localStorage.setItem(STORAGE_KEYS.SESSION_EXPIRES_AT, (Date.now() + 86400000).toString());
@@ -196,8 +200,11 @@ describe('App - Login Page Flicker Fix', () => {
 
     render(<App />);
 
-    // Should show settings page (deferred service activation)
-    expect(screen.getByTestId('settings-page')).toBeInTheDocument();
+    // Wait for async session restoration to complete
+    await waitFor(() => {
+      // Should show settings page (deferred service activation)
+      expect(screen.getByTestId('settings-page')).toBeInTheDocument();
+    });
     expect(screen.queryByTestId('dashboard')).not.toBeInTheDocument();
   });
 });
