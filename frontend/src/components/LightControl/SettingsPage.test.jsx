@@ -384,11 +384,13 @@ describe('SettingsPage', () => {
       expect(props.onUpdateSettings).not.toHaveBeenCalled();
     });
 
-    it('should call onUpdateSettings when disabling already-connected Hue', async () => {
+    it('should call onDisableHue when disabling Hue service', async () => {
       const user = userEvent.setup();
+      const onDisableHue = vi.fn();
       const props = {
         ...defaultProps,
         hueConnected: true,
+        onDisableHue,
         settings: {
           ...defaultProps.settings,
           services: {
@@ -401,17 +403,19 @@ describe('SettingsPage', () => {
 
       await user.click(screen.getByRole('switch', { name: /hue/i }));
 
-      // When disabling a connected service, should update settings
-      expect(props.onUpdateSettings).toHaveBeenCalledWith({
-        services: { hue: { enabled: false } },
-      });
+      // When disabling Hue, should call onDisableHue callback
+      expect(onDisableHue).toHaveBeenCalledTimes(1);
+      // Should NOT call onUpdateSettings - the callback handles it
+      expect(props.onUpdateSettings).not.toHaveBeenCalled();
     });
 
-    it('should call onUpdateSettings when disabling already-connected Hive', async () => {
+    it('should call onDisableHive when disabling Hive service', async () => {
       const user = userEvent.setup();
+      const onDisableHive = vi.fn();
       const props = {
         ...defaultProps,
         hiveConnected: true,
+        onDisableHive,
         settings: {
           ...defaultProps.settings,
           services: {
@@ -424,7 +428,55 @@ describe('SettingsPage', () => {
 
       await user.click(screen.getByRole('switch', { name: /hive/i }));
 
-      // When disabling a connected service, should update settings
+      // When disabling Hive, should call onDisableHive callback
+      expect(onDisableHive).toHaveBeenCalledTimes(1);
+      // Should NOT call onUpdateSettings - the callback handles it
+      expect(props.onUpdateSettings).not.toHaveBeenCalled();
+    });
+
+    it('should call onUpdateSettings when disabling Hue without onDisableHue callback', async () => {
+      const user = userEvent.setup();
+      const props = {
+        ...defaultProps,
+        hueConnected: true,
+        // onDisableHue not provided
+        settings: {
+          ...defaultProps.settings,
+          services: {
+            hue: { enabled: true },
+            hive: { enabled: false },
+          },
+        },
+      };
+      render(<SettingsPage {...props} />);
+
+      await user.click(screen.getByRole('switch', { name: /hue/i }));
+
+      // Fallback: When disabling without callback, should update settings
+      expect(props.onUpdateSettings).toHaveBeenCalledWith({
+        services: { hue: { enabled: false } },
+      });
+    });
+
+    it('should call onUpdateSettings when disabling Hive without onDisableHive callback', async () => {
+      const user = userEvent.setup();
+      const props = {
+        ...defaultProps,
+        hiveConnected: true,
+        // onDisableHive not provided
+        settings: {
+          ...defaultProps.settings,
+          services: {
+            hue: { enabled: true },
+            hive: { enabled: true },
+          },
+        },
+      };
+      render(<SettingsPage {...props} />);
+
+      await user.click(screen.getByRole('switch', { name: /hive/i }));
+
+      // Fallback: When disabling without callback, should update settings
       expect(props.onUpdateSettings).toHaveBeenCalledWith({
         services: { hive: { enabled: false } },
       });

@@ -66,13 +66,19 @@ export const BottomNav = ({
   const isHiveSelected = selectedId === 'hive';
   const navRef = useDragScroll();
 
-  // Connection-based visibility: tabs only show when service is connected
-  // (services prop kept for backwards compatibility but connection state takes precedence)
+  // Enabled + connected visibility: tabs only show when service is BOTH enabled AND connected
+  // (defaults to true for Hue if services prop is missing for backwards compatibility)
+  const hueEnabled = services?.hue?.enabled ?? true;
+  const hiveEnabled = services?.hive?.enabled ?? false;
+
+  // Combined visibility: must be both enabled in settings AND connected
+  const showHueTabs = hueEnabled && hueConnected;
+  const showHiveTab = hiveEnabled && hiveConnected;
 
   return (
     <nav className="bottom-nav" ref={navRef}>
-      {/* Rooms - only shown when Hue is connected */}
-      {hueConnected &&
+      {/* Rooms - only shown when Hue is enabled AND connected */}
+      {showHueTabs &&
         rooms.map((room) => {
           const isActive = selectedId === room.id;
           const lightsOn = room.stats?.lightsOnCount || 0;
@@ -90,8 +96,8 @@ export const BottomNav = ({
           );
         })}
 
-      {/* Zones - only shown when Hue is connected */}
-      {hueConnected && zones.length > 0 && (
+      {/* Zones - only shown when Hue is enabled AND connected */}
+      {showHueTabs && zones.length > 0 && (
         <button
           className={`nav-tab ${isZonesSelected ? 'active' : ''}`}
           onClick={() => onSelect('zones')}
@@ -102,8 +108,8 @@ export const BottomNav = ({
         </button>
       )}
 
-      {/* Automations - only shown when Hue is connected */}
-      {hueConnected && hasAutomations && (
+      {/* Automations - only shown when Hue is enabled AND connected */}
+      {showHueTabs && hasAutomations && (
         <button
           className={`nav-tab ${isAutomationsSelected ? 'active' : ''}`}
           onClick={() => onSelect('automations')}
@@ -113,8 +119,8 @@ export const BottomNav = ({
         </button>
       )}
 
-      {/* Hive tab - only shown when Hive is connected */}
-      {hiveConnected && (
+      {/* Hive tab - only shown when Hive is enabled AND connected */}
+      {showHiveTab && (
         <button
           className={`nav-tab ${isHiveSelected ? 'active' : ''}`}
           onClick={() => onSelect('hive')}

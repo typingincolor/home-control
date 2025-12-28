@@ -19,6 +19,7 @@ vi.mock('../../services/hiveCredentialsManager.js', () => ({
     getRefreshToken: vi.fn(() => null),
     setSessionToken: vi.fn(),
     clearSessionToken: vi.fn(),
+    clearCredentials: vi.fn(),
     getDeviceCredentials: vi.fn(() => null),
     setDeviceCredentials: vi.fn(),
     clearDeviceCredentials: vi.fn(),
@@ -154,9 +155,11 @@ describe('HiveService', () => {
   });
 
   describe('disconnect', () => {
-    it('should clear session token and credentials', async () => {
+    it('should clear all credentials and session tokens', async () => {
       await HiveService.disconnect();
 
+      expect(hiveCredentialsManager.clearCredentials).toHaveBeenCalled();
+      expect(hiveCredentialsManager.clearDeviceCredentials).toHaveBeenCalled();
       expect(hiveCredentialsManager.clearSessionToken).toHaveBeenCalled();
     });
   });

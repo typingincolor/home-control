@@ -47,6 +47,8 @@ export const SettingsPage = ({
   onHiveDisconnect,
   onEnableHue,
   onEnableHive,
+  onDisableHue,
+  onDisableHive,
 }) => {
   // Close on Escape key
   useEffect(() => {
@@ -74,8 +76,18 @@ export const SettingsPage = ({
         onEnableHive();
         return;
       }
+    } else {
+      // When disabling, call disable callback to clear credentials
+      if (service === 'hue' && onDisableHue) {
+        onDisableHue();
+        return;
+      }
+      if (service === 'hive' && onDisableHive) {
+        onDisableHive();
+        return;
+      }
     }
-    // When disabling, or if already connected, update settings
+    // Fallback: update settings directly (when callbacks not provided)
     onUpdateSettings({
       services: { [service]: { enabled } },
     });
@@ -205,4 +217,6 @@ SettingsPage.propTypes = {
   onHiveDisconnect: PropTypes.func,
   onEnableHue: PropTypes.func,
   onEnableHive: PropTypes.func,
+  onDisableHue: PropTypes.func,
+  onDisableHive: PropTypes.func,
 };

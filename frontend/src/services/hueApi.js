@@ -179,6 +179,9 @@ export const hueApi = {
 
   revokeSession: () => api.delete('/v1/auth/session', authHeader()).then((r) => r.data),
 
+  // Disconnect from bridge completely (revokes session AND clears stored credentials)
+  disconnect: () => api.post('/v1/auth/disconnect', null, authHeader()).then((r) => r.data),
+
   // Settings
   getSettings: () => api.get('/v1/settings', authHeader()).then((r) => r.data),
 

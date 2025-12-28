@@ -487,6 +487,52 @@ describe('SessionManager', () => {
         expect(sessionManager.hasBridgeCredentials(bridgeIp)).toBe(false);
       });
     });
+
+    describe('clearBridgeCredentials', () => {
+      it('should remove stored credentials for a bridge', () => {
+        sessionManager.storeBridgeCredentials(bridgeIp, username);
+        expect(sessionManager.hasBridgeCredentials(bridgeIp)).toBe(true);
+
+        const result = sessionManager.clearBridgeCredentials(bridgeIp);
+
+        expect(result).toBe(true);
+        expect(sessionManager.hasBridgeCredentials(bridgeIp)).toBe(false);
+        expect(sessionManager.getBridgeCredentials(bridgeIp)).toBeNull();
+      });
+
+      it('should return false for unknown bridge', () => {
+        const result = sessionManager.clearBridgeCredentials('192.168.1.200');
+
+        expect(result).toBe(false);
+      });
+
+      it('should not affect other bridges', () => {
+        sessionManager.storeBridgeCredentials('192.168.1.100', 'user1');
+        sessionManager.storeBridgeCredentials('192.168.1.101', 'user2');
+
+        sessionManager.clearBridgeCredentials('192.168.1.100');
+
+        expect(sessionManager.hasBridgeCredentials('192.168.1.100')).toBe(false);
+        expect(sessionManager.hasBridgeCredentials('192.168.1.101')).toBe(true);
+        expect(sessionManager.getBridgeCredentials('192.168.1.101')).toBe('user2');
+      });
+
+      it('should persist the removal to file', () => {
+        const testCredentialsPath = '/tmp/test-clear-credentials.json';
+        sessionManager.credentialsFilePath = testCredentialsPath;
+
+        sessionManager.storeBridgeCredentials(bridgeIp, username);
+        sessionManager.clearBridgeCredentials(bridgeIp);
+
+        const contents = fs.readFileSync(testCredentialsPath, 'utf8');
+        const credentials = JSON.parse(contents);
+
+        expect(credentials[bridgeIp]).toBeUndefined();
+
+        // Cleanup
+        fs.unlinkSync(testCredentialsPath);
+      });
+    });
   });
 
   describe('Credential Persistence', () => {

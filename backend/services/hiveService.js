@@ -194,10 +194,12 @@ class HiveService {
   }
 
   /**
-   * Disconnect from Hive
+   * Disconnect from Hive (clears all stored credentials)
    * @returns {Promise<void>}
    */
   async disconnect() {
+    hiveCredentialsManager.clearCredentials();
+    hiveCredentialsManager.clearDeviceCredentials();
     hiveCredentialsManager.clearSessionToken();
     this._demoConnected = false;
     logger.info('Disconnected from Hive');

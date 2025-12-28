@@ -74,6 +74,10 @@ describe('BottomNav', () => {
         <BottomNav
           {...defaultProps}
           hiveConnected={true}
+          services={{
+            hue: { enabled: true },
+            hive: { enabled: true },
+          }}
         />
       );
 
@@ -141,6 +145,10 @@ describe('BottomNav', () => {
           hasAutomations={false}
           hueConnected={false}
           hiveConnected={true}
+          services={{
+            hue: { enabled: true },
+            hive: { enabled: true },
+          }}
         />
       );
 
@@ -178,6 +186,107 @@ describe('BottomNav', () => {
     });
   });
 
+  describe('enabled + connected visibility', () => {
+    it('should hide Hue tabs when Hue is connected but disabled in settings', () => {
+      render(
+        <BottomNav
+          {...defaultProps}
+          hueConnected={true}
+          services={{
+            hue: { enabled: false },
+            hive: { enabled: false },
+          }}
+        />
+      );
+
+      // Even though connected, should be hidden because disabled
+      expect(screen.queryByText('Living Room')).not.toBeInTheDocument();
+      expect(screen.queryByText('Kitchen')).not.toBeInTheDocument();
+      expect(screen.queryByText(UI_TEXT.NAV_ZONES)).not.toBeInTheDocument();
+      expect(screen.queryByText(UI_TEXT.NAV_AUTOMATIONS)).not.toBeInTheDocument();
+    });
+
+    it('should hide Hive tab when Hive is connected but disabled in settings', () => {
+      render(
+        <BottomNav
+          {...defaultProps}
+          hiveConnected={true}
+          services={{
+            hue: { enabled: true },
+            hive: { enabled: false },
+          }}
+        />
+      );
+
+      // Even though connected, should be hidden because disabled
+      expect(screen.queryByText(UI_TEXT.NAV_HIVE)).not.toBeInTheDocument();
+    });
+
+    it('should show Hue tabs when both enabled and connected', () => {
+      render(
+        <BottomNav
+          {...defaultProps}
+          hueConnected={true}
+          services={{
+            hue: { enabled: true },
+            hive: { enabled: false },
+          }}
+        />
+      );
+
+      expect(screen.getByText('Living Room')).toBeInTheDocument();
+      expect(screen.getByText(UI_TEXT.NAV_ZONES)).toBeInTheDocument();
+      expect(screen.getByText(UI_TEXT.NAV_AUTOMATIONS)).toBeInTheDocument();
+    });
+
+    it('should show Hive tab when both enabled and connected', () => {
+      render(
+        <BottomNav
+          {...defaultProps}
+          hiveConnected={true}
+          services={{
+            hue: { enabled: true },
+            hive: { enabled: true },
+          }}
+        />
+      );
+
+      expect(screen.getByText(UI_TEXT.NAV_HIVE)).toBeInTheDocument();
+    });
+
+    it('should hide Hue tabs when enabled but not connected', () => {
+      render(
+        <BottomNav
+          {...defaultProps}
+          hueConnected={false}
+          services={{
+            hue: { enabled: true },
+            hive: { enabled: false },
+          }}
+        />
+      );
+
+      // Enabled but not connected - should be hidden
+      expect(screen.queryByText('Living Room')).not.toBeInTheDocument();
+    });
+
+    it('should hide Hive tab when enabled but not connected', () => {
+      render(
+        <BottomNav
+          {...defaultProps}
+          hiveConnected={false}
+          services={{
+            hue: { enabled: true },
+            hive: { enabled: true },
+          }}
+        />
+      );
+
+      // Enabled but not connected - should be hidden
+      expect(screen.queryByText(UI_TEXT.NAV_HIVE)).not.toBeInTheDocument();
+    });
+  });
+
   describe('active state', () => {
     it('should mark selected room as active', () => {
       render(<BottomNav {...defaultProps} selectedId="room-1" />);
@@ -192,6 +301,10 @@ describe('BottomNav', () => {
           {...defaultProps}
           selectedId="hive"
           hiveConnected={true}
+          services={{
+            hue: { enabled: true },
+            hive: { enabled: true },
+          }}
         />
       );
 

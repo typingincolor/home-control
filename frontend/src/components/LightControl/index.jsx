@@ -6,6 +6,7 @@ import { useSettings } from '../../hooks/useSettings';
 import { useLocation } from '../../hooks/useLocation';
 import { useWeather } from '../../hooks/useWeather';
 import { useHive } from '../../hooks/useHive';
+import { hueApi } from '../../services/hueApi';
 import { ERROR_MESSAGES } from '../../constants/messages';
 import { createLogger } from '../../utils/logger';
 import { TopToolbar } from './TopToolbar';
@@ -469,6 +470,21 @@ export const LightControl = ({ sessionToken, onLogout }) => {
             onEnableHive={() => {
               setSettingsOpen(false);
               setSelectedId('hive');
+            }}
+            onDisableHue={async () => {
+              // Clear Hue credentials on backend and return to settings step
+              try {
+                await hueApi.disconnect();
+              } catch {
+                // Ignore errors - we're disconnecting anyway
+              }
+              onLogout();
+            }}
+            onDisableHive={async () => {
+              // Clear Hive credentials
+              await hiveDisconnect();
+              // Update settings to mark as disabled
+              updateSettings({ services: { hive: { enabled: false } } });
             }}
           />
         ) : selectedId === 'hive' ? (
