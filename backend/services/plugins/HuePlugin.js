@@ -263,7 +263,10 @@ class HuePluginClass extends ServicePlugin {
    * @returns {Promise<Object>} Result object
    */
   async updateDevice(deviceId, state) {
-    const bridgeIp = this._bridgeIp;
+    const bridgeIp = this._bridgeIp || sessionManager.getDefaultBridgeIp();
+    if (!bridgeIp) {
+      throw new Error('No Hue bridge configured');
+    }
     const username = sessionManager.getBridgeCredentials(bridgeIp);
     const client = getHueClientForBridge(bridgeIp);
 
@@ -276,7 +279,10 @@ class HuePluginClass extends ServicePlugin {
    * @returns {Promise<Object>} Result object
    */
   async activateScene(sceneId) {
-    const bridgeIp = this._bridgeIp;
+    const bridgeIp = this._bridgeIp || sessionManager.getDefaultBridgeIp();
+    if (!bridgeIp) {
+      throw new Error('No Hue bridge configured');
+    }
     const username = sessionManager.getBridgeCredentials(bridgeIp);
     const client = getHueClientForBridge(bridgeIp);
 
@@ -290,7 +296,10 @@ class HuePluginClass extends ServicePlugin {
    * @returns {Promise<Object>} Result object with updatedLights
    */
   async updateRoomDevices(roomId, state) {
-    const bridgeIp = this._bridgeIp;
+    const bridgeIp = this._bridgeIp || sessionManager.getDefaultBridgeIp();
+    if (!bridgeIp) {
+      throw new Error('No Hue bridge configured');
+    }
     const username = sessionManager.getBridgeCredentials(bridgeIp);
     const client = getHueClientForBridge(bridgeIp);
 
@@ -319,7 +328,10 @@ class HuePluginClass extends ServicePlugin {
    * @returns {Promise<Object>} Result object with updatedLights
    */
   async updateZoneDevices(zoneId, state) {
-    const bridgeIp = this._bridgeIp;
+    const bridgeIp = this._bridgeIp || sessionManager.getDefaultBridgeIp();
+    if (!bridgeIp) {
+      throw new Error('No Hue bridge configured');
+    }
     const username = sessionManager.getBridgeCredentials(bridgeIp);
     const client = getHueClientForBridge(bridgeIp);
 
