@@ -175,8 +175,7 @@ export const layoutAssertions = {
   isDOMOrderedBefore(firstElement, secondElement) {
     const position = firstElement.compareDocumentPosition(secondElement);
     // DOCUMENT_POSITION_FOLLOWING = 4, meaning secondElement follows firstElement
-    // eslint-disable-next-line no-undef
-    if (!(position & Node.DOCUMENT_POSITION_FOLLOWING)) {
+    if (!(position & 4)) {
       throw new Error('Elements are not in expected DOM order');
     }
     return true;
