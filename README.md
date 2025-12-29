@@ -1,6 +1,7 @@
 # Home Control
 
 [![CI](https://github.com/typingincolor/home-control/actions/workflows/ci.yml/badge.svg)](https://github.com/typingincolor/home-control/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/typingincolor/home-control/graph/badge.svg)](https://codecov.io/gh/typingincolor/home-control)
 [![Release](https://img.shields.io/github/v/release/typingincolor/home-control)](https://github.com/typingincolor/home-control/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
