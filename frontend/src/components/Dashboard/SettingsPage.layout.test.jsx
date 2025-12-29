@@ -100,9 +100,8 @@ describe('SettingsPage Layout', () => {
       const title = header.querySelector('.settings-header-title');
 
       // Back button should come before title
-      expect(
-        backButton.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING
-      ).toBeTruthy();
+      // eslint-disable-next-line no-undef
+      expect(backButton.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
   });
 
