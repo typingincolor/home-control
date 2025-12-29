@@ -38,12 +38,14 @@ WORKDIR /app
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Copy package files
+# Copy package files (need all workspaces for npm resolution)
 COPY package*.json ./
+COPY frontend/package*.json ./frontend/
 COPY backend/package*.json ./backend/
 
 # Install production dependencies only
-RUN npm ci --workspace=backend --omit=dev && \
+# This installs backend deps + root deps (amazon-cognito-identity-js)
+RUN npm ci --omit=dev && \
     npm cache clean --force
 
 # Copy built backend and frontend
