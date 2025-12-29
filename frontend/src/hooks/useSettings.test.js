@@ -342,11 +342,11 @@ describe('useSettings', () => {
 
       rerender({ enabled: true });
 
+      // Wait for both the API call AND the state update to complete
       await waitFor(() => {
         expect(settingsApi.getSettings).toHaveBeenCalledWith(false);
+        expect(result.current.settings).toEqual({ ...mockSettings, services: defaultServices });
       });
-
-      expect(result.current.settings).toEqual({ ...mockSettings, services: defaultServices });
     });
   });
 

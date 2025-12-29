@@ -328,13 +328,14 @@ describe('Dashboard', () => {
       const user = userEvent.setup();
       render(<Dashboard sessionToken="test-token" />);
 
+      // Wait for RoomContent to render (scene drawer trigger indicates room is loaded)
+      let drawerTrigger;
       await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
+        drawerTrigger = document.querySelector('.scene-drawer-trigger');
+        expect(drawerTrigger).toBeTruthy();
       });
 
       // Open the scene drawer
-      const drawerTrigger = document.querySelector('.scene-drawer-trigger');
-      expect(drawerTrigger).toBeTruthy();
       await user.click(drawerTrigger);
 
       // Find toggle button in drawer
@@ -356,12 +357,14 @@ describe('Dashboard', () => {
 
       render(<Dashboard sessionToken="test-token" />);
 
+      // Wait for RoomContent to render
+      let drawerTrigger;
       await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
+        drawerTrigger = document.querySelector('.scene-drawer-trigger');
+        expect(drawerTrigger).toBeTruthy();
       });
 
       // Open the scene drawer
-      const drawerTrigger = document.querySelector('.scene-drawer-trigger');
       await user.click(drawerTrigger);
 
       const toggleButton = document.querySelector('.scene-drawer-toggle');
@@ -378,12 +381,14 @@ describe('Dashboard', () => {
       const user = userEvent.setup();
       render(<Dashboard sessionToken="test-token" />);
 
+      // Wait for RoomContent to render
+      let drawerTrigger;
       await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
+        drawerTrigger = document.querySelector('.scene-drawer-trigger');
+        expect(drawerTrigger).toBeTruthy();
       });
 
       // Open the scene drawer
-      const drawerTrigger = document.querySelector('.scene-drawer-trigger');
       await user.click(drawerTrigger);
 
       // Find scene button in drawer
@@ -400,12 +405,14 @@ describe('Dashboard', () => {
       const user = userEvent.setup();
       render(<Dashboard sessionToken="test-token" />);
 
+      // Wait for RoomContent to render
+      let drawerTrigger;
       await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
+        drawerTrigger = document.querySelector('.scene-drawer-trigger');
+        expect(drawerTrigger).toBeTruthy();
       });
 
       // Open the scene drawer
-      const drawerTrigger = document.querySelector('.scene-drawer-trigger');
       await user.click(drawerTrigger);
 
       const sceneItems = document.querySelectorAll('.scene-drawer-item');
@@ -422,12 +429,14 @@ describe('Dashboard', () => {
 
       render(<Dashboard sessionToken="test-token" />);
 
+      // Wait for RoomContent to render
+      let drawerTrigger;
       await waitFor(() => {
-        expect(screen.getByText('Living Room')).toBeInTheDocument();
+        drawerTrigger = document.querySelector('.scene-drawer-trigger');
+        expect(drawerTrigger).toBeTruthy();
       });
 
       // Open the scene drawer
-      const drawerTrigger = document.querySelector('.scene-drawer-trigger');
       await user.click(drawerTrigger);
 
       const sceneItems = document.querySelectorAll('.scene-drawer-item');

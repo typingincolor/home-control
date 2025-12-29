@@ -495,17 +495,14 @@ describe('Integration Tests', () => {
       await waitFor(() => screen.getByText(new RegExp(UI_TEXT.AUTH_TITLE, 'i')));
       await user.click(screen.getByText(new RegExp(UI_TEXT.BUTTON_I_PRESSED_BUTTON, 'i')));
 
-      // Wait for WebSocket to connect and receive data
+      // Wait for WebSocket to connect and receive data (wait for lights to render)
       await waitFor(
         () => {
-          expect(screen.getByText('Living Room')).toBeInTheDocument();
+          expect(screen.getByText('Light 1')).toBeInTheDocument();
+          expect(screen.getByText('Light 2')).toBeInTheDocument();
         },
         { timeout: 10000 }
       );
-
-      // Verify dashboard loaded via WebSocket
-      expect(screen.getByText('Light 1')).toBeInTheDocument();
-      expect(screen.getByText('Light 2')).toBeInTheDocument();
     });
 
     it('does not show error flash during initial connection', async () => {
