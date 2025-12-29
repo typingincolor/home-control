@@ -275,6 +275,16 @@ export const useHueBridge = () => {
     logger.info('Enabling Hue - starting discovery');
   }, []);
 
+  // Transition from settings directly to connected (when user enables Hive without Hue)
+  // This allows Hive-only mode where Dashboard renders with just Hive functionality
+  const enableHiveOnly = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      step: 'connected',
+    }));
+    logger.info('Enabling Hive-only mode - going to dashboard');
+  }, []);
+
   return {
     ...state,
     sessionToken,
@@ -282,5 +292,6 @@ export const useHueBridge = () => {
     authenticate,
     reset,
     enableHue,
+    enableHiveOnly,
   };
 };

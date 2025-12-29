@@ -163,6 +163,22 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
     }
   }, [wsDashboard, wsError, isDemoMode]);
 
+  // Handle Hive-only mode (no Hue sessionToken)
+  // In this case, we don't wait for Hue data - just show empty dashboard structure
+  useEffect(() => {
+    if (!isDemoMode && !sessionToken && loading) {
+      // No Hue session - this is Hive-only mode
+      // Set up empty dashboard structure so Hive tab can work
+      setLocalDashboard({
+        summary: { lightsOn: 0, totalLights: 0, roomCount: 0, sceneCount: 0 },
+        rooms: [],
+        zones: [],
+        motionZones: [],
+      });
+      setLoading(false);
+    }
+  }, [isDemoMode, sessionToken, loading]);
+
   // Fallback: If WebSocket doesn't deliver dashboard within 2 seconds, fetch via REST
   useEffect(() => {
     if (!isDemoMode && sessionToken && loading && !localDashboard) {
@@ -190,11 +206,11 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
 
   // Set default selected room when dashboard loads (check localStorage first)
   useEffect(() => {
-    if (dashboard?.rooms?.length > 0 && selectedId === null) {
+    if (dashboard && selectedId === null) {
       const persistedId = localStorage.getItem(STORAGE_KEYS.SELECTED_TAB);
 
       // Check if persisted ID is valid (exists in rooms, zones, or special views)
-      const isValidRoomId = dashboard.rooms.some((r) => r.id === persistedId);
+      const isValidRoomId = dashboard.rooms?.some((r) => r.id === persistedId);
       const isValidSpecialView =
         persistedId === 'zones' ||
         persistedId === 'automations' ||
@@ -203,8 +219,12 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
 
       if (persistedId && (isValidRoomId || isValidSpecialView)) {
         setSelectedId(persistedId);
-      } else {
+      } else if (dashboard.rooms?.length > 0) {
+        // Hue mode: default to first room
         setSelectedId(dashboard.rooms[0].id);
+      } else {
+        // Hive-only mode (no rooms): default to hive tab
+        setSelectedId('hive');
       }
     }
   }, [dashboard, selectedId]);
@@ -485,6 +505,14 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
     }
   }, [homeDevices.length, selectedId]);
 
+  // Bug fix: If 'home' tab is selected but no home devices exist, fall back to first room
+  // This prevents showing "No devices to display" when restoring from localStorage
+  useEffect(() => {
+    if (selectedId === 'home' && homeDevices.length === 0 && dashboard?.rooms?.length > 0) {
+      setSelectedId(dashboard.rooms[0].id);
+    }
+  }, [selectedId, homeDevices.length, dashboard?.rooms]);
+
   // Loading state
   if (loading && !dashboard) {
     return (
@@ -659,6 +687,6 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
 };
 
 Dashboard.propTypes = {
-  sessionToken: PropTypes.string.isRequired,
+  sessionToken: PropTypes.string, // Optional - null for Hive-only mode
   onLogout: PropTypes.func,
 };

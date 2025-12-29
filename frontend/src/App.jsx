@@ -23,6 +23,7 @@ function AppContent() {
     authenticate,
     reset,
     enableHue,
+    enableHiveOnly,
   } = useHueBridge();
 
   // In demo mode, use dummy credentials and skip to connected step
@@ -38,6 +39,7 @@ function AppContent() {
         <SettingsPage
           onBack={() => {}}
           onEnableHue={enableHue}
+          onEnableHive={enableHiveOnly}
           hueConnected={false}
           hiveConnected={false}
           settings={{ services: { hue: { enabled: false }, hive: { enabled: false } } }}
