@@ -53,9 +53,9 @@ RUN npm ci --omit=dev && \
 COPY --from=builder /app/backend/ ./backend/
 COPY config.yaml ./
 
-# Create data directory for persistent storage
+# Create data directory and set ownership for all files
 RUN mkdir -p /app/backend/data && \
-    chown -R nodejs:nodejs /app/backend/data
+    chown -R nodejs:nodejs /app
 
 # Switch to non-root user
 USER nodejs
