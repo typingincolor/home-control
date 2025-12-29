@@ -21,10 +21,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: rm -rf node_modules && npm install
 
       - name: Run ESLint
         run: npm run lint
@@ -42,10 +41,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: rm -rf node_modules && npm install
 
       - name: Run frontend tests
         run: npm run test:run --workspace=frontend
@@ -68,10 +66,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: rm -rf node_modules && npm install
 
       - name: Run backend tests
         run: npm run test:run --workspace=backend
@@ -94,10 +91,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: rm -rf node_modules && npm install
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -127,10 +123,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: rm -rf node_modules && npm install
 
       - name: Build frontend
         run: npm run build
