@@ -1,0 +1,73 @@
+# Home Control - Production Docker Image
+# Multi-stage build for smaller final image
+
+# ============================================
+# Stage 1: Build
+# ============================================
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files for dependency installation
+COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+COPY backend/package*.json ./backend/
+
+# Install all dependencies (including devDependencies for build)
+RUN npm ci
+
+# Copy source code
+COPY frontend/ ./frontend/
+COPY backend/ ./backend/
+COPY config.yaml ./
+
+# Build frontend (outputs to frontend/dist)
+RUN npm run build --workspace=frontend
+
+# Copy frontend build to backend/public
+RUN npm run build --workspace=backend
+
+# ============================================
+# Stage 2: Production
+# ============================================
+FROM node:20-alpine AS production
+
+WORKDIR /app
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Copy package files
+COPY package*.json ./
+COPY backend/package*.json ./backend/
+
+# Install production dependencies only
+RUN npm ci --workspace=backend --omit=dev && \
+    npm cache clean --force
+
+# Copy built backend and frontend
+COPY --from=builder /app/backend/ ./backend/
+COPY config.yaml ./
+
+# Create data directory for persistent storage
+RUN mkdir -p /app/backend/data && \
+    chown -R nodejs:nodejs /app/backend/data
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port (default from config.yaml)
+EXPOSE 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/v2/health || exit 1
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3001
+
+# Start the server
+WORKDIR /app/backend
+CMD ["node", "server.js"]
