@@ -230,7 +230,7 @@ jobs:
 
           # Test static files are served
           echo "Testing static file serving..."
-          curl -f http://localhost:3001/ | grep -q "<!DOCTYPE html>"
+          curl -f http://localhost:3001/ | grep -qi "<!doctype html>"
 
           echo "All production tests passed!"
 
