@@ -343,13 +343,13 @@ Implemented tab persistence - the selected navigation tab is now preserved acros
 
 ### Changes
 
-| File | Change |
-|------|--------|
-| `frontend/src/constants/storage.js` | Added `SELECTED_TAB` storage key |
-| `frontend/src/components/Dashboard/index.jsx` | Read/write selected tab to localStorage |
-| `frontend/src/components/Dashboard/index.test.jsx` | 6 new unit tests for tab persistence |
-| `frontend/e2e/settings-page.spec.ts` | Deleted 2 obsolete toggle tests, updated persistence test |
-| `frontend/src/test/setup.js` | Fixed localStorage mock for all tests |
+| File                                               | Change                                                    |
+| -------------------------------------------------- | --------------------------------------------------------- |
+| `frontend/src/constants/storage.js`                | Added `SELECTED_TAB` storage key                          |
+| `frontend/src/components/Dashboard/index.jsx`      | Read/write selected tab to localStorage                   |
+| `frontend/src/components/Dashboard/index.test.jsx` | 6 new unit tests for tab persistence                      |
+| `frontend/e2e/settings-page.spec.ts`               | Deleted 2 obsolete toggle tests, updated persistence test |
+| `frontend/src/test/setup.js`                       | Fixed localStorage mock for all tests                     |
 
 ### Test Results
 

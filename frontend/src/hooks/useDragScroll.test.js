@@ -78,19 +78,13 @@ describe('useDragScroll', () => {
 
     unmount();
 
-    expect(mockElement.removeEventListener).toHaveBeenCalledWith(
-      'mousedown',
-      expect.any(Function)
-    );
+    expect(mockElement.removeEventListener).toHaveBeenCalledWith('mousedown', expect.any(Function));
     expect(mockElement.removeEventListener).toHaveBeenCalledWith('mouseup', expect.any(Function));
     expect(mockElement.removeEventListener).toHaveBeenCalledWith(
       'mouseleave',
       expect.any(Function)
     );
-    expect(mockElement.removeEventListener).toHaveBeenCalledWith(
-      'mousemove',
-      expect.any(Function)
-    );
+    expect(mockElement.removeEventListener).toHaveBeenCalledWith('mousemove', expect.any(Function));
   });
 
   it('should set cursor to grab initially', () => {

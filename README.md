@@ -542,13 +542,13 @@ GitHub Actions workflows automate testing, building, and releasing.
 
 On every push to `main` and pull request:
 
-| Job | Description |
-|-----|-------------|
-| **Lint & Format** | ESLint + Prettier checks |
+| Job                | Description                     |
+| ------------------ | ------------------------------- |
+| **Lint & Format**  | ESLint + Prettier checks        |
 | **Frontend Tests** | Vitest unit tests with coverage |
-| **Backend Tests** | Vitest unit tests with coverage |
-| **E2E Tests** | Playwright browser tests |
-| **Build** | Production build verification |
+| **Backend Tests**  | Vitest unit tests with coverage |
+| **E2E Tests**      | Playwright browser tests        |
+| **Build**          | Production build verification   |
 
 Tests run in parallel for speed. Build artifacts are uploaded for debugging.
 
@@ -563,6 +563,7 @@ git push --tags
 ```
 
 This triggers:
+
 1. Full test suite runs
 2. Production build is created
 3. Release archive (`home-control-v*.tar.gz`) is published to GitHub Releases
@@ -587,6 +588,7 @@ export GITHUB_REPO="your-username/home-control"
 ```
 
 The script:
+
 - Downloads the release archive from GitHub
 - Backs up existing installation
 - Installs new version with dependencies

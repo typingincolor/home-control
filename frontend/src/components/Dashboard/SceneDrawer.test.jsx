@@ -105,9 +105,7 @@ describe('SceneDrawer', () => {
       const onActivateScene = vi.fn();
       const onClose = vi.fn();
 
-      render(
-        <SceneDrawer {...defaultProps} onActivateScene={onActivateScene} onClose={onClose} />
-      );
+      render(<SceneDrawer {...defaultProps} onActivateScene={onActivateScene} onClose={onClose} />);
 
       await user.click(screen.getByText('Relax'));
 
@@ -166,12 +164,7 @@ describe('SceneDrawer', () => {
       const onClose = vi.fn();
 
       render(
-        <SceneDrawer
-          {...defaultProps}
-          anyOn={true}
-          onToggleRoom={onToggleRoom}
-          onClose={onClose}
-        />
+        <SceneDrawer {...defaultProps} anyOn={true} onToggleRoom={onToggleRoom} onClose={onClose} />
       );
 
       await user.click(screen.getByText('Turn All Off'));

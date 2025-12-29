@@ -222,9 +222,7 @@ describe('AutomationCard', () => {
         recurrenceDays: ['monday', 'wednesday', 'friday'],
       };
       const { container } = render(<AutomationCard {...defaultProps} automation={automation} />);
-      expect(container.querySelector('.automation-description')).toHaveTextContent(
-        'Mon, Wed, Fri'
-      );
+      expect(container.querySelector('.automation-description')).toHaveTextContent('Mon, Wed, Fri');
     });
 
     it('should sort days in week order', () => {
@@ -233,9 +231,7 @@ describe('AutomationCard', () => {
         recurrenceDays: ['friday', 'monday', 'wednesday'], // Out of order
       };
       const { container } = render(<AutomationCard {...defaultProps} automation={automation} />);
-      expect(container.querySelector('.automation-description')).toHaveTextContent(
-        'Mon, Wed, Fri'
-      );
+      expect(container.querySelector('.automation-description')).toHaveTextContent('Mon, Wed, Fri');
     });
 
     it('should handle single day', () => {
@@ -378,7 +374,10 @@ describe('AutomationCard', () => {
         ...mockAutomation,
         targets: {
           groups: [{ id: 'g1', name: 'Bedroom', type: 'room' }],
-          lights: [{ id: 'l1', name: 'Lamp 1' }, { id: 'l2', name: 'Lamp 2' }],
+          lights: [
+            { id: 'l1', name: 'Lamp 1' },
+            { id: 'l2', name: 'Lamp 2' },
+          ],
         },
       };
       const { container } = render(<AutomationCard {...defaultProps} automation={automation} />);
