@@ -102,7 +102,9 @@ test.describe('Bug #3: Home Tab Reconnecting Spinner', () => {
     await expect(page.getByText('Living Room')).toBeVisible();
   });
 
-  test('should not show extended reconnecting spinner when selecting Home tab', async ({ page }) => {
+  test('should not show extended reconnecting spinner when selecting Home tab', async ({
+    page,
+  }) => {
     // Find and click Home tab
     const homeTab = page.locator('.bottom-nav-item').filter({ hasText: 'Home' });
 
