@@ -28,10 +28,10 @@ PROD_URL=http://localhost:3002 npm run test:auto
 
 These tests run completely automatically and verify layout, connectivity, and basic functionality.
 
-| Script | Tests | Description |
-|--------|-------|-------------|
-| `test:auto` | 27 | Core tests: connectivity, settings layout, dashboard layout |
-| `test:auto:all` | 32 | Extended: adds Hive login layout tests |
+| Script          | Tests | Description                                                 |
+| --------------- | ----- | ----------------------------------------------------------- |
+| `test:auto`     | 27    | Core tests: connectivity, settings layout, dashboard layout |
+| `test:auto:all` | 32    | Extended: adds Hive login layout tests                      |
 
 ```bash
 # Run core automated tests
@@ -45,9 +45,9 @@ PROD_URL=http://localhost:3002 npm run test:auto:all
 
 These tests need user interaction - entering credentials, verifying physical lights changed, etc.
 
-| Script | Description |
-|--------|-------------|
-| `test:interactive:hue` | Hue pairing and light control tests |
+| Script                  | Description                              |
+| ----------------------- | ---------------------------------------- |
+| `test:interactive:hue`  | Hue pairing and light control tests      |
 | `test:interactive:hive` | Hive login with 2FA and thermostat tests |
 
 ## Environment Setup
@@ -141,17 +141,17 @@ npm run test:interactive:hue
 
 ## Test Files
 
-| File | Description |
-|------|-------------|
-| `00-connectivity.spec.ts` | Server health, WebSocket connectivity |
-| `01-layout-settings.spec.ts` | Settings page fits 800x480 viewport |
-| `02-layout-discovery.spec.ts` | Discovery page layout |
-| `03-layout-auth.spec.ts` | Authentication page layout |
-| `04-layout-dashboard.spec.ts` | Dashboard, rooms, zones layout |
-| `05-hue-pairing.spec.ts` | Hue Bridge discovery and pairing |
-| `06-hue-controls.spec.ts` | Light toggle, brightness, scenes |
-| `07-hive-login.spec.ts` | Hive login with 2FA flow |
-| `08-hive-controls.spec.ts` | Thermostat and hot water controls |
+| File                          | Description                           |
+| ----------------------------- | ------------------------------------- |
+| `00-connectivity.spec.ts`     | Server health, WebSocket connectivity |
+| `01-layout-settings.spec.ts`  | Settings page fits 800x480 viewport   |
+| `02-layout-discovery.spec.ts` | Discovery page layout                 |
+| `03-layout-auth.spec.ts`      | Authentication page layout            |
+| `04-layout-dashboard.spec.ts` | Dashboard, rooms, zones layout        |
+| `05-hue-pairing.spec.ts`      | Hue Bridge discovery and pairing      |
+| `06-hue-controls.spec.ts`     | Light toggle, brightness, scenes      |
+| `07-hive-login.spec.ts`       | Hive login with 2FA flow              |
+| `08-hive-controls.spec.ts`    | Thermostat and hot water controls     |
 
 ## What These Tests Check
 
@@ -234,18 +234,22 @@ Each test that submits credentials triggers a **new SMS code**. Make sure you:
 ## Bugs Found By These Tests
 
 ### BUG-001: Settings page exceeds viewport height
+
 - **Found:** Layout test detected scrollHeight > clientHeight
 - **Fixed:** Added responsive CSS for max-height: 480px
 
 ### BUG-002: Automations tab shows without Hue
+
 - **Found:** Screenshot showed Automations when only Hive connected
 - **Fixed:** Derive hueConnected from sessionToken presence
 
 ### BUG-003: Touch targets too small
+
 - **Found:** Input fields only 38px height
 - **Fixed:** Added min-height: 44px for touch accessibility
 
 ### BUG-004: Toggle selectors incorrect
+
 - **Found:** Tests couldn't click service toggles
 - **Fixed:** Use `.service-toggle-switch` not `.service-toggle`
 
