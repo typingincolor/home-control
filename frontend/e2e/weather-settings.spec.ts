@@ -427,7 +427,7 @@ test.describe('Weather Unit Integration', () => {
     await toggleSwitch.click();
 
     // Return to previous view
-    await page.click('.settings-back-btn');
+    await page.click('.settings-close-btn');
 
     // Temperature should still be valid format
     const newTemp = await tempElement.textContent();

@@ -19,6 +19,7 @@ describe('SettingsPage', () => {
     onDetectLocation: vi.fn(),
     isDetecting: false,
     locationError: null,
+    hueConnected: true,
     hiveConnected: false,
   };
 
@@ -33,17 +34,35 @@ describe('SettingsPage', () => {
       expect(screen.getByText(UI_TEXT.SETTINGS_TITLE)).toBeInTheDocument();
     });
 
-    it('should render back button', () => {
-      render(<SettingsPage {...defaultProps} />);
+    it('should render close button when Hue is connected', () => {
+      render(<SettingsPage {...defaultProps} hueConnected={true} hiveConnected={false} />);
 
-      expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
     });
 
-    it('should call onBack when back button clicked', async () => {
+    it('should render close button when Hive is connected', () => {
+      render(<SettingsPage {...defaultProps} hueConnected={false} hiveConnected={true} />);
+
+      expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
+    });
+
+    it('should render close button when both services are connected', () => {
+      render(<SettingsPage {...defaultProps} hueConnected={true} hiveConnected={true} />);
+
+      expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
+    });
+
+    it('should NOT render close button when no services are connected', () => {
+      render(<SettingsPage {...defaultProps} hueConnected={false} hiveConnected={false} />);
+
+      expect(screen.queryByRole('button', { name: /close/i })).not.toBeInTheDocument();
+    });
+
+    it('should call onBack when close button clicked', async () => {
       const user = userEvent.setup();
       render(<SettingsPage {...defaultProps} />);
 
-      await user.click(screen.getByRole('button', { name: /back/i }));
+      await user.click(screen.getByRole('button', { name: /close/i }));
 
       expect(defaultProps.onBack).toHaveBeenCalledTimes(1);
     });
@@ -252,12 +271,20 @@ describe('SettingsPage', () => {
   });
 
   describe('keyboard navigation', () => {
-    it('should call onBack when Escape key pressed', () => {
-      render(<SettingsPage {...defaultProps} />);
+    it('should call onBack when Escape key pressed and close is allowed', () => {
+      render(<SettingsPage {...defaultProps} hueConnected={true} />);
 
       fireEvent.keyDown(document, { key: 'Escape' });
 
       expect(defaultProps.onBack).toHaveBeenCalledTimes(1);
+    });
+
+    it('should NOT call onBack when Escape pressed if no services connected', () => {
+      render(<SettingsPage {...defaultProps} hueConnected={false} hiveConnected={false} />);
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+
+      expect(defaultProps.onBack).not.toHaveBeenCalled();
     });
   });
 
@@ -272,10 +299,10 @@ describe('SettingsPage', () => {
       expect(hiveToggle).toBeInTheDocument();
     });
 
-    it('should have back button with accessible name', () => {
-      render(<SettingsPage {...defaultProps} />);
+    it('should have close button with accessible name when services connected', () => {
+      render(<SettingsPage {...defaultProps} hueConnected={true} />);
 
-      expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
     });
   });
 

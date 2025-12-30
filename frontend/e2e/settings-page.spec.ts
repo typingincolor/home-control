@@ -30,7 +30,7 @@ async function openSettings(page: Page) {
 
 // Helper to close settings and return to previous view
 async function closeSettings(page: Page) {
-  await page.click('.settings-back-btn');
+  await page.click('.settings-close-btn');
   await page.waitForSelector('.settings-page', { state: 'hidden' });
 }
 
@@ -57,12 +57,12 @@ test.describe('Settings Page - Navigation', () => {
     await expect(page.locator('.settings-header-title')).toHaveText('Settings');
   });
 
-  test('should show back button in settings header', async ({ page }) => {
+  test('should show close button in settings header', async ({ page }) => {
     await openSettings(page);
-    await expect(page.locator('.settings-back-btn')).toBeVisible();
+    await expect(page.locator('.settings-close-btn')).toBeVisible();
   });
 
-  test('should return to previous view when back button clicked', async ({ page }) => {
+  test('should return to previous view when close button clicked', async ({ page }) => {
     // Start on a room tab (not Home tab which shows Hive view in demo mode)
     const roomTab = page.locator('.nav-tab:has-text("Living Room")');
     await roomTab.click();
@@ -306,9 +306,9 @@ test.describe('Settings Page - Accessibility', () => {
     await openSettings(page);
   });
 
-  test('back button should have aria-label', async ({ page }) => {
-    const backBtn = page.locator('.settings-back-btn');
-    await expect(backBtn).toHaveAttribute('aria-label');
+  test('close button should have aria-label', async ({ page }) => {
+    const closeBtn = page.locator('.settings-close-btn');
+    await expect(closeBtn).toHaveAttribute('aria-label', 'close');
   });
 });
 

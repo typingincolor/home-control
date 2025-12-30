@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { ArrowLeft, MapPin, LocateFixed, Spinner } from './Icons';
+import { MapPin, LocateFixed, Spinner, X } from './Icons';
 import { UI_TEXT } from '../../constants/uiText';
 
 /**
@@ -52,8 +52,12 @@ export const SettingsPage = ({
   onDisableHue,
   onDisableHive,
 }) => {
-  // Close on Escape key
+  // Only show close button if at least one service is connected (there's somewhere to go back to)
+  const canClose = hueConnected || hiveConnected;
+
+  // Close on Escape key (only if close is allowed)
   useEffect(() => {
+    if (!canClose) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         onBack();
@@ -61,7 +65,7 @@ export const SettingsPage = ({
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onBack]);
+  }, [onBack, canClose]);
 
   const { units = 'celsius', services = {} } = settings || {};
   const hueEnabled = services?.hue?.enabled ?? true;
@@ -98,10 +102,12 @@ export const SettingsPage = ({
   return (
     <div className="settings-page">
       <div className="settings-header">
-        <button className="settings-back-btn" onClick={onBack} aria-label="back">
-          <ArrowLeft size={24} />
-        </button>
         <h2 className="settings-header-title">{UI_TEXT.SETTINGS_TITLE}</h2>
+        {canClose && (
+          <button className="settings-close-btn" onClick={onBack} aria-label="close">
+            <X size={24} />
+          </button>
+        )}
       </div>
 
       <div className="settings-content">

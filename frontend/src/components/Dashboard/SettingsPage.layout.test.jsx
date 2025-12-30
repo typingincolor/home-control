@@ -8,7 +8,7 @@ import { VIEWPORTS, setupViewport, resetViewport } from '../../test/layoutTestUt
  * SettingsPage Layout Tests
  *
  * Tests the structural layout requirements for the Settings page:
- * - Header with back button and title
+ * - Header with title and close button (when services connected)
  * - Content sections (Services, Location, Units)
  * - Footer with auto-save message
  * - Proper CSS classes for styling
@@ -76,12 +76,18 @@ describe('SettingsPage Layout', () => {
   });
 
   describe('Header Layout', () => {
-    it('should render back button', () => {
+    it('should render close button when services connected', () => {
       render(<SettingsPage {...defaultProps} />);
 
-      const backButton = screen.getByRole('button', { name: /back/i });
-      expect(backButton).toBeInTheDocument();
-      expect(backButton).toHaveClass('settings-back-btn');
+      const closeButton = screen.getByRole('button', { name: /close/i });
+      expect(closeButton).toBeInTheDocument();
+      expect(closeButton).toHaveClass('settings-close-btn');
+    });
+
+    it('should NOT render close button when no services connected', () => {
+      render(<SettingsPage {...defaultProps} hueConnected={false} hiveConnected={false} />);
+
+      expect(screen.queryByRole('button', { name: /close/i })).not.toBeInTheDocument();
     });
 
     it('should render title', () => {
@@ -92,15 +98,15 @@ describe('SettingsPage Layout', () => {
       expect(title).toHaveTextContent(UI_TEXT.SETTINGS_TITLE);
     });
 
-    it('should have back button before title in DOM order', () => {
+    it('should have title before close button in DOM order', () => {
       render(<SettingsPage {...defaultProps} />);
 
       const header = document.querySelector('.settings-header');
-      const backButton = header.querySelector('.settings-back-btn');
       const title = header.querySelector('.settings-header-title');
+      const closeButton = header.querySelector('.settings-close-btn');
 
-      // Back button should come before title (DOCUMENT_POSITION_FOLLOWING = 4)
-      expect(backButton.compareDocumentPosition(title) & 4).toBeTruthy();
+      // Title should come before close button (DOCUMENT_POSITION_FOLLOWING = 4)
+      expect(title.compareDocumentPosition(closeButton) & 4).toBeTruthy();
     });
   });
 
@@ -296,13 +302,13 @@ describe('SettingsPage Layout', () => {
           expect(sections.length).toBe(3);
         });
 
-        it('should render header with back button', () => {
+        it('should render header with close button', () => {
           render(<SettingsPage {...defaultProps} />);
 
           const header = document.querySelector('.settings-header');
-          const backButton = header.querySelector('.settings-back-btn');
+          const closeButton = header.querySelector('.settings-close-btn');
           expect(header).toBeInTheDocument();
-          expect(backButton).toBeInTheDocument();
+          expect(closeButton).toBeInTheDocument();
         });
 
         it('should render footer', () => {
@@ -331,11 +337,11 @@ describe('SettingsPage Layout', () => {
   });
 
   describe('Accessibility', () => {
-    it('should have accessible back button', () => {
+    it('should have accessible close button when services connected', () => {
       render(<SettingsPage {...defaultProps} />);
 
-      const backButton = screen.getByRole('button', { name: /back/i });
-      expect(backButton).toHaveAttribute('aria-label', 'back');
+      const closeButton = screen.getByRole('button', { name: /close/i });
+      expect(closeButton).toHaveAttribute('aria-label', 'close');
     });
 
     it('should have proper heading', () => {
