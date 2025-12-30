@@ -42,7 +42,7 @@ test.describe('Authentication Page Layout - Raspberry Pi 7"', () => {
     await page.waitForSelector('.discovery-page, .bridge-discovery', { timeout: 10000 });
 
     // Enter a test IP (will fail to connect but should show auth page)
-    const ipInput = page.getByPlaceholder(/ip/i);
+    const ipInput = page.locator('.ip-input');
     await ipInput.fill('192.168.1.100');
 
     const connectButton = page.getByRole('button', { name: /connect/i });

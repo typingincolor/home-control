@@ -46,6 +46,20 @@ Same root cause as BUG-001. Now fixed.
 
 ---
 
+### BUG-007: Automations tab shows when only Hive is connected ✓ FIXED
+
+**Severity:** Medium
+**Component:** Frontend - Dashboard BottomNav
+**Fixed in:** commit db4638c
+
+The Automations tab (which is for Hue scenes/schedules) was showing in the bottom navigation even when only Hive was connected and Hue was disconnected.
+
+**Root cause:** BottomNav had hardcoded `hueConnected={true}` with comment "Always true here - Dashboard only renders when Hue is connected" - but this assumption was wrong after Hive-only mode was added.
+
+**Fix:** Changed to `hueConnected={!!sessionToken}` to derive from actual Hue connection state.
+
+---
+
 ## Open Bugs
 
 ### BUG-005: Discovery page exceeds viewport height on Raspberry Pi 7"
@@ -102,14 +116,15 @@ Apply CSS media query for compact height viewport.
 
 ## Summary
 
-| Bug ID  | Issue                                 | Severity | Status           |
-| ------- | ------------------------------------- | -------- | ---------------- |
-| BUG-001 | Settings page exceeds viewport height | High     | ✓ Fixed (PR #25) |
-| BUG-002 | No left edge padding                  | Medium   | ✓ Fixed (PR #25) |
-| BUG-003 | Content cut off                       | High     | ✓ Fixed (PR #25) |
-| BUG-004 | Requires scrolling                    | High     | ✓ Fixed (PR #25) |
-| BUG-005 | Discovery page exceeds viewport       | High     | Open             |
-| BUG-006 | Auth page exceeds viewport            | High     | Open             |
+| Bug ID  | Issue                                 | Severity | Status            |
+| ------- | ------------------------------------- | -------- | ----------------- |
+| BUG-001 | Settings page exceeds viewport height | High     | ✓ Fixed (PR #25)  |
+| BUG-002 | No left edge padding                  | Medium   | ✓ Fixed (PR #25)  |
+| BUG-003 | Content cut off                       | High     | ✓ Fixed (PR #25)  |
+| BUG-004 | Requires scrolling                    | High     | ✓ Fixed (PR #25)  |
+| BUG-005 | Discovery page exceeds viewport       | High     | Open              |
+| BUG-006 | Auth page exceeds viewport            | High     | Open              |
+| BUG-007 | Automations tab shows without Hue     | Medium   | ✓ Fixed (db4638c) |
 
 ### Test Commands
 
