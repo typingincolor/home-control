@@ -579,7 +579,7 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
             onDetectLocation={detectLocation}
             isDetecting={isDetecting}
             locationError={locationError}
-            hueConnected={true} // Always true here - Dashboard only renders when Hue is connected
+            hueConnected={!!sessionToken}
             hiveConnected={hiveConnected}
             onEnableHive={() => {
               setSettingsOpen(false);
@@ -678,7 +678,7 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
           setSettingsOpen(false);
         }}
         services={settings.services}
-        hueConnected={true} // Always true here - Dashboard only renders when Hue is connected
+        hueConnected={!!sessionToken}
         hiveConnected={hiveConnected}
         homeDevices={homeDevices}
       />

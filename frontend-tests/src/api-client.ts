@@ -15,11 +15,7 @@ const BASE_URL = process.env.PROD_URL || 'http://localhost:3001';
 /**
  * Make an HTTP request to the production server
  */
-async function request(
-  method: string,
-  endpoint: string,
-  body?: object
-): Promise<Response> {
+async function request(method: string, endpoint: string, body?: object): Promise<Response> {
   const url = `${BASE_URL}${endpoint}`;
   const options: RequestInit = {
     method,

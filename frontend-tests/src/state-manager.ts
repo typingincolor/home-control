@@ -86,10 +86,7 @@ export async function ensureState(
     return;
   }
 
-  prompts.showInfo(
-    'State Transition',
-    `Current: ${currentState}\nTarget: ${targetState}`
-  );
+  prompts.showInfo('State Transition', `Current: ${currentState}\nTarget: ${targetState}`);
 
   switch (targetState) {
     case SystemState.FRESH:
@@ -133,9 +130,7 @@ async function transitionToFresh(): Promise<void> {
 /**
  * Transition to Hue discovered (bridge IP entered, not paired)
  */
-async function transitionToHueDiscovered(
-  options: EnsureStateOptions
-): Promise<void> {
+async function transitionToHueDiscovered(options: EnsureStateOptions): Promise<void> {
   // First ensure fresh state
   await transitionToFresh();
 
@@ -155,9 +150,7 @@ async function transitionToHueDiscovered(
 /**
  * Transition to Hue connected
  */
-async function transitionToHueConnected(
-  options: EnsureStateOptions
-): Promise<void> {
+async function transitionToHueConnected(options: EnsureStateOptions): Promise<void> {
   // First get to discovered state
   await transitionToHueDiscovered(options);
 
@@ -174,9 +167,7 @@ async function transitionToHueConnected(
 /**
  * Transition to Hive pending 2FA
  */
-async function transitionToHivePending2FA(
-  options: EnsureStateOptions
-): Promise<void> {
+async function transitionToHivePending2FA(options: EnsureStateOptions): Promise<void> {
   // Get credentials
   const creds = await getHiveCredentials();
 
@@ -194,9 +185,7 @@ async function transitionToHivePending2FA(
 /**
  * Transition to Hive connected
  */
-async function transitionToHiveConnected(
-  options: EnsureStateOptions
-): Promise<void> {
+async function transitionToHiveConnected(options: EnsureStateOptions): Promise<void> {
   // First get to 2FA pending
   await transitionToHivePending2FA(options);
 
@@ -213,9 +202,7 @@ async function transitionToHiveConnected(
 /**
  * Transition to fully connected (both Hue and Hive)
  */
-async function transitionToFullyConnected(
-  options: EnsureStateOptions
-): Promise<void> {
+async function transitionToFullyConnected(options: EnsureStateOptions): Promise<void> {
   await transitionToHueConnected(options);
   await transitionToHiveConnected(options);
 }

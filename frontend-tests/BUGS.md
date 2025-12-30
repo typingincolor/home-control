@@ -56,18 +56,23 @@ Same root cause as BUG-001. Now fixed.
 **Test:** `should display discovery page within viewport`
 
 #### Description
+
 The Bridge Discovery page content extends beyond the 480px viewport height of the Raspberry Pi 7" touchscreen.
 
 #### Expected Behavior
+
 All discovery page content should fit within the 480px viewport height without requiring scrolling.
 
 #### Actual Behavior
+
 - Discovery page height: 655px
 - Viewport height: 480px
 - Overflow: 175px
 
 #### Suggested Fix
+
 Apply similar CSS media query treatment as Settings page:
+
 ```css
 @media (max-height: 480px) {
   .bridge-discovery {
@@ -86,25 +91,28 @@ Apply similar CSS media query treatment as Settings page:
 **Test File:** `tests/03-layout-auth.spec.ts`
 
 #### Description
+
 The Authentication/Pairing page extends beyond the 480px viewport when navigating from Discovery. The tests timeout trying to find elements that are cut off.
 
 #### Suggested Fix
+
 Apply CSS media query for compact height viewport.
 
 ---
 
 ## Summary
 
-| Bug ID | Issue | Severity | Status |
-|--------|-------|----------|--------|
-| BUG-001 | Settings page exceeds viewport height | High | ✓ Fixed (PR #25) |
-| BUG-002 | No left edge padding | Medium | ✓ Fixed (PR #25) |
-| BUG-003 | Content cut off | High | ✓ Fixed (PR #25) |
-| BUG-004 | Requires scrolling | High | ✓ Fixed (PR #25) |
-| BUG-005 | Discovery page exceeds viewport | High | Open |
-| BUG-006 | Auth page exceeds viewport | High | Open |
+| Bug ID  | Issue                                 | Severity | Status           |
+| ------- | ------------------------------------- | -------- | ---------------- |
+| BUG-001 | Settings page exceeds viewport height | High     | ✓ Fixed (PR #25) |
+| BUG-002 | No left edge padding                  | Medium   | ✓ Fixed (PR #25) |
+| BUG-003 | Content cut off                       | High     | ✓ Fixed (PR #25) |
+| BUG-004 | Requires scrolling                    | High     | ✓ Fixed (PR #25) |
+| BUG-005 | Discovery page exceeds viewport       | High     | Open             |
+| BUG-006 | Auth page exceeds viewport            | High     | Open             |
 
 ### Test Commands
+
 ```bash
 # Run all layout tests
 npm test

@@ -36,20 +36,15 @@ export async function assertNoOverlap(
   const box2 = await getBoundingBox(page, selector2);
 
   // Check horizontal overlap
-  const horizontalOverlap =
-    box1.x < box2.x + box2.width && box1.x + box1.width > box2.x;
+  const horizontalOverlap = box1.x < box2.x + box2.width && box1.x + box1.width > box2.x;
 
   // Check vertical overlap
-  const verticalOverlap =
-    box1.y < box2.y + box2.height && box1.y + box1.height > box2.y;
+  const verticalOverlap = box1.y < box2.y + box2.height && box1.y + box1.height > box2.y;
 
   // Elements overlap if both horizontal AND vertical overlap
   const overlaps = horizontalOverlap && verticalOverlap;
 
-  expect(
-    overlaps,
-    `Elements ${selector1} and ${selector2} should not overlap`
-  ).toBe(false);
+  expect(overlaps, `Elements ${selector1} and ${selector2} should not overlap`).toBe(false);
 }
 
 /**
@@ -81,27 +76,22 @@ export async function assertMinEdgeSpacing(
 /**
  * Assert element is fully within viewport (no cutoffs)
  */
-export async function assertWithinViewport(
-  page: Page,
-  selector: string
-): Promise<void> {
+export async function assertWithinViewport(page: Page, selector: string): Promise<void> {
   const box = await getBoundingBox(page, selector);
   const viewport = page.viewportSize();
   expect(viewport, 'Viewport should be defined').not.toBeNull();
 
   // Check horizontal bounds
   expect(box.x, `${selector} should not extend past left edge`).toBeGreaterThanOrEqual(0);
-  expect(
-    box.x + box.width,
-    `${selector} should not extend past right edge`
-  ).toBeLessThanOrEqual(viewport!.width);
+  expect(box.x + box.width, `${selector} should not extend past right edge`).toBeLessThanOrEqual(
+    viewport!.width
+  );
 
   // Check vertical bounds
   expect(box.y, `${selector} should not extend past top edge`).toBeGreaterThanOrEqual(0);
-  expect(
-    box.y + box.height,
-    `${selector} should not extend past bottom edge`
-  ).toBeLessThanOrEqual(viewport!.height);
+  expect(box.y + box.height, `${selector} should not extend past bottom edge`).toBeLessThanOrEqual(
+    viewport!.height
+  );
 }
 
 /**
@@ -135,14 +125,8 @@ export async function assertSquareButtons(
 
       // Check square aspect ratio (within 5%)
       const aspectRatio = box.width / box.height;
-      expect(
-        aspectRatio,
-        `${selector}[${i}] should be approximately square`
-      ).toBeGreaterThan(0.95);
-      expect(
-        aspectRatio,
-        `${selector}[${i}] should be approximately square`
-      ).toBeLessThan(1.05);
+      expect(aspectRatio, `${selector}[${i}] should be approximately square`).toBeGreaterThan(0.95);
+      expect(aspectRatio, `${selector}[${i}] should be approximately square`).toBeLessThan(1.05);
     }
   }
 }
@@ -163,10 +147,7 @@ export async function assertGridColumns(
     return style.gridTemplateColumns.split(' ').length;
   });
 
-  expect(
-    columns,
-    `Grid should have ${expectedColumns} columns`
-  ).toBe(expectedColumns);
+  expect(columns, `Grid should have ${expectedColumns} columns`).toBe(expectedColumns);
 }
 
 /**
@@ -196,10 +177,7 @@ export async function assertGridRows(
     }
   }
 
-  expect(
-    yPositions.size,
-    `Grid should have ${expectedRows} rows`
-  ).toBe(expectedRows);
+  expect(yPositions.size, `Grid should have ${expectedRows} rows`).toBe(expectedRows);
 }
 
 /**
@@ -235,11 +213,7 @@ export async function assertToolbarNavSeparation(page: Page): Promise<void> {
   const main = page.locator('.main-panel');
 
   // Only check if all elements exist
-  if (
-    (await toolbar.count()) > 0 &&
-    (await nav.count()) > 0 &&
-    (await main.count()) > 0
-  ) {
+  if ((await toolbar.count()) > 0 && (await nav.count()) > 0 && (await main.count()) > 0) {
     await assertNoOverlap(page, '.top-toolbar', '.main-panel');
     await assertNoOverlap(page, '.main-panel', '.bottom-nav');
   }
@@ -248,10 +222,7 @@ export async function assertToolbarNavSeparation(page: Page): Promise<void> {
 /**
  * Assert no elements are cut off (simplified check for key elements)
  */
-export async function assertNoCutoffs(
-  page: Page,
-  selectors: string[]
-): Promise<void> {
+export async function assertNoCutoffs(page: Page, selectors: string[]): Promise<void> {
   for (const selector of selectors) {
     const elements = page.locator(selector);
     const count = await elements.count();

@@ -116,10 +116,7 @@ export async function prompt2FACode(): Promise<string> {
 /**
  * Prompt to confirm system is in expected state
  */
-export async function confirmState(
-  expectedState: string,
-  instructions: string
-): Promise<boolean> {
+export async function confirmState(expectedState: string, instructions: string): Promise<boolean> {
   console.log('\n' + '='.repeat(60));
   console.log(`EXPECTED STATE: ${expectedState}`);
   console.log('='.repeat(60));
