@@ -36,7 +36,7 @@ test.describe('Hive Login - Interactive', () => {
     await expect(page.locator('.settings-page')).toBeVisible();
 
     // Find and click the Hive toggle
-    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'UK Hive' });
+    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'Hive Heating' });
     await expect(hiveToggle).toBeVisible();
     await hiveToggle.click();
 
@@ -59,7 +59,7 @@ test.describe('Hive Login - Interactive', () => {
     await page.reload();
 
     await page.waitForSelector('.settings-page', { timeout: 10000 });
-    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'UK Hive' });
+    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'Hive Heating' });
     await hiveToggle.click();
     await page.waitForSelector('.hive-login, .hive-auth, form', { timeout: 10000 });
 
@@ -98,7 +98,7 @@ test.describe('Hive Login - Interactive', () => {
     await page.reload();
 
     await page.waitForSelector('.settings-page', { timeout: 10000 });
-    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'UK Hive' });
+    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'Hive Heating' });
     await hiveToggle.click();
     await page.waitForSelector('.hive-login, .hive-auth, form', { timeout: 10000 });
 
@@ -175,7 +175,7 @@ test.describe('Hive Login - Error Handling', () => {
     await page.reload();
 
     await page.waitForSelector('.settings-page', { timeout: 10000 });
-    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'UK Hive' });
+    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'Hive Heating' });
     await hiveToggle.click();
     await page.waitForSelector('.hive-login, .hive-auth, form', { timeout: 10000 });
 
@@ -209,7 +209,7 @@ test.describe('Hive Login - Error Handling', () => {
     await page.reload();
 
     await page.waitForSelector('.settings-page', { timeout: 10000 });
-    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'UK Hive' });
+    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'Hive Heating' });
     await hiveToggle.click();
     await page.waitForSelector('.hive-login, .hive-auth, form', { timeout: 10000 });
 
@@ -260,7 +260,7 @@ test.describe('Hive Login - Layout Checks', () => {
     await page.reload();
 
     await page.waitForSelector('.settings-page', { timeout: 10000 });
-    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'UK Hive' });
+    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'Hive Heating' });
     await hiveToggle.click();
     await page.waitForSelector('.hive-login, .hive-auth, form', { timeout: 10000 });
 
@@ -281,7 +281,7 @@ test.describe('Hive Login - Layout Checks', () => {
     await page.reload();
 
     await page.waitForSelector('.settings-page', { timeout: 10000 });
-    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'UK Hive' });
+    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'Hive Heating' });
     await hiveToggle.click();
     await page.waitForSelector('.hive-login, .hive-auth, form', { timeout: 10000 });
 
@@ -305,7 +305,7 @@ test.describe('Hive Login - Layout Checks', () => {
     await page.reload();
 
     await page.waitForSelector('.settings-page', { timeout: 10000 });
-    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'UK Hive' });
+    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'Hive Heating' });
     await hiveToggle.click();
     await page.waitForSelector('.hive-login, .hive-auth, form', { timeout: 10000 });
 

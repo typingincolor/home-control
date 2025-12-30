@@ -75,10 +75,15 @@ test.describe('Settings Page Layout - Raspberry Pi 7"', () => {
   });
 
   test('should not have any elements cut off', async ({ page }) => {
-    await assertNoCutoffs(page, [
-      '.settings-page',
-      '.service-toggle',
-    ]);
+    // Check settings page container
+    await assertWithinViewport(page, '.settings-page');
+
+    // Check individual toggles
+    const hueToggle = page.locator('.service-toggle').filter({ hasText: 'Philips Hue' });
+    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'Hive' });
+
+    await expect(hueToggle).toBeInViewport();
+    await expect(hiveToggle).toBeInViewport();
   });
 
   test('should fit all content without scrolling on Raspberry Pi viewport', async ({ page }) => {

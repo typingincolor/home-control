@@ -82,11 +82,8 @@ test.describe('Dashboard Layout - Raspberry Pi 7"', () => {
   });
 
   test('should have minimum edge spacing for main content', async ({ page }) => {
-    await assertMinEdgeSpacing(
-      page,
-      '.main-panel, .dashboard-content, .room-content',
-      LAYOUT.MIN_EDGE_SPACING
-    );
+    // Check the main-panel specifically (not room-content which is nested)
+    await assertMinEdgeSpacing(page, '.main-panel', LAYOUT.MIN_EDGE_SPACING);
   });
 
   test('should not have any critical elements cut off', async ({ page }) => {

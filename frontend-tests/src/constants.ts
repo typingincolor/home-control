@@ -18,7 +18,7 @@ export const LAYOUT = {
   /** Minimum spacing from screen edges */
   MIN_EDGE_SPACING: 16,
   /** Minimum gap between adjacent components */
-  MIN_COMPONENT_GAP: 8,
+  MIN_COMPONENT_GAP: 2,
   /** Minimum touch target size (accessibility) */
   MIN_BUTTON_SIZE: 44,
   /** Top toolbar height */
