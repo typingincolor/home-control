@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { ArrowLeft, MapPin, Spinner } from './Icons';
+import { ArrowLeft, MapPin, LocateFixed, Spinner } from './Icons';
 import { UI_TEXT } from '../../constants/uiText';
 
 /**
@@ -136,15 +136,10 @@ export const SettingsPage = ({
               className="settings-detect-btn"
               onClick={onDetectLocation}
               disabled={isDetecting}
+              aria-label={UI_TEXT.SETTINGS_DETECT_LOCATION}
+              title={UI_TEXT.SETTINGS_DETECT_LOCATION}
             >
-              {isDetecting ? (
-                <>
-                  <Spinner size={14} />
-                  <span>{UI_TEXT.SETTINGS_DETECTING}</span>
-                </>
-              ) : (
-                <span>{UI_TEXT.SETTINGS_DETECT_LOCATION}</span>
-              )}
+              {isDetecting ? <Spinner size={18} /> : <LocateFixed size={18} />}
             </button>
           </div>
           {locationError && <div className="settings-error">{locationError}</div>}
@@ -153,20 +148,21 @@ export const SettingsPage = ({
         {/* Units Section */}
         <div className="settings-section">
           <div className="settings-section-label">{UI_TEXT.SETTINGS_UNITS}</div>
-          <div className="settings-units">
-            <button
-              className={`settings-unit-btn ${units === 'celsius' ? 'selected' : ''}`}
-              onClick={() => onUpdateSettings({ units: 'celsius' })}
-            >
-              {UI_TEXT.SETTINGS_CELSIUS}
-            </button>
-            <button
-              className={`settings-unit-btn ${units === 'fahrenheit' ? 'selected' : ''}`}
-              onClick={() => onUpdateSettings({ units: 'fahrenheit' })}
-            >
-              {UI_TEXT.SETTINGS_FAHRENHEIT}
-            </button>
-          </div>
+          <label className="settings-units-toggle">
+            <span className="units-label-left">℉</span>
+            <input
+              type="checkbox"
+              role="switch"
+              checked={units === 'celsius'}
+              onChange={(e) =>
+                onUpdateSettings({ units: e.target.checked ? 'celsius' : 'fahrenheit' })
+              }
+            />
+            <span className="units-toggle-switch">
+              <span className="units-toggle-thumb" />
+            </span>
+            <span className="units-label-right">℃</span>
+          </label>
         </div>
       </div>
 
