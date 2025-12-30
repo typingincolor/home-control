@@ -39,8 +39,14 @@ export async function confirmAction(message: string): Promise<void> {
 
 /**
  * Prompt for Hue bridge IP address
+ * Set HUE_BRIDGE_IP env var to skip interactive prompt
  */
 export async function promptBridgeIp(): Promise<string> {
+  if (process.env.HUE_BRIDGE_IP) {
+    console.log(`Using HUE_BRIDGE_IP: ${process.env.HUE_BRIDGE_IP}`);
+    return process.env.HUE_BRIDGE_IP;
+  }
+
   return input({
     message: 'Enter the Hue Bridge IP address:',
     validate: (value) => {
@@ -55,11 +61,20 @@ export async function promptBridgeIp(): Promise<string> {
 
 /**
  * Prompt for Hive credentials
+ * Set HIVE_EMAIL and HIVE_PASSWORD env vars to skip interactive prompt
  */
 export async function promptHiveCredentials(): Promise<{
   username: string;
   password: string;
 }> {
+  if (process.env.HIVE_EMAIL && process.env.HIVE_PASSWORD) {
+    console.log(`Using HIVE_EMAIL: ${process.env.HIVE_EMAIL}`);
+    return {
+      username: process.env.HIVE_EMAIL,
+      password: process.env.HIVE_PASSWORD,
+    };
+  }
+
   const username = await input({
     message: 'Enter your Hive email address:',
     validate: (value) => {

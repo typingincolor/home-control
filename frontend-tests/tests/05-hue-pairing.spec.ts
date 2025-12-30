@@ -63,8 +63,8 @@ test.describe('Hue Bridge Pairing - Interactive', () => {
     // Prompt user for bridge IP
     const bridgeIp = await stateManager.getBridgeIp();
 
-    // Enter the bridge IP
-    const ipInput = page.getByPlaceholder(/ip/i);
+    // Enter the bridge IP (placeholder is "192.168.1.xxx")
+    const ipInput = page.locator('.ip-input');
     await ipInput.fill(bridgeIp);
 
     // Click connect
@@ -72,7 +72,7 @@ test.describe('Hue Bridge Pairing - Interactive', () => {
     await connectButton.click();
 
     // Should navigate to auth/pairing page
-    await page.waitForSelector('.auth-page, .bridge-auth, .pairing-page', {
+    await page.waitForSelector('.authentication', {
       timeout: 15000,
     });
 
@@ -94,13 +94,13 @@ test.describe('Hue Bridge Pairing - Interactive', () => {
     await page.waitForSelector('.discovery-page, .bridge-discovery', { timeout: 10000 });
 
     const bridgeIp = await stateManager.getBridgeIp();
-    const ipInput = page.getByPlaceholder(/ip/i);
+    const ipInput = page.locator('.ip-input');
     await ipInput.fill(bridgeIp);
 
     const connectButton = page.getByRole('button', { name: /connect/i });
     await connectButton.click();
 
-    await page.waitForSelector('.auth-page, .bridge-auth, .pairing-page', {
+    await page.waitForSelector('.authentication', {
       timeout: 15000,
     });
 
@@ -111,9 +111,9 @@ test.describe('Hue Bridge Pairing - Interactive', () => {
         'You have about 30 seconds after pressing it to complete pairing.'
     );
 
-    // Click the authenticate/pair button in the app
+    // Click the "I Pressed the Button" button in the app
     const authButton = page.getByRole('button', {
-      name: /authenticate|pair|connect/i,
+      name: /pressed the button/i,
     });
     await authButton.click();
 
@@ -170,7 +170,7 @@ test.describe('Hue Bridge Pairing - Error Handling', () => {
     await page.waitForSelector('.discovery-page, .bridge-discovery', { timeout: 10000 });
 
     // Enter an invalid IP
-    const ipInput = page.getByPlaceholder(/ip/i);
+    const ipInput = page.locator('.ip-input');
     await ipInput.fill('192.168.255.255');
 
     const connectButton = page.getByRole('button', { name: /connect/i });
@@ -193,13 +193,13 @@ test.describe('Hue Bridge Pairing - Error Handling', () => {
     await page.waitForSelector('.discovery-page, .bridge-discovery', { timeout: 10000 });
 
     const bridgeIp = await stateManager.getBridgeIp();
-    const ipInput = page.getByPlaceholder(/ip/i);
+    const ipInput = page.locator('.ip-input');
     await ipInput.fill(bridgeIp);
 
     const connectButton = page.getByRole('button', { name: /connect/i });
     await connectButton.click();
 
-    await page.waitForSelector('.auth-page, .bridge-auth, .pairing-page', {
+    await page.waitForSelector('.authentication', {
       timeout: 15000,
     });
 
@@ -210,7 +210,7 @@ test.describe('Hue Bridge Pairing - Error Handling', () => {
     );
 
     const authButton = page.getByRole('button', {
-      name: /authenticate|pair|connect/i,
+      name: /pressed the button/i,
     });
     await authButton.click();
 

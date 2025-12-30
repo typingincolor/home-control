@@ -5,15 +5,12 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { createLogger } from '../utils/logger.js';
+import { DATA_DIR, ROOM_MAPPINGS_FILE } from '../constants/paths.js';
 
 const logger = createLogger('ROOM_MAPPING');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const MAPPINGS_FILE = path.join(DATA_DIR, 'roomMappings.json');
+const MAPPINGS_FILE = ROOM_MAPPINGS_FILE;
 
 class RoomMappingServiceClass {
   constructor() {

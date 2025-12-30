@@ -5,13 +5,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { createLogger } from '../utils/logger.js';
+import { SLUG_MAPPINGS_FILE } from '../constants/paths.js';
 
 const logger = createLogger('SLUG_MAPPING');
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 class SlugMappingServiceClass {
   constructor() {
@@ -22,7 +19,7 @@ class SlugMappingServiceClass {
     // Track used slugs per service to handle collisions
     this._usedSlugs = new Map();
 
-    this._filePath = path.join(__dirname, '..', 'data', 'slug-mappings.json');
+    this._filePath = SLUG_MAPPINGS_FILE;
     this._loaded = false;
   }
 

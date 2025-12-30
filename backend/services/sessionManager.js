@@ -1,15 +1,11 @@
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { SESSION_EXPIRY_MS, SESSION_CLEANUP_INTERVAL_MS } from '../constants/timings.js';
+import { BRIDGE_CREDENTIALS_FILE, DATA_DIR } from '../constants/paths.js';
 import { createLogger } from '../utils/logger.js';
 
 const logger = createLogger('SESSION');
-
-// Get the directory of this module for default credentials path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 /**
  * SessionManager - Manages user sessions to avoid repeating bridge credentials
@@ -28,8 +24,8 @@ class SessionManager {
     this.SESSION_EXPIRY = SESSION_EXPIRY_MS;
     this.CLEANUP_INTERVAL = SESSION_CLEANUP_INTERVAL_MS;
 
-    // Default path for credentials file
-    this.credentialsFilePath = path.join(__dirname, '..', 'data', 'bridge-credentials.json');
+    // Path for credentials file (uses shared constant)
+    this.credentialsFilePath = BRIDGE_CREDENTIALS_FILE;
 
     // Load persisted credentials on startup
     this._loadCredentials();
@@ -273,7 +269,7 @@ class SessionManager {
    */
   _saveCredentials() {
     try {
-      // Ensure directory exists
+      // Ensure parent directory exists
       const dir = path.dirname(this.credentialsFilePath);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
