@@ -173,9 +173,14 @@ test.describe('Hive Login - Error Handling', () => {
     }
 
     // Skip if already connected (no need to test)
-    const hiveStatus = await api.getHiveConnection();
-    if (hiveStatus.connected) {
-      test.skip(true, 'Hive already connected');
+    let hiveStatus;
+    try {
+      hiveStatus = await api.getHiveConnection();
+      if (hiveStatus.connected) {
+        test.skip(true, 'Hive already connected');
+      }
+    } catch {
+      // Not connected, which is what we want for this test
     }
 
     await api.resetToFresh();
