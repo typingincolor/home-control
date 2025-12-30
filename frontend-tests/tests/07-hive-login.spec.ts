@@ -53,6 +53,13 @@ test.describe('Hive Login - Interactive', () => {
   });
 
   test('should submit credentials and receive 2FA prompt', async ({ page }) => {
+    // Requires HIVE_EMAIL and HIVE_PASSWORD env vars
+    const email = process.env.HIVE_EMAIL;
+    const password = process.env.HIVE_PASSWORD;
+    if (!email || !password) {
+      test.skip(true, 'Set HIVE_EMAIL and HIVE_PASSWORD env vars to run this test');
+    }
+
     // Navigate to Hive login
     await api.resetToFresh();
     await page.goto('/');
@@ -64,15 +71,12 @@ test.describe('Hive Login - Interactive', () => {
     await hiveToggle.click();
     await page.waitForSelector('.hive-login, .hive-auth, form', { timeout: 10000 });
 
-    // Get credentials from user
-    const creds = await stateManager.getHiveCredentials();
-
-    // Fill in credentials
+    // Fill in credentials from env vars
     const emailInput = page.getByPlaceholder(/email/i);
     const passwordInput = page.getByPlaceholder(/password/i);
 
-    await emailInput.fill(creds.username);
-    await passwordInput.fill(creds.password);
+    await emailInput.fill(email!);
+    await passwordInput.fill(password!);
 
     // Submit login
     const loginButton = page.getByRole('button', { name: /connect|login|sign in/i });
@@ -84,11 +88,19 @@ test.describe('Hive Login - Interactive', () => {
       { timeout: 30000 }
     );
 
-    prompts.showInfo('2FA Required', 'Check your phone for the SMS verification code from Hive');
+    console.log('\n' + '='.repeat(60));
+    console.log('2FA CODE SENT - Check your phone for SMS from Hive');
+    console.log('='.repeat(60) + '\n');
   });
 
   test('should complete login with 2FA code', async ({ page }) => {
-    // This test continues from the previous one
+    // Requires HIVE_EMAIL and HIVE_PASSWORD env vars
+    const email = process.env.HIVE_EMAIL;
+    const password = process.env.HIVE_PASSWORD;
+    if (!email || !password) {
+      test.skip(true, 'Set HIVE_EMAIL and HIVE_PASSWORD env vars to run this test');
+    }
+
     // Navigate to Hive login
     await api.resetToFresh();
     await page.goto('/');
@@ -100,14 +112,11 @@ test.describe('Hive Login - Interactive', () => {
     await hiveToggle.click();
     await page.waitForSelector('.hive-login, .hive-auth, form', { timeout: 10000 });
 
-    // Get credentials
-    const creds = await stateManager.getHiveCredentials();
-
-    // Fill and submit credentials
+    // Fill and submit credentials from env vars
     const emailInput = page.getByPlaceholder(/email/i);
     const passwordInput = page.getByPlaceholder(/password/i);
-    await emailInput.fill(creds.username);
-    await passwordInput.fill(creds.password);
+    await emailInput.fill(email!);
+    await passwordInput.fill(password!);
 
     const loginButton = page.getByRole('button', { name: /connect|login|sign in/i });
     await loginButton.click();
@@ -118,25 +127,24 @@ test.describe('Hive Login - Interactive', () => {
       { timeout: 30000 }
     );
 
-    // Get 2FA code from user
-    const code = await prompts.prompt2FACode();
-
-    // Enter the 2FA code
-    const codeInput = page
-      .locator('input[placeholder*="code"], input[placeholder*="2FA"], .verification-code input')
-      .first();
-    await codeInput.fill(code);
-
-    // Submit 2FA
-    const verifyButton = page.getByRole('button', { name: /verify|submit|confirm/i });
-    await verifyButton.click();
+    // Pause for user to enter 2FA code manually
+    console.log('\n' + '='.repeat(60));
+    console.log('2FA CODE REQUIRED');
+    console.log('1. Check your phone for SMS from Hive');
+    console.log('2. Enter the 6-digit code in the browser');
+    console.log('3. Click Verify in the app');
+    console.log('4. Click "Resume" in Playwright inspector when done');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
 
     // Should complete login and show Hive connected
     await page.waitForSelector('.hive-connected, .hive-status, .thermostat', {
       timeout: 30000,
     });
 
-    prompts.showInfo('Login Complete', 'Successfully connected to Hive!');
+    console.log('\n' + '='.repeat(60));
+    console.log('LOGIN COMPLETE - Successfully connected to Hive!');
+    console.log('='.repeat(60) + '\n');
   });
 
   test('should show Hive status after login', async ({ page }) => {
@@ -193,10 +201,15 @@ test.describe('Hive Login - Error Handling', () => {
   });
 
   test('should show error for invalid 2FA code', async ({ page }) => {
-    // This test needs valid credentials to reach 2FA stage
-    const hiveStatus = await api.getHiveConnection();
+    // Requires HIVE_EMAIL and HIVE_PASSWORD env vars
+    const email = process.env.HIVE_EMAIL;
+    const password = process.env.HIVE_PASSWORD;
+    if (!email || !password) {
+      test.skip(true, 'Set HIVE_EMAIL and HIVE_PASSWORD env vars to run this test');
+    }
 
     // Skip if already connected (no need to test)
+    const hiveStatus = await api.getHiveConnection();
     if (hiveStatus.connected) {
       test.skip(true, 'Hive already connected');
     }
@@ -211,13 +224,11 @@ test.describe('Hive Login - Error Handling', () => {
     await hiveToggle.click();
     await page.waitForSelector('.hive-login, .hive-auth, form', { timeout: 10000 });
 
-    // Get real credentials to reach 2FA
-    const creds = await stateManager.getHiveCredentials();
-
+    // Use credentials from env vars
     const emailInput = page.getByPlaceholder(/email/i);
     const passwordInput = page.getByPlaceholder(/password/i);
-    await emailInput.fill(creds.username);
-    await passwordInput.fill(creds.password);
+    await emailInput.fill(email!);
+    await passwordInput.fill(password!);
 
     const loginButton = page.getByRole('button', { name: /connect|login|sign in/i });
     await loginButton.click();
@@ -229,10 +240,10 @@ test.describe('Hive Login - Error Handling', () => {
     );
 
     // Enter wrong 2FA code
-    prompts.showWarning(
-      'Entering an INVALID 2FA code to test error handling.\n' +
-        'You will receive a real SMS code - do NOT enter it.'
-    );
+    console.log('\n' + '!'.repeat(60));
+    console.log('WARNING: Entering INVALID 2FA code to test error handling');
+    console.log('You will receive a real SMS - do NOT enter that code');
+    console.log('!'.repeat(60) + '\n');
 
     const codeInput = page
       .locator('input[placeholder*="code"], input[placeholder*="2FA"], .verification-code input')

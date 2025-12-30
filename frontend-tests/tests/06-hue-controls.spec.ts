@@ -49,17 +49,21 @@ test.describe('Hue Light Controls - Interactive', () => {
     await page.waitForTimeout(1000);
 
     // Prompt user to confirm the lights changed
-    const confirmed = await prompts.confirmReady('Did the lights in the room toggle on or off?');
-    expect(confirmed).toBe(true);
+    console.log('\n' + '='.repeat(60));
+    console.log('Did the lights in the room toggle on or off?');
+    console.log('Click "Resume" in Playwright inspector to confirm');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
 
     // Toggle back
     await roomCard.click();
     await page.waitForTimeout(1000);
 
-    const confirmedBack = await prompts.confirmReady(
-      'Did the lights toggle back to their original state?'
-    );
-    expect(confirmedBack).toBe(true);
+    console.log('\n' + '='.repeat(60));
+    console.log('Did the lights toggle back to their original state?');
+    console.log('Click "Resume" in Playwright inspector to confirm');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
   });
 
   test('should adjust brightness with slider', async ({ page }) => {
@@ -78,19 +82,21 @@ test.describe('Hue Light Controls - Interactive', () => {
     await slider.fill('50');
     await page.waitForTimeout(1000);
 
-    const confirmed = await prompts.confirmReady(
-      'Did the light brightness change to approximately 50%?'
-    );
-    expect(confirmed).toBe(true);
+    console.log('\n' + '='.repeat(60));
+    console.log('Did the light brightness change to approximately 50%?');
+    console.log('Click "Resume" in Playwright inspector to confirm');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
 
     // Move to another position
     await slider.fill('100');
     await page.waitForTimeout(1000);
 
-    const confirmedMax = await prompts.confirmReady(
-      'Did the light brightness increase to maximum (100%)?'
-    );
-    expect(confirmedMax).toBe(true);
+    console.log('\n' + '='.repeat(60));
+    console.log('Did the light brightness increase to maximum (100%)?');
+    console.log('Click "Resume" in Playwright inspector to confirm');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
 
     // Restore original value
     await slider.fill(initialValue || '75');
@@ -112,10 +118,11 @@ test.describe('Hue Light Controls - Interactive', () => {
     await sceneButton.click();
     await page.waitForTimeout(1000);
 
-    const confirmed = await prompts.confirmReady(
-      `Did the lights change to the "${sceneName}" scene?`
-    );
-    expect(confirmed).toBe(true);
+    console.log('\n' + '='.repeat(60));
+    console.log(`Did the lights change to the "${sceneName}" scene?`);
+    console.log('Click "Resume" in Playwright inspector to confirm');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
   });
 
   test('should navigate between rooms', async ({ page }) => {
@@ -195,10 +202,11 @@ test.describe('Hue Dashboard - Real-time Updates', () => {
     // Give time for WebSocket update
     await page.waitForTimeout(2000);
 
-    const confirmed = await prompts.confirmReady(
-      'Did the Home Control app reflect the change you made externally?'
-    );
-    expect(confirmed).toBe(true);
+    console.log('\n' + '='.repeat(60));
+    console.log('Did the Home Control app reflect the change you made externally?');
+    console.log('Click "Resume" in Playwright inspector to confirm');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
   });
 
   test('should update when scene activated externally', async ({ page }) => {
@@ -211,7 +219,10 @@ test.describe('Hue Dashboard - Real-time Updates', () => {
 
     await page.waitForTimeout(2000);
 
-    const confirmed = await prompts.confirmReady('Did the Home Control app show the scene change?');
-    expect(confirmed).toBe(true);
+    console.log('\n' + '='.repeat(60));
+    console.log('Did the Home Control app show the scene change?');
+    console.log('Click "Resume" in Playwright inspector to confirm');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
   });
 });

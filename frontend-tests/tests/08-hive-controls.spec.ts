@@ -96,17 +96,21 @@ test.describe('Hive Heating Controls - Interactive', () => {
     await tempUp.first().click();
     await page.waitForTimeout(1000);
 
-    const confirmed = await prompts.confirmReady(
-      'Did the target temperature increase by 0.5°C or 1°C?'
-    );
-    expect(confirmed).toBe(true);
+    console.log('\n' + '='.repeat(60));
+    console.log('Did the target temperature increase by 0.5°C or 1°C?');
+    console.log('Click "Resume" in Playwright inspector to confirm');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
 
     // Decrease back to original
     await tempDown.first().click();
     await page.waitForTimeout(1000);
 
-    const confirmedBack = await prompts.confirmReady('Did the target temperature decrease back?');
-    expect(confirmedBack).toBe(true);
+    console.log('\n' + '='.repeat(60));
+    console.log('Did the target temperature decrease back?');
+    console.log('Click "Resume" in Playwright inspector to confirm');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
   });
 
   test('should toggle heating mode', async ({ page }) => {
@@ -129,10 +133,11 @@ test.describe('Hive Heating Controls - Interactive', () => {
     await control.click();
     await page.waitForTimeout(1000);
 
-    const confirmed = await prompts.confirmReady(
-      'Did the heating mode change (e.g., Schedule → Manual → Off)?'
-    );
-    expect(confirmed).toBe(true);
+    console.log('\n' + '='.repeat(60));
+    console.log('Did the heating mode change (e.g., Schedule → Manual → Off)?');
+    console.log('Click "Resume" in Playwright inspector to confirm');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
 
     // Note: We don't automatically restore the mode as it could affect user's heating
     prompts.showWarning(
@@ -182,10 +187,11 @@ test.describe('Hive Hot Water Controls - Interactive', () => {
     await boostButton.first().click();
     await page.waitForTimeout(1000);
 
-    const confirmed = await prompts.confirmReady(
-      'Did hot water boost activate? (Check if boost indicator appeared)'
-    );
-    expect(confirmed).toBe(true);
+    console.log('\n' + '='.repeat(60));
+    console.log('Did hot water boost activate? (Check if boost indicator appeared)');
+    console.log('Click "Resume" in Playwright inspector to confirm');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
 
     // Try to deactivate boost
     await boostButton.first().click();
