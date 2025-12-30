@@ -189,12 +189,12 @@ test.describe('Hue Dashboard - Real-time Updates', () => {
         'Please use the Hue app or physical switch to change a light.'
     );
 
-    await prompts.confirmAction(
-      'Use the Hue mobile app or a physical switch to:\n' +
-        '1. Turn a light ON or OFF\n' +
-        '2. Wait for the change to appear in this app\n\n' +
-        'Press Enter after making the change.'
-    );
+    // Using page.pause() since stdin doesn't work with Playwright
+    console.log('\n' + '='.repeat(60));
+    console.log('Use the Hue app or switch to turn a light ON or OFF');
+    console.log('Click "Resume" in Playwright inspector after making the change');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
 
     // Give time for WebSocket update
     await page.waitForTimeout(2000);
@@ -206,10 +206,12 @@ test.describe('Hue Dashboard - Real-time Updates', () => {
   });
 
   test('should update when scene activated externally', async ({ page }) => {
-    await prompts.confirmAction(
-      'Use the Hue mobile app to activate a different scene.\n\n' +
-        'Press Enter after activating the scene.'
-    );
+    // Using page.pause() since stdin doesn't work with Playwright
+    console.log('\n' + '='.repeat(60));
+    console.log('Use the Hue app to activate a different scene');
+    console.log('Click "Resume" in Playwright inspector after activating');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
 
     await page.waitForTimeout(2000);
 

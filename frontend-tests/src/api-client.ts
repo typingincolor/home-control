@@ -113,6 +113,16 @@ export async function disconnectHue(): Promise<void> {
 }
 
 /**
+ * Clear all stored Hue credentials (for testing reset)
+ */
+export async function clearHueCredentials(): Promise<void> {
+  const response = await request('DELETE', API.AUTH_CREDENTIALS);
+  if (!response.ok) {
+    throw new Error(`Failed to clear Hue credentials: ${response.status}`);
+  }
+}
+
+/**
  * Update settings
  */
 export async function updateSettings(settings: {
@@ -128,7 +138,10 @@ export async function updateSettings(settings: {
  * Reset system to fresh state (no services connected)
  */
 export async function resetToFresh(): Promise<void> {
-  // Disconnect both services
+  // Clear stored credentials (doesn't require session)
+  await clearHueCredentials().catch(() => {});
+
+  // Disconnect both services (may fail without session, that's OK)
   await disconnectHive().catch(() => {});
   await disconnectHue().catch(() => {});
   await clearHueSession().catch(() => {});

@@ -116,4 +116,19 @@ router.post('/disconnect', requireSession, (req, res) => {
   res.json({ success: true });
 });
 
+/**
+ * DELETE /api/v2/auth/credentials
+ * Clear all stored bridge credentials (for testing/reset)
+ * Does not require a session - used for test state reset
+ */
+router.delete('/credentials', (req, res) => {
+  const bridgeIp = sessionManager.getDefaultBridgeIp();
+
+  if (bridgeIp) {
+    sessionManager.clearBridgeCredentials(bridgeIp);
+  }
+
+  res.json({ success: true, cleared: !!bridgeIp });
+});
+
 export default router;

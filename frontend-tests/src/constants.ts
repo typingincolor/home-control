@@ -107,6 +107,7 @@ export const API = {
   SETTINGS: '/api/v2/settings',
   AUTH_SESSION: '/api/v2/auth/session',
   AUTH_DISCONNECT: '/api/v2/auth/disconnect',
+  AUTH_CREDENTIALS: '/api/v2/auth/credentials',
   HIVE_CONNECTION: '/api/v2/services/hive/connection',
   HIVE_DISCONNECT: '/api/v2/services/hive/disconnect',
 } as const;

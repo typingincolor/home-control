@@ -105,11 +105,12 @@ test.describe('Hue Bridge Pairing - Interactive', () => {
     });
 
     // Prompt user to press the physical link button
-    await prompts.confirmAction(
-      'Please press the LINK BUTTON on your Hue Bridge now.\n\n' +
-        'The link button is the large round button on top of the bridge.\n' +
-        'You have about 30 seconds after pressing it to complete pairing.'
-    );
+    // Using console.log + page.pause() since stdin doesn't work with Playwright
+    console.log('\n' + '='.repeat(60));
+    console.log('ACTION REQUIRED: Press the LINK BUTTON on your Hue Bridge');
+    console.log('Then click "Resume" in the Playwright inspector');
+    console.log('='.repeat(60) + '\n');
+    await page.pause();
 
     // Click the "I Pressed the Button" button in the app
     const authButton = page.getByRole('button', {
@@ -131,17 +132,49 @@ test.describe('Hue Bridge Pairing - Interactive', () => {
   });
 
   test('should show lights after successful pairing', async ({ page }) => {
-    // This test assumes we're already paired from the previous test
-    // If running standalone, it will need credentials
+    // This test assumes pairing completed in previous test
+    // Credentials are stored in backend, but Hue is enabled in settings
+    // We need to disable Hue first (via API), then re-enable to trigger connect
+
+    // Disable Hue in settings (but keep credentials in backend)
+    await api.updateSettings({
+      services: { hue: { enabled: false } },
+    });
 
     await page.goto('/');
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+
+    // Wait for settings page
+    await page.waitForSelector('.settings-page', { timeout: 10000 });
+
+    // Click the toggle switch element (checkbox is hidden, styled as toggle)
+    const hueToggle = page
+      .locator('.service-toggle')
+      .filter({ hasText: 'Philips Hue' })
+      .locator('.service-toggle-switch');
+    await hueToggle.click();
+
+    // Wait for discovery page (class is bridge-discovery, not discovery-page)
+    await page.waitForSelector('.bridge-discovery', { timeout: 10000 });
+
+    // Enter bridge IP
+    const bridgeIp = await stateManager.getBridgeIp();
+    const ipInput = page.locator('.ip-input');
+    await ipInput.fill(bridgeIp);
+
+    const connectButton = page.getByRole('button', { name: /connect/i });
+    await connectButton.click();
+
+    // Since credentials exist in backend, should auto-connect to dashboard
+    // (no auth page needed)
     await page.waitForSelector('.dashboard, .light-control, .main-panel', {
       timeout: 15000,
     });
 
     // Look for light controls
     const lightControls = page.locator(
-      '.light-button, .light-control, .room-card, .zone-card'
+      '.light-button, .light-tile, .room-card, .zone-card, .tiles-grid > *'
     );
     const count = await lightControls.count();
 
@@ -165,9 +198,12 @@ test.describe('Hue Bridge Pairing - Error Handling', () => {
     await page.reload();
 
     await page.waitForSelector('.settings-page', { timeout: 10000 });
-    const hueToggle = page.locator('.service-toggle').filter({ hasText: 'Philips Hue' });
+    const hueToggle = page
+      .locator('.service-toggle')
+      .filter({ hasText: 'Philips Hue' })
+      .locator('.service-toggle-switch');
     await hueToggle.click();
-    await page.waitForSelector('.discovery-page, .bridge-discovery', { timeout: 10000 });
+    await page.waitForSelector('.bridge-discovery', { timeout: 10000 });
 
     // Enter an invalid IP
     const ipInput = page.locator('.ip-input');
@@ -176,8 +212,15 @@ test.describe('Hue Bridge Pairing - Error Handling', () => {
     const connectButton = page.getByRole('button', { name: /connect/i });
     await connectButton.click();
 
-    // Should show an error message (connection timeout or invalid)
-    const errorMessage = page.getByText(/error|failed|unable|timeout|invalid/i);
+    // Frontend goes to auth page - error only shows when we try to pair
+    await page.waitForSelector('.authentication', { timeout: 10000 });
+
+    // Try to pair (will fail with invalid IP)
+    const authButton = page.getByRole('button', { name: /pressed the button/i });
+    await authButton.click();
+
+    // Should show an error message (connection timeout or unreachable)
+    const errorMessage = page.getByText(/error|failed|unable|timeout|could not|unreachable/i);
     await expect(errorMessage.first()).toBeVisible({ timeout: 30000 });
   });
 
@@ -188,9 +231,12 @@ test.describe('Hue Bridge Pairing - Error Handling', () => {
     await page.reload();
 
     await page.waitForSelector('.settings-page', { timeout: 10000 });
-    const hueToggle = page.locator('.service-toggle').filter({ hasText: 'Philips Hue' });
+    const hueToggle = page
+      .locator('.service-toggle')
+      .filter({ hasText: 'Philips Hue' })
+      .locator('.service-toggle-switch');
     await hueToggle.click();
-    await page.waitForSelector('.discovery-page, .bridge-discovery', { timeout: 10000 });
+    await page.waitForSelector('.bridge-discovery', { timeout: 10000 });
 
     const bridgeIp = await stateManager.getBridgeIp();
     const ipInput = page.locator('.ip-input');
