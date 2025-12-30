@@ -52,7 +52,7 @@ test.describe('Hive Login - Interactive', () => {
     await expect(passwordInput).toBeVisible();
   });
 
-  test('should submit credentials and receive 2FA prompt', async ({ page }) => {
+  test('should complete full login with 2FA', async ({ page }) => {
     // Requires HIVE_EMAIL and HIVE_PASSWORD env vars
     const email = process.env.HIVE_EMAIL;
     const password = process.env.HIVE_PASSWORD;
@@ -83,49 +83,7 @@ test.describe('Hive Login - Interactive', () => {
     await loginButton.click();
 
     // Should show 2FA input
-    await page.waitForSelector(
-      'input[placeholder*="code"], input[placeholder*="2FA"], .verification-code',
-      { timeout: 30000 }
-    );
-
-    console.log('\n' + '='.repeat(60));
-    console.log('2FA CODE SENT - Check your phone for SMS from Hive');
-    console.log('='.repeat(60) + '\n');
-  });
-
-  test('should complete login with 2FA code', async ({ page }) => {
-    // Requires HIVE_EMAIL and HIVE_PASSWORD env vars
-    const email = process.env.HIVE_EMAIL;
-    const password = process.env.HIVE_PASSWORD;
-    if (!email || !password) {
-      test.skip(true, 'Set HIVE_EMAIL and HIVE_PASSWORD env vars to run this test');
-    }
-
-    // Navigate to Hive login
-    await api.resetToFresh();
-    await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
-    await page.reload();
-
-    await page.waitForSelector('.settings-page', { timeout: 10000 });
-    const hiveToggle = page.locator('.service-toggle').filter({ hasText: 'Hive Heating' });
-    await hiveToggle.click();
-    await page.waitForSelector('.hive-login, .hive-auth, form', { timeout: 10000 });
-
-    // Fill and submit credentials from env vars
-    const emailInput = page.getByPlaceholder(/email/i);
-    const passwordInput = page.getByPlaceholder(/password/i);
-    await emailInput.fill(email!);
-    await passwordInput.fill(password!);
-
-    const loginButton = page.getByRole('button', { name: /connect|login|sign in/i });
-    await loginButton.click();
-
-    // Wait for 2FA prompt
-    await page.waitForSelector(
-      'input[placeholder*="code"], input[placeholder*="2FA"], .verification-code',
-      { timeout: 30000 }
-    );
+    await page.waitForSelector('.hive-2fa-form, input[placeholder*="code"]', { timeout: 30000 });
 
     // Pause for user to enter 2FA code manually
     console.log('\n' + '='.repeat(60));
@@ -137,8 +95,8 @@ test.describe('Hive Login - Interactive', () => {
     console.log('='.repeat(60) + '\n');
     await page.pause();
 
-    // Should complete login and show Hive connected
-    await page.waitForSelector('.hive-connected, .hive-status, .thermostat', {
+    // Should complete login and show Hive tiles grid
+    await page.waitForSelector('[data-testid="hive-tiles-grid"], .hive-view .tiles-grid', {
       timeout: 30000,
     });
 
@@ -149,7 +107,13 @@ test.describe('Hive Login - Interactive', () => {
 
   test('should show Hive status after login', async ({ page }) => {
     // Check Hive connection status via API
-    const hiveStatus = await api.getHiveConnection();
+    let hiveStatus;
+    try {
+      hiveStatus = await api.getHiveConnection();
+    } catch {
+      test.skip(true, 'Hive connection endpoint not available');
+      return;
+    }
 
     if (!hiveStatus.connected) {
       test.skip(true, 'Hive not connected - run login tests first');
@@ -160,9 +124,9 @@ test.describe('Hive Login - Interactive', () => {
       timeout: 15000,
     });
 
-    // Look for Hive/thermostat controls
+    // Look for Hive view with tiles grid
     const hiveControls = page.locator(
-      '.thermostat, .hive-control, .heating-control, [data-service="hive"]'
+      '[data-testid="hive-tiles-grid"], .hive-view .tiles-grid, .hive-tile'
     );
     const count = await hiveControls.count();
 

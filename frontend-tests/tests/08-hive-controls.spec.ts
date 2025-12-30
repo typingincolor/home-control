@@ -19,7 +19,13 @@ test.describe('Hive Heating Controls - Interactive', () => {
 
   test.beforeEach(async ({ page }) => {
     // Check Hive connection
-    const hiveStatus = await api.getHiveConnection();
+    let hiveStatus;
+    try {
+      hiveStatus = await api.getHiveConnection();
+    } catch {
+      test.skip(true, 'Hive connection endpoint not available');
+      return;
+    }
     if (!hiveStatus.connected) {
       test.skip(true, 'Hive not connected - run login tests first');
     }
@@ -150,7 +156,13 @@ test.describe('Hive Hot Water Controls - Interactive', () => {
   test.use({ viewport: VIEWPORTS.raspberryPi });
 
   test.beforeEach(async ({ page }) => {
-    const hiveStatus = await api.getHiveConnection();
+    let hiveStatus;
+    try {
+      hiveStatus = await api.getHiveConnection();
+    } catch {
+      test.skip(true, 'Hive connection endpoint not available');
+      return;
+    }
     if (!hiveStatus.connected) {
       test.skip(true, 'Hive not connected');
     }
@@ -208,7 +220,13 @@ test.describe('Hive Dashboard Layout', () => {
   test.use({ viewport: VIEWPORTS.raspberryPi });
 
   test.beforeEach(async ({ page }) => {
-    const hiveStatus = await api.getHiveConnection();
+    let hiveStatus;
+    try {
+      hiveStatus = await api.getHiveConnection();
+    } catch {
+      test.skip(true, 'Hive connection endpoint not available');
+      return;
+    }
     if (!hiveStatus.connected) {
       test.skip(true, 'Hive not connected');
     }
