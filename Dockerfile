@@ -53,8 +53,8 @@ RUN npm ci --omit=dev && \
 COPY --from=builder /app/backend/ ./backend/
 COPY config.yaml ./
 
-# Create data directory and set ownership for all files
-RUN mkdir -p /app/backend/data && \
+# Create data directory for persistent storage (mount point for volumes)
+RUN mkdir -p /app/data && \
     chown -R nodejs:nodejs /app
 
 # Switch to non-root user
@@ -70,6 +70,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3001
+ENV DATA_DIR=/app/data
 
 # Start the server
 WORKDIR /app/backend

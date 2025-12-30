@@ -6,16 +6,12 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { getMockSettings } from './mockData.js';
 import { createLogger } from '../utils/logger.js';
 import ServiceRegistry from './ServiceRegistry.js';
+import { SETTINGS_FILE } from '../constants/paths.js';
 
 const logger = createLogger('SETTINGS');
-
-// Get the directory of this module for default settings path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const VALID_UNITS = ['celsius', 'fahrenheit'];
 
@@ -101,8 +97,8 @@ const validateLocation = (location) => {
 
 class SettingsService {
   constructor() {
-    // Default path for settings file
-    this.settingsFilePath = path.join(__dirname, '..', 'data', 'settings.json');
+    // Path for settings file (uses shared constant)
+    this.settingsFilePath = SETTINGS_FILE;
 
     // Load persisted settings on startup
     this._loadSettings();
@@ -243,7 +239,7 @@ class SettingsService {
    */
   _saveSettings() {
     try {
-      // Ensure directory exists
+      // Ensure parent directory exists
       const dir = path.dirname(this.settingsFilePath);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });

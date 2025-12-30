@@ -1,14 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { encrypt, decrypt, getEncryptionKey } from '../utils/encryption.js';
 import { createLogger } from '../utils/logger.js';
+import { HIVE_CREDENTIALS_FILE } from '../constants/paths.js';
 
 const logger = createLogger('HiveCredentials');
-
-// Get the directory of this module for default credentials path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Demo mode credentials (shared across Hive services)
 // Real Hive always requires SMS 2FA via Cognito
@@ -38,8 +34,8 @@ class HiveCredentialsManager {
     this.deviceGroupKey = null;
     this.devicePassword = null;
 
-    // Default path for credentials file
-    this.credentialsFilePath = path.join(__dirname, '..', 'data', 'hive-credentials.json');
+    // Path for credentials file (uses shared constant)
+    this.credentialsFilePath = HIVE_CREDENTIALS_FILE;
 
     // Load persisted credentials on startup
     this._loadCredentials();
@@ -247,7 +243,7 @@ class HiveCredentialsManager {
    */
   _saveCredentials() {
     try {
-      // Ensure directory exists
+      // Ensure parent directory exists
       const dir = path.dirname(this.credentialsFilePath);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });

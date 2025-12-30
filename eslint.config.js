@@ -86,6 +86,7 @@ export default [
       '**/playwright-report/**',
       '**/backend/public/**',
       '**/e2e/**/*.ts',
+      '**/frontend-tests/**',
     ],
   },
 ];
