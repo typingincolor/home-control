@@ -1,0 +1,20 @@
+{
+  "name": "frontend-tests",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Production smoke tests for Home Control - runs against live server with interactive prompts",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:connectivity": "playwright test tests/00-connectivity.spec.ts",
+    "test:layout": "playwright test tests/01-layout-settings.spec.ts tests/02-layout-discovery.spec.ts tests/03-layout-auth.spec.ts tests/04-layout-dashboard.spec.ts",
+    "test:hue": "playwright test tests/05-hue-pairing.spec.ts tests/06-hue-controls.spec.ts",
+    "test:hive": "playwright test tests/07-hive-login.spec.ts tests/08-hive-controls.spec.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@inquirer/prompts": "^7.0.0",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  }
+}
