@@ -154,6 +154,9 @@ export const Dashboard = ({ sessionToken, onLogout }) => {
       if (wsDashboard) {
         setLoading(false);
         setError(null);
+        // Always sync WebSocket data - real-time updates are important
+        // The optimistic updates in toggle handlers apply immediately,
+        // and WebSocket will eventually catch up with the correct state
         setLocalDashboard(wsDashboard);
       } else if (wsError) {
         // Show error and stop loading spinner

@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 ## Project Overview
 
 **Home Control** - React/Express monorepo for smart home control. Integrates Philips Hue (lights, scenes, rooms, zones) and UK Hive (heating, hot water). Features true color display, responsive design, and Socket.IO real-time updates.
@@ -13,6 +15,10 @@ npm run dev              # Start both servers (frontend:5173, backend:3001)
 npm run test:all         # Run all unit tests (frontend + backend)
 npm run test:e2e         # E2E tests (auto-starts servers on ports 5174/3002)
 npm run deploy           # Build and start production
+npm run lint             # ESLint check
+npm run lint:fix         # ESLint auto-fix
+npm run format           # Prettier format
+npm run format:check     # Check formatting
 ```
 
 **Demo Mode:** `http://localhost:5173/?demo=true` - Works without real Hue Bridge
@@ -176,13 +182,24 @@ Headers returned: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Res
 
 ## Testing
 
-See `frontend/TESTING.md` for detailed documentation.
-
 ```bash
-npm run test:all          # All unit tests
-npm run test:e2e          # E2E tests
+npm run test:all          # All unit tests (frontend + backend)
+npm run test:e2e          # E2E tests (auto-starts servers on ports 5174/3002)
 npm run test:mutation:all # Mutation testing
+
+# Run single test file
+npm test --workspace=frontend -- src/hooks/useSession.test.js
+npm test --workspace=backend -- test/services/roomService.test.js
+
+# Run tests matching pattern
+npm test --workspace=frontend -- -t "should handle"
+
+# Watch mode (interactive)
+npm test --workspace=frontend
+npm test --workspace=backend
 ```
+
+See `frontend/TESTING.md` for detailed testing documentation.
 
 ## Common Tasks
 
