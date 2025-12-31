@@ -97,12 +97,12 @@ describe('RoomContent Layout', () => {
       expect(tiles.length).toBe(8);
     });
 
-    it('should render All On/Off tile in carousel container with fixed class', () => {
+    it('should render All On/Off tile inside scenes carousel', () => {
       render(<RoomContent {...defaultProps} />);
 
-      const carouselContainer = document.querySelector('.scenes-row .tiles-carousel-container');
-      // All On/Off should be in container with carousel-fixed-tile class
-      const allOnOffTile = carouselContainer.querySelector('.all-on-off-tile.carousel-fixed-tile');
+      const scenesCarousel = document.querySelector('.scenes-row .tiles-carousel');
+      // All On/Off should be inside the carousel (scrollable with scenes)
+      const allOnOffTile = scenesCarousel.querySelector('.all-on-off-tile');
       expect(allOnOffTile).toBeInTheDocument();
     });
 

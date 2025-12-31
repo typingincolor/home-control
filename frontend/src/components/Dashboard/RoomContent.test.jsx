@@ -87,19 +87,19 @@ describe('RoomContent', () => {
       expect(rows[1]).toHaveClass('lights-row');
     });
 
-    it('should render All On/Off tile in carousel container with fixed class', () => {
+    it('should render All On/Off tile inside scenes carousel', () => {
       const { container } = render(<RoomContent {...defaultProps} />);
-      const carouselContainer = container.querySelector('.scenes-row .tiles-carousel-container');
-      // All On/Off should be in carousel container with carousel-fixed-tile class
-      const allOnOffTile = carouselContainer.querySelector('.all-on-off-tile.carousel-fixed-tile');
+      const scenesCarousel = container.querySelector('.scenes-row .tiles-carousel');
+      // All On/Off should be inside the carousel (scrollable with scenes)
+      const allOnOffTile = scenesCarousel.querySelector('.all-on-off-tile');
       expect(allOnOffTile).toBeInTheDocument();
     });
 
-    it('should render All On/Off tile before scenes carousel (not inside it)', () => {
+    it('should render All On/Off tile as first item in scenes carousel', () => {
       const { container } = render(<RoomContent {...defaultProps} />);
       const scenesCarousel = container.querySelector('.scenes-row .tiles-carousel');
-      const allOnOffInCarousel = scenesCarousel.querySelector('.all-on-off-tile');
-      expect(allOnOffInCarousel).toBeNull();
+      const firstChild = scenesCarousel.firstElementChild;
+      expect(firstChild).toHaveClass('all-on-off-tile');
     });
 
     it('should render scenes inside tiles-carousel', () => {

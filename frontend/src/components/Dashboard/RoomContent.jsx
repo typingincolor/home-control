@@ -186,7 +186,7 @@ export const RoomContent = ({
 
   return (
     <div className="room-content room-content-carousel">
-      {/* Row 1: All On/Off fixed + Scenes carousel */}
+      {/* Row 1: Scenes carousel with All On/Off as first item */}
       <div className="room-row scenes-row">
         <div className="tiles-carousel-container">
           <button
@@ -198,15 +198,13 @@ export const RoomContent = ({
             <ChevronLeft size={20} />
           </button>
 
-          <AllOnOffTile
-            anyOn={anyOn}
-            onToggle={onToggleRoom}
-            roomId={room.id}
-            isToggling={isActivatingScene}
-            className="carousel-fixed-tile"
-          />
-
           <div className="tiles-carousel scenes-carousel" ref={setScenesRef}>
+            <AllOnOffTile
+              anyOn={anyOn}
+              onToggle={onToggleRoom}
+              roomId={room.id}
+              isToggling={isActivatingScene}
+            />
             {scenes.map((scene) => (
               <SceneTile
                 key={scene.id}
@@ -239,9 +237,6 @@ export const RoomContent = ({
           >
             <ChevronLeft size={20} />
           </button>
-
-          {/* Spacer to align with All Off tile above */}
-          <div className="carousel-spacer" aria-hidden="true" />
 
           <div className="tiles-carousel lights-carousel" ref={setLightsRef}>
             {lights.map((light) => (

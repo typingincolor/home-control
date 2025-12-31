@@ -1885,13 +1885,6 @@ body.dark-theme {
   gap: 8px;
 }
 
-/* All On/Off tile in scenes row - fixed size, square */
-.scenes-row > .all-on-off-tile {
-  flex-shrink: 0;
-  width: auto;
-  height: 100%;
-  aspect-ratio: 1;
-}
 
 /* Lights row - full width carousel */
 .lights-row {
@@ -1982,38 +1975,21 @@ body.dark-theme {
   min-height: unset !important;
 }
 
-/* All On/Off tile in carousel - sticky first position */
+/* All On/Off tile in carousel - first scrollable item */
 .tiles-carousel .all-on-off-tile {
   flex: 0 0 auto;
   width: auto !important;
   height: 100% !important;
   aspect-ratio: 1 !important;
+  scroll-snap-align: start;
   min-width: unset !important;
   min-height: unset !important;
-}
-
-/* Fixed tile in carousel row - sits between chevron and scrollable area */
-.carousel-fixed-tile {
-  flex: 0 0 auto;
-  height: calc(100% - 8px);
-  margin: 4px 0;
-  aspect-ratio: 1;
-  min-width: unset !important;
-  min-height: unset !important;
-  box-sizing: border-box;
-}
-
-/* Spacer to align lights row with scenes row */
-.carousel-spacer {
-  flex: 0 0 auto;
-  height: calc(100% - 8px);
-  margin: 4px 0;
-  aspect-ratio: 1;
 }
 
 /* Ensure all carousel tiles use border-box */
 .tiles-carousel .scene-tile,
-.tiles-carousel .light-tile {
+.tiles-carousel .light-tile,
+.tiles-carousel .all-on-off-tile {
   box-sizing: border-box;
 }
 
