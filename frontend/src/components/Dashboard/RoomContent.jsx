@@ -91,7 +91,6 @@ export const RoomContent = ({
     const el = scenesCarouselRef.current;
     if (el) {
       el.scrollBy({ left: -getScrollDistance(el), behavior: 'smooth' });
-      // Update button states after scroll animation
       setTimeout(updateScenesScroll, 300);
     }
   };
@@ -213,6 +212,11 @@ export const RoomContent = ({
                 isActivating={isActivatingScene}
               />
             ))}
+            {/* Invisible spacers to align with lights row */}
+            {lights.length > scenes.length + 1 &&
+              Array.from({ length: lights.length - scenes.length - 1 }).map((_, i) => (
+                <div key={`scene-spacer-${i}`} className="carousel-spacer" aria-hidden="true" />
+              ))}
           </div>
 
           <button
@@ -248,6 +252,11 @@ export const RoomContent = ({
                 isToggling={togglingLights.has(light.id)}
               />
             ))}
+            {/* Invisible spacers to align with scenes row */}
+            {scenes.length + 1 > lights.length &&
+              Array.from({ length: scenes.length + 1 - lights.length }).map((_, i) => (
+                <div key={`light-spacer-${i}`} className="carousel-spacer" aria-hidden="true" />
+              ))}
           </div>
 
           <button

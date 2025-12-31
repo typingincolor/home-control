@@ -1993,6 +1993,16 @@ body.dark-theme {
   box-sizing: border-box;
 }
 
+/* Invisible spacer to align carousels with different item counts */
+.carousel-spacer {
+  flex: 0 0 auto;
+  width: auto;
+  height: 100%;
+  aspect-ratio: 1;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .room-header-bar {
   display: flex;
   align-items: center;
