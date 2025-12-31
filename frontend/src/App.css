@@ -1901,11 +1901,12 @@ body.dark-theme {
 
 /* Carousel container with chevron buttons */
 .tiles-carousel-container {
+  position: relative;
   display: flex;
   align-items: stretch;
-  gap: 0;
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 /* Scrollable carousel area */
@@ -1918,9 +1919,9 @@ body.dark-theme {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   cursor: grab;
-  flex: 1 1 0;
+  flex: 1;
   min-width: 0;
-  padding: 4px;
+  padding: 4px 32px;
   touch-action: pan-x;
 }
 
@@ -1932,22 +1933,31 @@ body.dark-theme {
   cursor: grabbing;
 }
 
-/* Carousel chevron buttons - compact style */
+/* Carousel chevron buttons - overlay style */
 .carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  align-self: center;
-  width: 24px;
-  min-width: 24px;
-  height: 32px;
-  background: transparent;
+  width: 28px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.5);
   border: none;
   border-radius: 4px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
-  flex-shrink: 0;
-  transition: opacity 0.2s ease, color 0.2s ease, background 0.2s ease;
+  z-index: 10;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.carousel-btn-left {
+  left: 0;
+}
+
+.carousel-btn-right {
+  right: 0;
 }
 
 .carousel-btn svg {
@@ -1959,8 +1969,7 @@ body.dark-theme {
 }
 
 .carousel-btn:hover:not(:disabled) {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.7);
 }
 
 .carousel-btn:disabled {
