@@ -122,40 +122,39 @@ test.describe('Light Tiles - Light Interaction', () => {
   });
 });
 
-test.describe('Light Tiles - Responsive Layout', () => {
-  test('should show 10 tiles across on RPi viewport', async ({ page }) => {
+test.describe('Light Tiles - Carousel Layout (issue 47)', () => {
+  test('should show carousel layout on RPi viewport', async ({ page }) => {
     await page.setViewportSize({ width: 800, height: 480 });
     await page.goto('/?demo=true');
     await expect(page.getByText('Living Room')).toBeVisible();
 
-    // Tiles grid should be visible
-    const tilesGrid = page.locator('.tiles-grid');
-    await expect(tilesGrid).toBeVisible();
+    // Carousel layout should be visible
+    const carousel = page.locator('.tiles-carousel');
+    await expect(carousel.first()).toBeVisible();
 
-    // Grid should accommodate 10 tiles per row
-    // This is verified by checking tiles don't overflow
+    // Tiles should be visible in carousel
     const firstTile = page.locator('.scene-tile, .light-tile').first();
     await expect(firstTile).toBeVisible();
   });
 
-  test('should show 2 tiles across on phone viewport', async ({ page }) => {
+  test('should show carousel layout on phone viewport', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/?demo=true');
     await expect(page.getByText('Living Room')).toBeVisible();
 
-    // Tiles should be larger on phone
-    const tilesGrid = page.locator('.tiles-grid');
-    await expect(tilesGrid).toBeVisible();
+    // Carousel should be visible on phone
+    const carousel = page.locator('.tiles-carousel');
+    await expect(carousel.first()).toBeVisible();
   });
 
-  test('should show appropriate tiles across on tablet viewport', async ({ page }) => {
+  test('should show carousel layout on tablet viewport', async ({ page }) => {
     await page.setViewportSize({ width: 820, height: 1180 });
     await page.goto('/?demo=true');
     await expect(page.getByText('Living Room')).toBeVisible();
 
-    // Tiles grid should adapt to tablet size
-    const tilesGrid = page.locator('.tiles-grid');
-    await expect(tilesGrid).toBeVisible();
+    // Carousel should adapt to tablet size
+    const carousel = page.locator('.tiles-carousel');
+    await expect(carousel.first()).toBeVisible();
   });
 });
 
@@ -203,13 +202,17 @@ test.describe('Light Tiles - Edge Cases', () => {
   test('should handle room with no lights', async ({ page }) => {
     await page.goto('/?demo=true');
 
-    // Navigate to a room - all demo rooms have lights
-    // so this tests the presence of empty state handling in code
-    const tilesGrid = page.locator('.tiles-grid');
+    // Click on a room tab to navigate to a room view (not Home)
+    const roomTab = page.locator('.nav-tab').nth(1); // First room after Home
+    await roomTab.click();
+    await page.waitForSelector('.room-content');
+
+    // Carousel layout replaces grid (issue 47)
+    const tilesCarousel = page.locator('.tiles-carousel');
     const emptyState = page.locator('.empty-state-dark');
 
-    // Either grid or empty state should be visible
-    const hasContent = await tilesGrid.isVisible() || await emptyState.isVisible();
+    // Either carousel or empty state should be visible
+    const hasContent = await tilesCarousel.first().isVisible() || await emptyState.isVisible();
     expect(hasContent).toBe(true);
   });
 
