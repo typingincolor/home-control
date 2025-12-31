@@ -4422,8 +4422,7 @@ body.dark-theme {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
@@ -4431,6 +4430,7 @@ body.dark-theme {
   cursor: pointer;
   transition: background 0.2s, color 0.2s, border-color 0.2s;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .spotify-transport-btn svg {
@@ -4454,8 +4454,7 @@ body.dark-theme {
 }
 
 .spotify-play-btn {
-  width: 64px;
-  height: 64px;
+  padding: 16px;
   background: #1db954;
   color: white;
 }
@@ -4731,8 +4730,7 @@ body.dark-theme {
   }
 
   .spotify-transport-btn {
-    width: 32px;
-    height: 32px;
+    padding: 6px;
   }
 
   .spotify-transport-btn svg {
@@ -4746,8 +4744,7 @@ body.dark-theme {
   }
 
   .spotify-play-btn {
-    width: 44px;
-    height: 44px;
+    padding: 10px;
   }
 
   .spotify-play-btn svg {
@@ -4927,13 +4924,11 @@ body.dark-theme {
   }
 
   .spotify-transport-btn {
-    width: 40px;
-    height: 40px;
+    padding: 8px;
   }
 
   .spotify-play-btn {
-    width: 52px;
-    height: 52px;
+    padding: 12px;
   }
 
   .spotify-speaker-card {
@@ -4988,13 +4983,11 @@ body.dark-theme {
   }
 
   .spotify-transport-btn {
-    width: 52px;
-    height: 52px;
+    padding: 14px;
   }
 
   .spotify-play-btn {
-    width: 72px;
-    height: 72px;
+    padding: 20px;
   }
 
   .spotify-speaker-list {
