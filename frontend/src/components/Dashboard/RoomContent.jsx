@@ -98,12 +98,6 @@ export const RoomContent = ({
       lightsEl.addEventListener('scroll', updateLightsScroll);
     }
 
-    // Delay initial check to ensure DOM is rendered
-    const rafId = requestAnimationFrame(() => {
-      updateScenesScroll();
-      updateLightsScroll();
-    });
-
     // ResizeObserver to update on resize
     const resizeObserver = new ResizeObserver(() => {
       updateScenesScroll();
@@ -114,12 +108,22 @@ export const RoomContent = ({
     if (lightsEl) resizeObserver.observe(lightsEl);
 
     return () => {
-      cancelAnimationFrame(rafId);
       if (scenesEl) scenesEl.removeEventListener('scroll', updateScenesScroll);
       if (lightsEl) lightsEl.removeEventListener('scroll', updateLightsScroll);
       resizeObserver.disconnect();
     };
   }, [updateScenesScroll, updateLightsScroll]);
+
+  // Update scroll state when room content changes
+  useEffect(() => {
+    // Use multiple RAF frames to ensure DOM is fully laid out
+    const timeoutId = setTimeout(() => {
+      updateScenesScroll();
+      updateLightsScroll();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [room, updateScenesScroll, updateLightsScroll]);
 
   if (!room) {
     return (

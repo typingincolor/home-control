@@ -1932,22 +1932,20 @@ body.dark-theme {
   cursor: grabbing;
 }
 
-/* Carousel chevron buttons - compact circular style */
+/* Carousel chevron buttons - rectangular style */
 .carousel-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  min-height: 32px;
-  background: rgba(255, 255, 255, 0.15);
+  width: 28px;
+  min-width: 28px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
   border: none;
-  border-radius: 50%;
-  color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   flex-shrink: 0;
-  align-self: center;
   transition: opacity 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
