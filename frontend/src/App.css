@@ -1905,7 +1905,7 @@ body.dark-theme {
   align-items: stretch;
   flex: 1;
   min-width: 0;
-  gap: 4px;
+  gap: 8px;
 }
 
 /* Scrollable carousel area */
@@ -1922,6 +1922,8 @@ body.dark-theme {
   min-width: 0;
   padding: 4px 0;
   touch-action: pan-x;
+  /* Clip content at edges so partial tiles don't overflow */
+  clip-path: inset(0);
 }
 
 .tiles-carousel::-webkit-scrollbar {
@@ -1993,7 +1995,8 @@ body.dark-theme {
 /* Fixed tile in carousel row - sits between chevron and scrollable area */
 .carousel-fixed-tile {
   flex: 0 0 auto;
-  height: 100%;
+  height: calc(100% - 8px);
+  margin: 4px 0;
   aspect-ratio: 1;
   min-width: unset !important;
   min-height: unset !important;
