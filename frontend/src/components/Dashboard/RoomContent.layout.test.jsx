@@ -14,7 +14,7 @@ import {
  * Tests the structural layout requirements for the room view:
  * - Grid structure with correct CSS classes
  * - Light tiles rendered with proper classes
- * - Scene drawer trigger positioned correctly
+ * - Scene tiles and All On/Off tile in first row
  * - Empty states rendered appropriately
  *
  * Note: jsdom doesn't compute real CSS layouts, so we test:
@@ -83,12 +83,18 @@ describe('RoomContent Layout', () => {
       expect(tiles.length).toBe(8);
     });
 
-    it('should render scene drawer trigger button', () => {
+    it('should render All On/Off tile', () => {
       render(<RoomContent {...defaultProps} />);
 
-      const trigger = document.querySelector('.scene-drawer-trigger');
-      expect(trigger).toBeInTheDocument();
-      expect(trigger).toHaveAttribute('aria-label', 'Open scenes menu');
+      const allOnOffTile = document.querySelector('.all-on-off-tile');
+      expect(allOnOffTile).toBeInTheDocument();
+    });
+
+    it('should render scene tiles', () => {
+      render(<RoomContent {...defaultProps} />);
+
+      const sceneTiles = document.querySelectorAll('.scene-tile');
+      expect(sceneTiles.length).toBe(2); // 2 scenes in mockRoom
     });
 
     it('should render light tiles inside tiles-grid', () => {
@@ -117,21 +123,25 @@ describe('RoomContent Layout', () => {
       expect(screen.getByText('No lights in this room')).toBeInTheDocument();
     });
 
-    it('should still render scene drawer trigger in empty room', () => {
+    it('should still render All On/Off tile in empty room', () => {
       render(<RoomContent {...defaultProps} room={{ ...mockRoom, lights: [] }} />);
 
-      const trigger = document.querySelector('.scene-drawer-trigger');
-      expect(trigger).toBeInTheDocument();
+      // Empty room shows empty state, no All On/Off tile
+      const emptyState = document.querySelector('.empty-state-dark');
+      expect(emptyState).toBeInTheDocument();
     });
   });
 
   describe('Light Tile Structure', () => {
-    it('should render each light tile as a button', () => {
+    it('should render each light tile with a toggle button', () => {
       render(<RoomContent {...defaultProps} />);
 
       const tiles = document.querySelectorAll('.light-tile');
       tiles.forEach((tile) => {
-        expect(tile.tagName.toLowerCase()).toBe('button');
+        // Each light tile should contain a toggle button
+        const toggleButton = tile.querySelector('.light-tile-toggle');
+        expect(toggleButton).toBeInTheDocument();
+        expect(toggleButton.tagName.toLowerCase()).toBe('button');
       });
     });
 
@@ -155,11 +165,20 @@ describe('RoomContent Layout', () => {
   });
 
   describe('Accessibility', () => {
-    it('should have accessible scene drawer trigger', () => {
+    it('should have accessible All On/Off tile', () => {
       render(<RoomContent {...defaultProps} />);
 
-      const trigger = document.querySelector('.scene-drawer-trigger');
-      expect(trigger).toHaveAttribute('aria-label');
+      const allOnOffTile = document.querySelector('.all-on-off-tile');
+      expect(allOnOffTile).toHaveAttribute('aria-label');
+    });
+
+    it('should have accessible scene tiles', () => {
+      render(<RoomContent {...defaultProps} />);
+
+      const sceneTiles = document.querySelectorAll('.scene-tile');
+      sceneTiles.forEach((tile) => {
+        expect(tile).toHaveAttribute('aria-label');
+      });
     });
 
     it('should have focusable light tiles', () => {
@@ -167,8 +186,10 @@ describe('RoomContent Layout', () => {
 
       const tiles = document.querySelectorAll('.light-tile');
       tiles.forEach((tile) => {
-        // Buttons are focusable by default
-        expect(tile.tagName.toLowerCase()).toBe('button');
+        // Each light tile should have a focusable toggle button
+        const toggleButton = tile.querySelector('.light-tile-toggle');
+        expect(toggleButton).toBeInTheDocument();
+        expect(toggleButton.tagName.toLowerCase()).toBe('button');
       });
     });
   });
@@ -202,11 +223,13 @@ describe('RoomContent Layout', () => {
           expect(content).toBeInTheDocument();
         });
 
-        it('should render scene drawer trigger floating button', () => {
+        it('should render All On/Off tile and scene tiles', () => {
           render(<RoomContent {...defaultProps} />);
 
-          const trigger = document.querySelector('.scene-drawer-trigger');
-          expect(trigger).toBeInTheDocument();
+          const allOnOffTile = document.querySelector('.all-on-off-tile');
+          expect(allOnOffTile).toBeInTheDocument();
+          const sceneTiles = document.querySelectorAll('.scene-tile');
+          expect(sceneTiles.length).toBe(2);
         });
       });
     });
@@ -231,22 +254,19 @@ describe('RoomContent Layout', () => {
     });
   });
 
-  describe('Scene Drawer Integration', () => {
-    it('should render SceneDrawer component', () => {
+  describe('Scene Tile Integration', () => {
+    it('should render scene tiles for each scene', () => {
       render(<RoomContent {...defaultProps} />);
 
-      // SceneDrawer may not be visible initially but should be in DOM
-      // The overlay/drawer classes indicate it's rendered
-      const trigger = document.querySelector('.scene-drawer-trigger');
-      expect(trigger).toBeInTheDocument();
+      const sceneTiles = document.querySelectorAll('.scene-tile');
+      expect(sceneTiles.length).toBe(2);
     });
 
-    it('should pass scenes to SceneDrawer', () => {
+    it('should display scene names in tiles', () => {
       render(<RoomContent {...defaultProps} />);
 
-      // Scene drawer trigger should be present
-      const trigger = document.querySelector('.scene-drawer-trigger');
-      expect(trigger).toBeInTheDocument();
+      expect(screen.getByText('Bright')).toBeInTheDocument();
+      expect(screen.getByText('Dim')).toBeInTheDocument();
     });
   });
 

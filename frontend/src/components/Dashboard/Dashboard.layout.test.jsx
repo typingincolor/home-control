@@ -250,78 +250,52 @@ describe('Dashboard Layout', () => {
     });
   });
 
-  describe('Scene Drawer (Migrated from E2E)', () => {
-    it('should render scene drawer trigger', async () => {
+  describe('Scene Tiles (Migrated from E2E)', () => {
+    it('should render All On/Off tile', async () => {
       render(<Dashboard sessionToken="test-token" />);
 
       await waitFor(() => {
-        const trigger = document.querySelector('.scene-drawer-trigger');
-        expect(trigger).toBeInTheDocument();
+        const allOnOffTile = document.querySelector('.all-on-off-tile');
+        expect(allOnOffTile).toBeInTheDocument();
       });
     });
 
-    it('should open drawer when trigger is clicked', async () => {
-      const user = userEvent.setup();
+    it('should render scene tiles', async () => {
       render(<Dashboard sessionToken="test-token" />);
 
       await waitFor(() => {
-        expect(document.querySelector('.scene-drawer-trigger')).toBeInTheDocument();
-      });
-
-      const trigger = document.querySelector('.scene-drawer-trigger');
-      await user.click(trigger);
-
-      await waitFor(() => {
-        const drawer = document.querySelector('.scene-drawer');
-        expect(drawer).toBeVisible();
+        const sceneTiles = document.querySelectorAll('.scene-tile');
+        expect(sceneTiles.length).toBe(3); // Bright, Dim, Movie
       });
     });
 
-    it('should render scene items in drawer', async () => {
-      const user = userEvent.setup();
+    it('should display scene names on tiles', async () => {
       render(<Dashboard sessionToken="test-token" />);
 
       await waitFor(() => {
-        expect(document.querySelector('.scene-drawer-trigger')).toBeInTheDocument();
-      });
-
-      await user.click(document.querySelector('.scene-drawer-trigger'));
-
-      await waitFor(() => {
-        const sceneItems = document.querySelectorAll('.scene-drawer-item');
-        expect(sceneItems.length).toBe(3); // Bright, Dim, Movie
+        expect(screen.getByText('Bright')).toBeInTheDocument();
+        expect(screen.getByText('Dim')).toBeInTheDocument();
+        expect(screen.getByText('Movie')).toBeInTheDocument();
       });
     });
 
-    it('should render toggle button in drawer', async () => {
-      const user = userEvent.setup();
+    it('should have accessible All On/Off tile', async () => {
       render(<Dashboard sessionToken="test-token" />);
 
       await waitFor(() => {
-        expect(document.querySelector('.scene-drawer-trigger')).toBeInTheDocument();
-      });
-
-      await user.click(document.querySelector('.scene-drawer-trigger'));
-
-      await waitFor(() => {
-        const toggleButton = document.querySelector('.scene-drawer-toggle');
-        expect(toggleButton).toBeInTheDocument();
+        const allOnOffTile = document.querySelector('.all-on-off-tile');
+        expect(allOnOffTile).toHaveAttribute('aria-label');
       });
     });
 
-    it('should render close button in drawer', async () => {
-      const user = userEvent.setup();
+    it('should have accessible scene tiles', async () => {
       render(<Dashboard sessionToken="test-token" />);
 
       await waitFor(() => {
-        expect(document.querySelector('.scene-drawer-trigger')).toBeInTheDocument();
-      });
-
-      await user.click(document.querySelector('.scene-drawer-trigger'));
-
-      await waitFor(() => {
-        const closeButton = document.querySelector('.scene-drawer-close');
-        expect(closeButton).toBeInTheDocument();
+        const sceneTiles = document.querySelectorAll('.scene-tile');
+        sceneTiles.forEach((tile) => {
+          expect(tile).toHaveAttribute('aria-label');
+        });
       });
     });
   });
@@ -398,12 +372,14 @@ describe('Dashboard Layout', () => {
           });
         });
 
-        it('should render scene drawer trigger', async () => {
+        it('should render All On/Off tile and scene tiles', async () => {
           render(<Dashboard sessionToken="test-token" />);
 
           await waitFor(() => {
-            const trigger = document.querySelector('.scene-drawer-trigger');
-            expect(trigger).toBeInTheDocument();
+            const allOnOffTile = document.querySelector('.all-on-off-tile');
+            expect(allOnOffTile).toBeInTheDocument();
+            const sceneTiles = document.querySelectorAll('.scene-tile');
+            expect(sceneTiles.length).toBe(3);
           });
         });
       });

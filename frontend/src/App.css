@@ -1989,11 +1989,11 @@ body.dark-theme {
   border-radius: 24px;
   background: var(--bg-card);
   border: 1px solid var(--accent-primary);
-  cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
   overflow: hidden;
   padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Responsive gap adjustments */
@@ -2026,30 +2026,43 @@ body.dark-theme {
   opacity: 0.7;
 }
 
-/* Brightness fill - rises from bottom */
+/* Toggle button area - fills most of the tile */
+.light-tile-toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 23px 23px 0 0;
+  border: none;
+  background: transparent;
+  width: 100%;
+  padding: 0;
+}
+
+.light-tile-toggle:focus {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
+.light-tile-toggle:disabled {
+  cursor: not-allowed;
+}
+
+/* Brightness fill - rises from bottom within toggle area */
 .light-tile-fill {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   transition: height 0.4s ease-out;
-  border-radius: 0 0 23px 23px;
-}
-
-/* Content layer - centered over fill */
-.light-tile-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 100%;
-  width: 100%;
 }
 
 .light-tile-icon {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2077,6 +2090,233 @@ body.dark-theme {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Color temperature slider */
+.light-tile-slider {
+  /* Base styles - width and padding controlled by modifier classes */
+}
+
+.light-tile-slider input[type='range'] {
+  width: 100%;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, #ff9500 0%, #fffaf0 50%, #87ceeb 100%);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.light-tile-slider input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border: 2px solid var(--accent-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.light-tile-slider input[type='range']::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: white;
+  border: 2px solid var(--accent-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.light-tile-slider input[type='range']:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Layout classes for centering and spacing (bug 45) */
+.light-tile-flex-layout {
+  align-items: center;  /* Adds horizontal centering to existing flex column */
+}
+
+.light-tile-slider-centered {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.light-tile-slider-padded {
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.light-tile-slider-spaced {
+  /* Base spacing - overridden by -expanded when both applied */
+}
+
+.light-tile-name-centered {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+}
+
+.light-tile-name-padded {
+  padding: 2px 8px;
+  box-sizing: border-box;
+}
+
+.light-tile-name-spaced {
+  /* Base spacing - overridden by -expanded when both applied */
+}
+
+/* Bug 45 refinements - fill containment and spacing */
+
+/* Semantic class for balanced tile layout - styling via parent .light-tile */
+.light-tile-balanced {
+}
+
+.light-tile-toggle-contained {
+  padding: 4px;
+}
+
+/* Semantic class for proportional sizing - styling via parent .light-tile-toggle */
+.light-tile-toggle-proportional {
+}
+
+.light-tile-fill-rounded {
+  /* Superseded by .light-tile-fill-all-rounded */
+}
+
+.light-tile-fill-inset {
+  left: 4px;
+  right: 4px;
+}
+
+.light-tile-slider-expanded {
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+
+.light-tile-name-expanded {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+/* Issue 45 comment - fill corner rounding */
+.light-tile-fill-all-rounded {
+  border-radius: 18px;
+}
+
+.light-tile-toggle-fill-container {
+  overflow: hidden;
+}
+
+.light-tile-toggle-flush {
+  padding: 0;
+}
+
+.light-tile-fill-edge-to-edge {
+  /* Small inset from edges for visual polish */
+  left: 6px;
+  right: 6px;
+  top: 6px;
+}
+
+/* Scene Tile */
+.scene-tile {
+  width: var(--tile-size);
+  height: var(--tile-size);
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--accent-secondary);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0;
+}
+
+.scene-tile:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-primary);
+}
+
+.scene-tile.activating {
+  opacity: 0.7;
+}
+
+.scene-tile-icon {
+  color: var(--text-primary);
+}
+
+.scene-tile-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+/* All On/Off Tile */
+.all-on-off-tile {
+  width: var(--tile-size);
+  height: var(--tile-size);
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 24px;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-primary);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0;
+}
+
+.all-on-off-tile:hover {
+  transform: translateY(-4px);
+}
+
+.all-on-off-tile.on {
+  background: var(--accent-primary);
+}
+
+.all-on-off-tile.on .all-on-off-tile-icon,
+.all-on-off-tile.on .all-on-off-tile-name {
+  color: var(--bg-primary);
+}
+
+.all-on-off-tile.off .all-on-off-tile-icon,
+.all-on-off-tile.off .all-on-off-tile-name {
+  color: var(--text-primary);
+}
+
+.all-on-off-tile.toggling {
+  opacity: 0.7;
+}
+
+.all-on-off-tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.all-on-off-tile-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 /* Bottom Navigation */
