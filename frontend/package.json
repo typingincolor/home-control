@@ -20,7 +20,7 @@
     "@testing-library/dom": "^10.4.1",
     "axios": "^1.13.2",
     "loglevel": "^1.9.2",
-    "lucide-react": "^0.562.0",
+    "lucide-react": "^0.563.0",
     "openmeteo": "^1.2.3",
     "prop-types": "^15.8.1",
     "react": "^19.2.3",
