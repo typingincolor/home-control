@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "amazon-cognito-identity-js": "^6.3.16",
-    "axios": "^1.13.2",
+    "axios": "^1.13.3",
     "cie-rgb-color-converter": "^1.0.6",
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "express": "^5.2.1",
     "fs-extra": "^11.2.0",
     "js-yaml": "^4.1.1",
