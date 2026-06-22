@@ -29,8 +29,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@playwright/test": "^1.58.2",
-    "@stryker-mutator/core": "^9.6.0",
+    "@playwright/test": "^1.61.0",
+    "@stryker-mutator/core": "^9.6.1",
     "@stryker-mutator/vitest-runner": "^9.6.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -40,12 +40,12 @@
     "@vitest/ui": "^4.0.16",
     "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "js-yaml": "^4.1.1",
     "jsdom": "^27.3.0",
-    "msw": "^2.12.11",
-    "prettier": "^3.8.1",
+    "msw": "^2.14.6",
+    "prettier": "^3.8.4",
     "vite": "^7.3.0",
-    "vitest": "^4.0.16"
+    "vitest": "^4.1.9"
   }
 }
