@@ -45,6 +45,6 @@
   },
   "dependencies": {
     "@ckelsoe/claude-skill-prompt-architect": "^1.0.8",
-    "amazon-cognito-identity-js": "^6.3.16"
+    "amazon-cognito-identity-js": "^6.3.18"
   }
 }

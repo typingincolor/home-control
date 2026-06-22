@@ -13,12 +13,12 @@
     "test:mutation": "stryker run"
   },
   "dependencies": {
-    "amazon-cognito-identity-js": "^6.3.16",
+    "amazon-cognito-identity-js": "^6.3.18",
     "axios": "^1.13.2",
     "cie-rgb-color-converter": "^1.0.6",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "fs-extra": "^11.3.4",
+    "fs-extra": "^11.3.5",
     "js-yaml": "^4.1.1",
     "node-cache": "^5.1.2",
     "socket.io": "^4.8.3",
