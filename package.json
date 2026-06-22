@@ -44,7 +44,7 @@
     "prettier": "^3.7.4"
   },
   "dependencies": {
-    "@ckelsoe/claude-skill-prompt-architect": "^1.0.8",
+    "@ckelsoe/claude-skill-prompt-architect": "^2.1.4",
     "amazon-cognito-identity-js": "^6.3.16"
   }
 }
