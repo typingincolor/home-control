@@ -51,7 +51,7 @@ jobs:
         run: npm run test:coverage --workspace=frontend
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: frontend/coverage/lcov.info
@@ -85,7 +85,7 @@ jobs:
         run: npm run test:coverage --workspace=backend
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: backend/coverage/lcov.info
