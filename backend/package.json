@@ -19,7 +19,7 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "fs-extra": "^11.3.4",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "^5.0.0",
     "node-cache": "^5.1.2",
     "socket.io": "^4.8.3",
     "swagger-jsdoc": "^6.2.8",
