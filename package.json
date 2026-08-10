@@ -39,9 +39,9 @@
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "globals": "^17.0.0",
-    "prettier": "^3.7.4"
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.9.0",
+    "prettier": "^3.9.6"
   },
   "dependencies": {
     "@ckelsoe/claude-skill-prompt-architect": "^1.0.8",
