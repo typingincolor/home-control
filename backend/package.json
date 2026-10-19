@@ -13,7 +13,7 @@
     "test:mutation": "stryker run"
   },
   "dependencies": {
-    "amazon-cognito-identity-js": "^6.3.20",
+    "amazon-cognito-identity-js": "^6.3.22",
     "axios": "^1.13.2",
     "cie-rgb-color-converter": "^1.0.6",
     "cors": "^2.8.6",
@@ -21,7 +21,7 @@
     "fs-extra": "^11.3.4",
     "js-yaml": "^4.1.1",
     "node-cache": "^5.1.2",
-    "socket.io": "^4.8.3",
+    "socket.io": "^4.8.4",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "winston": "^3.19.0"
